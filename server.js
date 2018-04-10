@@ -7,7 +7,6 @@ const WSM = require('./inner_modules/ws-manager');
 const db = require('./inner_modules/database').current;
 const NodeStatic = require('node-static');
 const wss_cmdrs = new WSM(cfg.main.ws_cmdr);
-const wss_journals = new WSM(cfg.main.ws_journal);
 const app = new NodeStatic.Server('./app');
 const action_signup = require('./actions/signup');
 const action_record = require('./actions/record');
@@ -19,7 +18,7 @@ require('http').createServer((req, res) => {
 
     if (req.url === '/record')
         return action_record(req, res, (cmdr, rec) => {
-            console.log('[' + cmdr.name + ']', rec._line_id || 'single', rec.event, rec.timestamp);
+            if (cfg.main.log) console.log('[' + cmdr.name + ']', rec._line_id || 'single', rec.event, rec.timestamp);
         });
 
     req.addListener('end', function () {
@@ -66,7 +65,6 @@ wss_cmdrs.on('connected', async (client) => {
 });
 
 db.connect(cfg.db, async () => {
-    wss_journals.init();
     wss_cmdrs.init();
     console.log('Whoosh! MASTER READY!');
     console.log('localhost:' + cfg.main.web_port);
