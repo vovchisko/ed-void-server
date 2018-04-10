@@ -1,0 +1,24 @@
+* { box-sizing: border-box; }
+*::placeholder { color: #839aa2; }
+*:focus, *:active { outline: none; }
+body { margin: 0; padding: 0; font-size: 12px; background: #3c635a; color: #fff; }
+input[type=text],
+input[type=password] { font-size: 14px; line-height: 42px; height: auto; border: 1px solid #839aa2; color: #fff; background: transparent; padding: 0px 7px; max-width: 100%; width: 200px; }
+button { transition: all linear 100ms; background: #6daabf; color: #fff; font-size: 14px; line-height: 42px; border: 0 none; display: inline-block; padding: 0 10px; border-radius: 0; }
+button:hover { background: #4eb9de; }
+button:active { background: #6daabf; }
+/*
+    MAIN MENU, LOGIN
+*/
+#app { padding: 0 24px; z-index: 3000; position: relative; line-height: 24px; }
+#app form { width: 300px; margin: 22px auto 0px auto; background: #5b7768; padding: 16px; clear: both; text-align: center; position: relative; top: 50px; }
+#app form input { width: 100%; margin-bottom: 15px; }
+#app form button { width: 100%; margin-bottom: 20px; }
+#app > span { padding: 0 5px; line-height: inherit; float: right; background: #444444; font-weight: 200; font-size: 9px; }
+#app > button { line-height: inherit; }
+/*
+    GLOBAL MESSAGE
+*/
+#msg { position: absolute; left: 0; top: 20px; font-size: 20px; text-align: center; right: 0; opacity: 0; visibility: hidden; transition: all linear 400ms; }
+#msg.show { transform: translateY(20px); visibility: visible; opacity: 1; }
+#msg.warn { color: #cfee6e; }
