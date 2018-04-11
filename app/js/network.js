@@ -14,7 +14,7 @@ class Network extends EventEmitter {
     init(email, pass) {
         const _net = this;
 
-        this.ws = new WebSocket('ws://' + window.location.hostname + ':4200');
+        this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
 
         this.ws.onopen = function () {
             _net.auth.email = email;
