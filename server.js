@@ -18,7 +18,7 @@ require('http').createServer((req, res) => {
 
     if (req.url === '/record')
         return action_record(req, res, (cmdr, rec) => {
-            if (cfg.main.log) console.log('[' + cmdr.name + ']', rec.event, rec.timestamp);
+            if (cfg.main.log) console.log('[' + cmdr.name + ']', rec.timestamp, rec.event);
         });
 
     req.addListener('end', function () {
