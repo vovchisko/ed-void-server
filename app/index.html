@@ -4,7 +4,6 @@
 <head>
     <meta charset='utf-8'>
     <title>ED-ASS</title>
-    <link href="css/fonts.css" rel="stylesheet" type="text/css">
     <link href="css/styles.css" rel="stylesheet" type="text/css">
 </head>
 
@@ -18,16 +17,16 @@
     <form v-on:submit.prevent="_signin" v-if="!state && auth._sign === 'in'">
         <input v-model="auth.email" type="text" placeholder="Player Email" autocomplete="email">
         <input v-model="auth.pass" type="password" placeholder="Password" autocomplete="current-password">
-        <button type="submit">登录</button>
-        <a v-on:click="auth._sign = 'up'">Create new user</a>
+        <button type="submit">LOGIN</button>
+        <a v-on:click="auth._sign = 'up'">Register Pilot</a>
     </form>
 
     <form v-on:submit.prevent="_signup" v-if="!state && auth._sign === 'up'">
         <input v-model="auth.email" type="text" placeholder=" * Email" autocomplete="email">
-        <input v-model="auth.name" type="text" placeholder="CMDR NAME" autocomplete="username">
+        <input v-model="auth.name" type="text" placeholder="* CMDR NAME" autocomplete="username">
         <input v-model="auth.pass" type="password" placeholder=" * Password" autocomplete="new-password">
         <input v-model="auth.pass_c" type="password" placeholder=" * Confirm password" autocomplete="new-password">
-        <button type="submit">注册</button>
+        <button type="submit">REGISTER</button>
         <div v-bind:class="['msg']" v-if="auth._message">{{auth._message}}</div>
         <a v-on:click="auth._sign = 'in'">Cancel</a>
     </form>

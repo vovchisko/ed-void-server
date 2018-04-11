@@ -12,7 +12,7 @@ module.exports = function (req, res, _cb) {
         //	console.log(req.headers);
         try {
             let res_text = '';
-            let rec = JSON.parse(data);
+            let records = JSON.parse(data);
 
             let head = req.headers;
 
@@ -20,25 +20,26 @@ module.exports = function (req, res, _cb) {
 
             if (cmdr && cmdr.name === head.cmdr) {
 
-                rec._id = cmdr.id + '-' + rec.event + '-' + rec.timestamp;
-                rec._cmdr = cmdr.name;
-                rec._cmdr_id = cmdr.id;
-                rec._line_id = head.line_id;
-
-                db.records.save(rec);
+                for (let i = 0; i < records.length; i++) {
+                    let rec = records[i];
+                    rec._id = cmdr.id + '-' + rec.event + '-' + rec.timestamp;
+                    rec._cmdr = cmdr.name;
+                    rec._cmdr_id = cmdr.id;
+                    db.records.save(rec);
+                    _cb(cmdr, rec);
+                }
 
                 res.statusCode = 200;
                 res_text = 'ok!';
 
-                _cb(cmdr, rec);
             } else {
                 res.statusCode = 498;
                 res_text = 'invalid api-key or cmdr name';
             }
 
-            //setTimeout(() => {
-            res.end(res_text);
-            //}, 500);
+            setTimeout(() => {
+                res.end(res_text);
+            }, 500);
 
         } catch (e) {
             console.log(e);

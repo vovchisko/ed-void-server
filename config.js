@@ -3,9 +3,9 @@
  */
 module.exports = {
     main: {
-        web_host: '127.0.0.1',
-        web_port: 4200,
-        ws_cmdr: 4201,
+        web_host: 'localhost',
+        web_port: 80,
+        ws_cmdr: 4200,
         log: true
     },
     db: {
