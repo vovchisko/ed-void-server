@@ -50,7 +50,6 @@ wss_cmdrs.on('connected', async (client) => {
 
     if (!cmdr) {
         return client.close();
-        throw new Error('something went wrong here');
     }
 
     client.cmdr = cmdr;
