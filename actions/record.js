@@ -8,11 +8,11 @@ const db = require('../inner_modules/database').current;
 const UNI = require('../universe');
 
 module.exports = function (req, res, _cb) {
-    the.handle_request(req, res, async (req, res, data) => {
+    the.handle_request(req, res, async (req, res, buffer) => {
         //	console.log(req.headers);
         try {
             let res_text = '';
-            let records = JSON.parse(data);
+            let records = JSON.parse(buffer.toString());
             let head = req.headers;
             let cmdr = await UNI.get_cmdr({api_key: head.api_key});
             if (cmdr && cmdr.name === head.cmdr) {
