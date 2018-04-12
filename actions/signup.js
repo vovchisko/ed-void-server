@@ -11,6 +11,7 @@ module.exports = function (req, res) {
         let dat = null;
         try {
             dat = JSON.parse(data);
+            console.log('req    ',dat)
         } catch (e) {
         }
 
@@ -32,9 +33,10 @@ module.exports = function (req, res) {
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'this email already used'}));
 
         const exists_cmdr = await db.cmrds.findOne({cmdr: dat.cmdr});
-        if (exists_cmdr !== null)
+        if (exists_cmdr !== null){
+            console.log(exists_cmdr)
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'this cmdr already registered'}));
-
+        }
 
         let cmdr = {
             id: db.id('U'),
