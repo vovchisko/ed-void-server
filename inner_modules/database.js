@@ -46,4 +46,8 @@ Database.prototype.generate_api_key = function () {
     return 'A-' + shortid.generate() + shortid.generate() + shortid.generate();
 };
 
+Database.prototype.generate_token = function () {
+    return 'T-' + shortid.generate();
+};
+
 module.exports.current = new Database();

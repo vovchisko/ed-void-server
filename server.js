@@ -9,12 +9,16 @@ const NodeStatic = require('node-static');
 const wss_cmdrs = new WSM(cfg.main.ws_cmdr);
 const app = new NodeStatic.Server('./app');
 const action_signup = require('./actions/signup');
+const action_signin = require('./actions/signin');
 const action_record = require('./actions/record');
 const UNI = require('./universe');
 
 require('http').createServer((req, res) => {
     if (req.url === '/signup')
         return action_signup(req, res);
+
+    if (req.url === '/signin')
+        return action_signin(req, res);
 
     if (req.url === '/record')
         return action_record(req, res, (cmdr, rec) => {
@@ -31,10 +35,11 @@ require('http').createServer((req, res) => {
 // WS ON WEB LOGIN PROCEDURE
 //
 wss_cmdrs.auth = async function (cmd, dat, callback) {
-    if (cmd !== 'auth') return callback(null);
-    let cmdr = await UNI.get_cmdr({email: dat.email});
 
-    if (cmdr && cmdr.pass === dat.pass) {
+    if (cmd !== 'auth') return callback(null);
+    let cmdr = await UNI.get_cmdr({atoken: dat});
+
+    if (cmdr) {
         return callback(cmdr.id);
     } else {
         callback(null);
@@ -43,21 +48,23 @@ wss_cmdrs.auth = async function (cmd, dat, callback) {
 
 wss_cmdrs.on('disconnected', async (client) => {
     console.log('CMDR', client.cmdr.name.toUpperCase(), 'leave');
+    client.cmdr.online = false;
 });
 wss_cmdrs.on('connected', async (client) => {
 
     let cmdr = await UNI.get_cmdr({id: client.id});
 
-    if (!cmdr) {
-        return client.close();
-    }
+    if (!cmdr) return client.close();
+
+    client.cmdr = cmdr;
+    client.cmdr.online = true;
 
     client.cmdr = cmdr;
     client.c_send('cmdr', {
         name: client.cmdr.name,
         api_key: client.cmdr.api_key,
+        email: client.cmdr.email
     });
-    client.cmdr.online = true;
 
     console.log('CMDR', client.cmdr.name.toUpperCase(), 'online');
 

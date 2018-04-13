@@ -6,22 +6,29 @@
     <title>ED-ASS</title>
     <link href="css/styles.css" rel="stylesheet" type="text/css">
 </head>
-
 <body>
 
 <div id="app">
 
-    <button v-on:click="_logout()" v-if="state > 0">_logout
-    </button>
+    <button v-on:click="_toggle_config()" class="small-btn config" v-if="online">logout</button>
+    <button v-on:click="_logout()" class="small-btn logout" v-if="online">logout</button>
 
-    <form v-on:submit.prevent="_signin" v-if="!state && auth._sign === 'in'">
+    <div v-if="show_config">
+        CMDR: {{cmdr.name}}<br>
+        CMDR: {{cmdr.email}}<br>
+        API_KEY: {{cmdr.api_key}}<br>
+        LOGGED: {{logged}}<br>
+        ONLINE: {{logged}}<br>
+    </div>
+
+    <form v-on:submit.prevent="_signin" v-if="!logged && auth._sign === 'in'">
         <input v-model="auth.email" type="text" placeholder="Player Email" autocomplete="email">
         <input v-model="auth.pass" type="password" placeholder="Password" autocomplete="current-password">
         <button type="submit">LOGIN</button>
         <a v-on:click="auth._sign = 'up'">Register Pilot</a>
     </form>
 
-    <form v-on:submit.prevent="_signup" v-if="!state && auth._sign === 'up'">
+    <form v-on:submit.prevent="_signup" v-if="!logged && auth._sign === 'up'">
         <input v-model="auth.email" type="text" placeholder=" * Email" autocomplete="email">
         <input v-model="auth.name" type="text" placeholder="* CMDR NAME" autocomplete="username">
         <input v-model="auth.pass" type="password" placeholder=" * Password" autocomplete="new-password">
@@ -37,10 +44,7 @@
     {{text}}
 </div>
 
-<div id="panel" v-if="state">
-    CMDR: {{cmdr.name}}<br>
-    API_KEY: {{cmdr.api_key}}<br>
-</div>
+
 
 </body>
 

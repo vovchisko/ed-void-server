@@ -4,29 +4,33 @@ Vue.http.options.emulateJSON = true;
 
 const log = console.log;
 
-
 const net = new Network();
 
 const game = {
-    state: 0,
+    logged: false,
+    online: false,
     auth: {
         _sign: 'in',
         name: '',
         email: window.location.hash.substr(1) || '',
         pass: '',
         pass_c: '',
+        atoken: localStorage.getItem('atoken') || ''
     },
     cmdr: {},
+    show_config: false,
 };
 
-
-/* 
+/*
  *      MAIN MENU 
  */
 const Vue_App = new Vue({
     el: '#app',
     data: game,
     methods: {
+        _toggle_config() {
+            game.show_config = !game.show_config;
+        },
         _signup: function () {
             fetch('/signup', {
                 headers: {'Content-type': 'application/json'},
@@ -34,15 +38,35 @@ const Vue_App = new Vue({
                 body: JSON.stringify(game.auth)
             }).then((res) => {return res.json();})
                 .then((dat) => {
-                    if (dat.result) return this._signin();
-                    Msg.show(dat);
+                    if (dat.result) return Msg.show(dat);
+                    this._signin();
                 }).catch((err) => {});
-
         },
         _signin: function () {
-            net.init(this.auth.email, this.auth.pass);
+            fetch('/signin', {
+                headers: {'Content-type': 'application/json'},
+                method: 'POST',
+                body: JSON.stringify({email: game.auth.email, pass: game.auth.pass})
+            }).then((res) => {return res.json();})
+                .then((dat) => {
+                    if (!dat.result) return Msg.show(dat);
+                    localStorage.setItem('atoken', dat.cmdr.atoken);
+                    game.auth.atoken = dat.cmdr.atoken;
+                    game.auth.pass = '';
+                    game.logged = true;
+
+                    game._net_connect();
+
+                }).catch((err) => {});
+
+
+        },
+        _net_connect: function () {
+            net.init(game.auth.atoken);
         },
         _logout: function () {
+            game.logged = false;
+            localStorage.removeItem('atoken');
             net.disconnect();
         },
 
@@ -68,22 +92,30 @@ const Msg = new Vue({
 });
 
 
-const Panel = new Vue({
-    el: '#panel',
-    data: game,
-    methods: {}
-});
-
 /*
  *          NETWORK
  */
 net.on('_error', (error) => console.error('_error', error));
-net.on('_close', (core, reason) => {
-    game.state = 0;
+net.on('_close', (reason) => {
+    console.log('closed', reason);
+    game.online = false;
     game.auth._sign = 'in';
 });
-net.on('welcome', () => { game.state = 1 });
-net.on('cmdr', (dat) => {
-    for (let i in dat) Vue.set(game.cmdr, i, dat[i]);
-    console.log(game.cmdr)
+net.on('welcome', (dat) => {
+    game.online = true;
+    game.logged = true;
+
+    console.log('welcome');
 });
+
+net.on('cmdr', (cmdr) => {
+    game.cmdr.name = cmdr.name;
+    game.cmdr.email = cmdr.email;
+    game.cmdr.api_key = cmdr.api_key;
+});
+net.on('event:scan', (dat) => {
+    for (let i in dat) Vue.set(game.cmdr, i, dat[i]);
+});
+
+
+if (game.auth.atoken) { Vue_App._net_connect(); }
