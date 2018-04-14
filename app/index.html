@@ -66,12 +66,12 @@
             <div class="col">
                 <div class="main">
                     <em><b>Type</b><span>{{s.StarType}}</span></em>
-                    <em><b>Stellar Mass</b><span>{{s.StellarMass}} <i>SOM.M</i></span></em>
-                    <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <i>KM</i></span></em>
-                    <em><b>Age</b><span>{{s.Age_MY}} M.y</span></em>
+                    <em><b>Solar Masses</b><span>{{s.StellarMass | nn(4)}} <i>SOL</i></span></em>
+                    <em><b>Radius</b><span>{{s.Radius / 696000000 | nn(4)}} <i>SOL [ {{s.Radius /1000| nn(0)}} KM ]</i></span></em>
+                    <em><b>Age</b><span>{{s.Age_MY | nn(4)}} MILLION YEARS</span></em>
                     <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(1) }} <i>K</i></span></em>
                     <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
-                    <em><b>Rot. Period</b><span>{{s.RotationPeriod}}</span></em>
+                    <em><b>Rot. Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
                 </div>
             </div>
         </section>
