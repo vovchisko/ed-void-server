@@ -117,4 +117,8 @@ net.on('welcome', (dat) => {
 });
 
 
-if (app.auth.atoken) { App._net_connect(); }
+document.onreadystatechange = () => {
+    if (document.readyState === 'complete') {
+        if (app.auth.atoken) { App._net_connect(); }
+    }
+};
