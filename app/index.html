@@ -60,7 +60,6 @@
                 <span class="star" v-if="s.StarType">[ STAR ]</span>
                 <span class="planet" v-if="s.PlanetClass && !s.Landable">[ BODY ]</span>
                 <span class="landable" v-if="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
-                <span class="landable" v-if="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
             </div>
         </h4>
         <section v-if="s.StarType">
@@ -75,6 +74,15 @@
                     <em><b>Rot. Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
                 </div>
             </div>
+            <div class="col">
+                <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
+                    <b>BELT: {{ring.Name}}</b>
+                    <em><b>Class</b><span>{{ring.RingClass}}</span></em>
+                    <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
+                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                </div>
+            </div>
         </section>
         <section v-if="s.PlanetClass">
             <div class="col">
@@ -87,14 +95,6 @@
                     <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <i>KM</i></span></em>
                     <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <i>G</i></span></em>
                     <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <i>K</i></span></em>
-                </div>
-
-                <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
-                    <b>Ring: {{ring.Name}}</b>
-                    <em><b>Class</b><span>{{ring.RingClass}}</span></em>
-                    <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
-                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
-                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
                 </div>
             </div>
             <div class="col">
