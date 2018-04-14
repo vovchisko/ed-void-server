@@ -60,6 +60,7 @@
                 <span class="star" v-if="s.StarType">[ STAR ]</span>
                 <span class="planet" v-if="s.PlanetClass && !s.Landable">[ BODY ]</span>
                 <span class="landable" v-if="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
+                <span class="landable" v-if="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
             </div>
         </h4>
         <section v-if="s.StarType">
@@ -79,12 +80,12 @@
             <div class="col">
                 <div class="main">
                     <em><b>Planet Class</b><span>{{s.PlanetClass}}</span></em>
-                    <em><b>Terraform State</b><span>{{s.TerraformState | isval}}</span></em>
-                    <em><b>Tidal Lock</b><span>{{s.TidalLock | yn}}</span></em>
-                    <em><b>Volcanism</b><span>{{s.Volcanism | isval}}</span></em>
+                    <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
+                    <em><b>Tidal Lock</b><span v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
+                    <em><b>Volcanism</b><span v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
                     <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
                     <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <i>KM</i></span></em>
-                    <em><b>Gravity</b><span>{{s.SurfaceGravity | nn(4)}} <i>G</i></span></em>
+                    <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <i>G</i></span></em>
                     <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <i>K</i></span></em>
                 </div>
             </div>
@@ -96,18 +97,18 @@
 
                 <div class="sub atmosphere" v-if="s.Atmosphere">
                     <b>Atmosphere</b>
-                    <em><b>Surf. Pressure</b><span>{{s.SurfacePressure / 101325 | nn(3)}}</span></em>
+                    <em><b>Surf. Pressure</b><span>{{s.SurfacePressure / 101325 | nn(3)}} <i>ATM</i></span></em>
                     <em><b>Atmosphere</b><span>{{s.Atmosphere || 'n/a'}}</span></em>
                     <em><b>Type</b><span>{{s.AtmosphereType}}</span></em>
                     <b>Composition</b>
-                    <em v-for="acomp in s.AtmosphereComposition"><b>{{acomp.Name}}</b><span>{{acomp.Percent}}</span></em>
+                    <em v-for="acomp in s.AtmosphereComposition"><b>{{acomp.Name}}</b><span>{{acomp.Percent | nn(2,2)}} <i>%</i></span></em>
                 </div>
 
 
                 <div class="sub materials" v-if="s.Materials">
                     <b>Materials</b>
                     <em v-for="material in s.Materials">
-                        <b>{{material.Name}}</b><span>{{material.Percent | nn(3,3)}} <i>%</i></span>
+                        <b>{{material.Name}}</b><span>{{material.Percent | nn(2,2)}} <i>%</i></span>
                     </em>
                 </div>
 
@@ -121,11 +122,20 @@
                     <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <i>°</i></span></em>
                     <em><b>Axial Tilt</b><span>{{s.AxialTilt  * 180 / Math.PI | nn(2,2)}} <i>°</i></span></em>
                 </div>
+
+                <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
+                    <b>Ring: {{ring.Name}}</b>
+                    <em><b>Class</b><span>{{ring.RingClass}}</span></em>
+                    <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
+                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>AU</i></span></em>
+                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>AU</i></span></em>
+                </div>
             </div>
 
 
         </section>
     </div>
+    <div class="scan empty">No scans in last recent records.</div>
 </div>
 </body>
 

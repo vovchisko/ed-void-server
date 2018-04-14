@@ -14,9 +14,8 @@ Vue.filter('yn', function (value) {
     return value ? 'TRUE' : 'FALSE';
 });
 
-
 Vue.filter('isval', function (value) {
-    return value ? value : '--';
+    return value ? value : 'FALSE';
 });
 
 const log = console.log;

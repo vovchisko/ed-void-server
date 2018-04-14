@@ -22,13 +22,13 @@ module.exports = function (req, res, _cb) {
                     rec._id = cmdr.id + '-' + rec.event + '-' + rec.timestamp;
                     rec._cmdr = cmdr.name;
                     rec._cmdr_id = cmdr.id;
-                    await db.records.save(rec);
+
+                    if (!cfg.records.dont_save.includes(rec.event)) await db.records.save(rec);
 
                     UNI.process_record(rec);
 
                     if (i > records.length - 30)
-                        //if (cfg.client.send_events.includes(rec.event))
-                            UNI.send_cmdr_rec(rec);
+                        UNI.send_cmdr_rec(rec);
 
                     _cb(cmdr, rec);
                 }

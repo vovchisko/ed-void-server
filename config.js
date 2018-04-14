@@ -13,7 +13,7 @@ module.exports = {
         port: 27017,
         dbname: 'ed-void',
     },
-    client: {
-        send_events: ['Status', 'Scan', 'SupercruiseEntry']
+    records: {
+        dont_save: ['Status']
     }
 };

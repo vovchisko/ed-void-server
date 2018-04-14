@@ -49,16 +49,19 @@ TABS
 #ed-ass h4 {text-transform: uppercase;font-size: 18px;margin: 10px 0 5px 0;padding: 0;text-align: left;}
 #ed-ass h4 b { }
 #ed-ass h4 span { }
-#ed-ass h4 span.arrival {color: grey;text-align: right;}
+#ed-ass h4 span.arrival {color: #d1d2a3;text-align: right;}
 #ed-ass h4 span.star {color: #6a2feb;}
 #ed-ass h4 span.planet {color: #438e70;}
 #ed-ass h4 span.landable {color: #2f77eb;}
-#ed-ass .scan {}
+#ed-ass .scan:last-child { display: none; }
+#ed-ass .scan:first-child { display: block !important; }
+#ed-ass .scan.empty { text-align: center; color: #ff8800; padding: 100px 0; }
 #ed-ass section {color: #ff8800;line-height: 18px;}
 #ed-ass section div {font-size: 14px;padding-bottom: 15px;line-height: 19px;}
 #ed-ass section div em {font-style: normal; }
 #ed-ass section div em b {font-weight: normal;text-transform: uppercase;color: #c56209;}
 #ed-ass section div em span { }
+#ed-ass section div em span.false {color: #5d5d5d;}
 #ed-ass section div em span i{font-style: normal;color: #715029;}
 #ed-ass section .sub {font-size: 11px;line-height: 13px;/* opacity: 0.5; */}
 #ed-ass section .sub > b {font-size: 12px;color: #5d5d5d;font-weight: normal;text-transform: uppercase; /* margin-bottom: 5px; */}
@@ -75,7 +78,7 @@ TABS
 #ed-ass .scan {}
 #ed-ass .scan h4 {margin: 5px -15px;padding: 5px 15px;background: #100f0f;}
 #ed-ass .scan h4 b { float: left; width: 60%; }
-#ed-ass .scan h4 div {float: left;width: 40%;text-align: right;font-size: 14px;}
+#ed-ass .scan h4 div {float: left;width: 40%;text-align: right;font-size: 12px;}
 #ed-ass .scan h4 div span { display: block;}
 #ed-ass section { display: flex; line-height: 15px; }
 #ed-ass section b {display: block;}
