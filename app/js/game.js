@@ -38,27 +38,23 @@ const Vue_App = new Vue({
                 body: JSON.stringify(game.auth)
             }).then((res) => {return res.json();})
                 .then((dat) => {
-                    if (dat.result) return Msg.show(dat);
+                    if (!dat.result) return Msg.show(dat);
                     this._signin();
-                }).catch((err) => {});
+                });
         },
         _signin: function () {
             fetch('/signin', {
                 headers: {'Content-type': 'application/json'},
                 method: 'POST',
                 body: JSON.stringify({email: game.auth.email, pass: game.auth.pass})
-            }).then((res) => {return res.json();})
+            }).then(res => res.json())
                 .then((dat) => {
                     if (!dat.result) return Msg.show(dat);
                     localStorage.setItem('atoken', dat.cmdr.atoken);
                     game.auth.atoken = dat.cmdr.atoken;
                     game.auth.pass = '';
-                    game.logged = true;
-
-                    game._net_connect();
-
-                }).catch((err) => {});
-
+                    this._net_connect();
+                });
 
         },
         _net_connect: function () {
@@ -66,6 +62,7 @@ const Vue_App = new Vue({
         },
         _logout: function () {
             game.logged = false;
+            game.auth.atoken = '';
             localStorage.removeItem('atoken');
             net.disconnect();
         },
@@ -95,26 +92,19 @@ const Msg = new Vue({
 /*
  *          NETWORK
  */
-net.on('_error', (error) => console.error('_error', error));
 net.on('_close', (reason) => {
-    console.log('closed', reason);
     game.online = false;
-    game.auth._sign = 'in';
+    if (game.logged) setTimeout(() => Vue_App._net_connect(), 1000);
 });
 net.on('welcome', (dat) => {
     game.online = true;
     game.logged = true;
-
-    console.log('welcome');
 });
 
 net.on('cmdr', (cmdr) => {
     game.cmdr.name = cmdr.name;
     game.cmdr.email = cmdr.email;
     game.cmdr.api_key = cmdr.api_key;
-});
-net.on('event:scan', (dat) => {
-    for (let i in dat) Vue.set(game.cmdr, i, dat[i]);
 });
 
 

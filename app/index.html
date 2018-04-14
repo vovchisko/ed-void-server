@@ -10,8 +10,8 @@
 
 <div id="app">
 
-    <button v-on:click="_toggle_config()" class="small-btn config" v-if="online">logout</button>
-    <button v-on:click="_logout()" class="small-btn logout" v-if="online">logout</button>
+    <button v-on:click="_toggle_config()" class="small-btn config" v-if="online">config</button>
+    <button v-on:click="_logout()" class="small-btn logout" v-if="online">out</button>
 
     <div v-if="show_config">
         CMDR: {{cmdr.name}}<br>

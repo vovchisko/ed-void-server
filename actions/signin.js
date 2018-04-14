@@ -28,7 +28,7 @@ module.exports = function (req, res) {
         }
 
         let jdata = {
-            result: 1, type: 'success', text: 'Your account ready!', cmdr: {
+            result: 1, type: 'success', cmdr: {
                 atoken: cmdr.atoken, //todo: let's do different keys here
                 name: cmdr.name,
                 email: cmdr.email
