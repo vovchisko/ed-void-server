@@ -88,6 +88,14 @@
                     <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <i>G</i></span></em>
                     <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <i>K</i></span></em>
                 </div>
+
+                <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
+                    <b>Ring: {{ring.Name}}</b>
+                    <em><b>Class</b><span>{{ring.RingClass}}</span></em>
+                    <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
+                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                </div>
             </div>
             <div class="col">
                 <div class="sub composion">
@@ -127,8 +135,8 @@
                     <b>Ring: {{ring.Name}}</b>
                     <em><b>Class</b><span>{{ring.RingClass}}</span></em>
                     <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
-                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>AU</i></span></em>
-                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>AU</i></span></em>
+                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
                 </div>
             </div>
 
