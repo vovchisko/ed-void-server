@@ -5,7 +5,11 @@ const EDASS = new Vue({
     data: {app: app, scans: []},
     methods: {
         _add_scan: function (rec) {
-            this.scans.unshift(rec);
+            if (rec.__from_history) {
+                this.scans.push(rec);
+            } else {
+                this.scans.unshift(rec);
+            }
         }
     }
 });

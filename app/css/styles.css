@@ -66,6 +66,7 @@ TABS
 #ed-ass section .sub em b {color: #693a10;}
 #ed-ass section .sub em span {
     color: #98570d;
+    text-transform: capitalize;
 }
 /*
     ED-ASS LAYOUT
@@ -80,7 +81,7 @@ TABS
 #ed-ass section b {display: block;}
 #ed-ass section em {width: 100%;}
 #ed-ass section em b {text-align: left;display: block;width: 50%;float: left;}
-#ed-ass section em span { /* text-align: right; */display: block;width: 50%;float: left;}
+#ed-ass section em span {/* text-align: right; */display: block;width: 50%;float: left;text-transform: capitalize;}
 @media (orientation: landscape) {
     #ed-ass section div.col { width: 50%; }
     #ed-ass section div.col { padding: 0 25px;}

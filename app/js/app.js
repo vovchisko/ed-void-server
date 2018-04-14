@@ -11,7 +11,7 @@ Vue.filter('nn', function (value, frac = 3, min_frac = 0) {
 
 Vue.filter('yn', function (value) {
     if (typeof value !== "boolean") return value;
-    return value ? 'YES' : 'NO';
+    return value ? 'TRUE' : 'FALSE';
 });
 
 
@@ -118,20 +118,3 @@ net.on('welcome', (dat) => {
 
 
 if (app.auth.atoken) { App._net_connect(); }
-
-function toggleFullScreen() {
-    var doc = window.document;
-    var docEl = doc.documentElement;
-
-    var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-    var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-
-    if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-        requestFullScreen.call(docEl);
-    }
-    else {
-        cancelFullScreen.call(doc);
-    }
-}
-
-toggleFullScreen();
