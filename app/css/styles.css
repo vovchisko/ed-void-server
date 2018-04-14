@@ -2,24 +2,96 @@
 * { box-sizing: border-box; font-family: 'Sintony', sans-serif; }
 *::placeholder { color: #839aa2; }
 *:focus, *:active { outline: none; }
-body { margin: 0; padding: 0; font-size: 12px; background: #3c635a; color: #fff; }
+body {margin: 0;padding: 0;font-size: 12px;background: #141414;color: #fff;}
 input[type=text],
 input[type=password] { font-size: 14px; line-height: 42px; height: auto; border: 1px solid #839aa2; color: #fff; background: transparent; padding: 0px 7px; max-width: 100%; width: 200px; }
 button { transition: all linear 100ms; background: #6daabf; color: #fff; font-size: 14px; line-height: 42px; border: 0 none; display: inline-block; padding: 0 10px; border-radius: 0; }
 button:hover { background: #4eb9de; }
 button:active { background: #6daabf; }
+section,
+#ed-ass .scan section div.col::after,
+#ed-ass section .sub em::after,
+#ed-ass .scan h4::after,
+.cls::after { content: ""; clear: both; display: table; }
 /*
     MAIN MENU, LOGIN
 */
-#app { padding: 0 24px; z-index: 3000; position: relative; line-height: 24px; }
+#app {/* padding: 0 24px; */z-index: 3000;position: relative;line-height: 24px;}
 #app form { width: 300px; margin: 22px auto 0px auto; background: #5b7768; padding: 16px; clear: both; text-align: center; position: relative; top: 50px; }
 #app form input { width: 100%; margin-bottom: 15px; }
 #app form button { width: 100%; margin-bottom: 20px; }
 #app > span { padding: 0 5px; line-height: inherit; float: right; background: #444444; font-weight: 200; font-size: 9px; }
 #app > button { line-height: inherit; }
 /*
+
+TABS
+
+*/
+.tabs {
+    padding: 5px 15px;
+}
+.tabs button {margin: 0 10px 0 0;background: transparent;color: orange;border: 1px solid orange;text-transform: uppercase;font-weight: bold;line-height: 32px;height: 32px;}
+.tabs button.active {
+    margin: 0 10px 0 0;
+    background: #af7307;
+    color: #000;
+    border: 1px solid orange;
+}
+/*
     GLOBAL MESSAGE
 */
-#msg { position: absolute; left: 0; top: 20px; font-size: 20px; text-align: center; right: 0; opacity: 0; visibility: hidden; transition: all linear 400ms; }
+#msg {position: absolute;left: 0;top: 20px;font-size: 20px;text-align: center;right: 0;opacity: 0;visibility: hidden;transition: all linear 400ms;}
 #msg.show { transform: translateY(20px); visibility: visible; opacity: 1; }
 #msg.warn { color: #cfee6e; }
+/*
+    ED-ASS UI/STYLE
+*/
+#ed-ass h4 {text-transform: uppercase;font-size: 18px;margin: 10px 0 5px 0;padding: 0;text-align: left;}
+#ed-ass h4 b { }
+#ed-ass h4 span { }
+#ed-ass h4 span.arrival {color: grey;text-align: right;}
+#ed-ass h4 span.star {color: #6a2feb;}
+#ed-ass h4 span.planet {color: #438e70;}
+#ed-ass h4 span.landable {color: #2f77eb;}
+#ed-ass .scan {}
+#ed-ass section {color: #ff8800;line-height: 18px;}
+#ed-ass section div {font-size: 14px;padding-bottom: 15px;line-height: 19px;}
+#ed-ass section div em {font-style: normal; }
+#ed-ass section div em b {font-weight: normal;text-transform: uppercase;color: #c56209;}
+#ed-ass section div em span { }
+#ed-ass section div em span i{font-style: normal;color: #715029;}
+#ed-ass section .sub {font-size: 11px;line-height: 13px;/* opacity: 0.5; */}
+#ed-ass section .sub > b {font-size: 12px;color: #5d5d5d;font-weight: normal;text-transform: uppercase; /* margin-bottom: 5px; */}
+#ed-ass section .sub em { }
+#ed-ass section .sub em b {color: #693a10;}
+#ed-ass section .sub em span {
+    color: #98570d;
+}
+/*
+    ED-ASS LAYOUT
+*/
+#ed-ass {padding: 0 15px;}
+#ed-ass .scan {}
+#ed-ass .scan h4 {margin: 5px -15px;padding: 5px 15px;background: #100f0f;}
+#ed-ass .scan h4 b { float: left; width: 60%; }
+#ed-ass .scan h4 div {float: left;width: 40%;text-align: right;font-size: 14px;}
+#ed-ass .scan h4 div span { display: block;}
+#ed-ass section { display: flex; line-height: 15px; }
+#ed-ass section b {display: block;}
+#ed-ass section em {width: 100%;}
+#ed-ass section em b {text-align: left;display: block;width: 50%;float: left;}
+#ed-ass section em span { /* text-align: right; */display: block;width: 50%;float: left;}
+@media (orientation: landscape) {
+    #ed-ass section div.col { width: 50%; }
+    #ed-ass section div.col { padding: 0 25px;}
+    #ed-ass section div.col:first-child {padding-left: 0;}
+    #ed-ass section div.col:last-child {padding-right: 0;}
+}
+@media (orientation: portrait) {
+    #ed-ass section div.col { width: 100%; }
+    #ed-ass section { display: block; }
+}
+/*
+    CMDR
+*/
+#cmdr {padding: 0 15px;}

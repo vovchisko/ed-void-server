@@ -22,10 +22,8 @@ module.exports = function (req, res) {
         if (!cmdr) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'no cush user is here'}));
         if (cmdr.pass !== dat.pass) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid pass'}))
 
-        if (!cmdr.atoken) {
-            cmdr.atoken = db.generate_token();
-            await db.cmrds.save(cmdr);
-        }
+        cmdr.atoken = db.generate_token();
+        await db.cmdrs.save(cmdr);
 
         let jdata = {
             result: 1, type: 'success', cmdr: {
@@ -34,11 +32,7 @@ module.exports = function (req, res) {
                 email: cmdr.email
             }
         };
-
-        console.log(jdata)
-
         res.end(JSON.stringify(jdata));
-
     });
 };
 

@@ -12,5 +12,8 @@ module.exports = {
         host: '127.0.0.1',
         port: 27017,
         dbname: 'ed-void',
+    },
+    client: {
+        send_events: ['Status', 'Scan', 'SupercruiseEntry']
     }
 };

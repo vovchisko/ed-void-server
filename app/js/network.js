@@ -2,7 +2,7 @@ class Network extends EventEmitter {
 
     constructor() {
         super();
-
+        this.warn_unlistened = false;
         this.ws = null;
         this.atoken = null;
     }
@@ -16,20 +16,24 @@ class Network extends EventEmitter {
         this.ws.onopen = function () {
             _net.atoken = atoken;
             _net.send('auth', _net.atoken);
+            console.info('net::auth:', _net.atoken);
         };
 
         this.ws.onmessage = function (msg) {
             let m = JSON.parse(msg.data);
-            if (!_net._events[m.c]) console.warn('master::no_listeners', m.c, m.dat);
+            if (net.warn_unlistened && !_net._events[m.c]) console.warn('master::no_listeners', m.c, m.dat);
             _net.emit(m.c, m.dat);
         };
         this.ws.onclose = function (e) {
             _net.emit('_close', e.code, e.reason);
+            console.info('net:_close', e.code, e.reason);
+
         };
 
         this.ws.onerror = function (err) {
             _net.emit('_error', err);
             _net.ws = null;
+            console.info('net:_error', err);
         }
     };
 

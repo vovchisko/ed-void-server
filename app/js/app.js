@@ -1,12 +1,29 @@
 "use strict";
 
 Vue.http.options.emulateJSON = true;
+Vue.filter('nn', function (value, frac = 3, min_frac = 0) {
+    if (typeof value !== "number") return value;
+    return (new Intl.NumberFormat('en-US', {
+        maximumFractionDigits: frac,
+        minimumFractionDigits: min_frac
+    })).format(value);
+});
+
+Vue.filter('yn', function (value) {
+    if (typeof value !== "boolean") return value;
+    return value ? 'YES' : 'NO';
+});
+
+
+Vue.filter('isval', function (value) {
+    return value ? value : '--';
+});
 
 const log = console.log;
 
 const net = new Network();
 
-const game = {
+const app = {
     logged: false,
     online: false,
     auth: {
@@ -17,25 +34,25 @@ const game = {
         pass_c: '',
         atoken: localStorage.getItem('atoken') || ''
     },
-    cmdr: {},
-    show_config: false,
+    tabs: ['cmdr', 'ed-ass'],
+    tab: 'ed-ass'
 };
 
 /*
  *      MAIN MENU 
  */
-const Vue_App = new Vue({
+const App = new Vue({
     el: '#app',
-    data: game,
+    data: app,
     methods: {
-        _toggle_config() {
-            game.show_config = !game.show_config;
+        _tab: function (tab) {
+            this.tab = tab;
         },
         _signup: function () {
             fetch('/signup', {
                 headers: {'Content-type': 'application/json'},
                 method: 'POST',
-                body: JSON.stringify(game.auth)
+                body: JSON.stringify(app.auth)
             }).then((res) => {return res.json();})
                 .then((dat) => {
                     if (!dat.result) return Msg.show(dat);
@@ -46,23 +63,21 @@ const Vue_App = new Vue({
             fetch('/signin', {
                 headers: {'Content-type': 'application/json'},
                 method: 'POST',
-                body: JSON.stringify({email: game.auth.email, pass: game.auth.pass})
+                body: JSON.stringify({email: app.auth.email, pass: app.auth.pass})
             }).then(res => res.json())
                 .then((dat) => {
                     if (!dat.result) return Msg.show(dat);
                     localStorage.setItem('atoken', dat.cmdr.atoken);
-                    game.auth.atoken = dat.cmdr.atoken;
-                    game.auth.pass = '';
+                    app.auth.atoken = dat.cmdr.atoken;
                     this._net_connect();
                 });
-
         },
         _net_connect: function () {
-            net.init(game.auth.atoken);
+            net.init(app.auth.atoken);
         },
         _logout: function () {
-            game.logged = false;
-            game.auth.atoken = '';
+            app.logged = false;
+            app.auth.atoken = '';
             localStorage.removeItem('atoken');
             net.disconnect();
         },
@@ -88,24 +103,35 @@ const Msg = new Vue({
     }
 });
 
-
 /*
  *          NETWORK
  */
-net.on('_close', (reason) => {
-    game.online = false;
-    if (game.logged) setTimeout(() => Vue_App._net_connect(), 1000);
+net.on('_close', (code, reason) => {
+    app.online = false;
+    if (reason === 'unauthorized' || reason === 'other-client-comes') App._logout();
+    if (app.logged || reason === 're-auth') setTimeout(() => App._net_connect(), 500);
 });
 net.on('welcome', (dat) => {
-    game.online = true;
-    game.logged = true;
-});
-
-net.on('cmdr', (cmdr) => {
-    game.cmdr.name = cmdr.name;
-    game.cmdr.email = cmdr.email;
-    game.cmdr.api_key = cmdr.api_key;
+    app.online = true;
+    app.logged = true;
 });
 
 
-if (game.auth.atoken) { Vue_App._net_connect(); }
+if (app.auth.atoken) { App._net_connect(); }
+
+function toggleFullScreen() {
+    var doc = window.document;
+    var docEl = doc.documentElement;
+
+    var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+    var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+    if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        requestFullScreen.call(docEl);
+    }
+    else {
+        cancelFullScreen.call(doc);
+    }
+}
+
+toggleFullScreen();

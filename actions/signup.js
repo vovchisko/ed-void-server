@@ -27,11 +27,11 @@ module.exports = function (req, res) {
         if (dat.pass !== dat.pass_c)
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'password and confirmation are not equal'}));
 
-        const exists_email = await db.cmrds.findOne({email: dat.email});
+        const exists_email = await db.cmdrs.findOne({email: dat.email});
         if (exists_email !== null)
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'this email already used'}));
 
-        const exists_cmdr = await db.cmrds.findOne({name: dat.name});
+        const exists_cmdr = await db.cmdrs.findOne({name: dat.name});
         if (exists_cmdr !== null){
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'this cmdr already registered'}));
         }
@@ -45,7 +45,7 @@ module.exports = function (req, res) {
             dev: false,
         };
 
-        await db.cmrds.save(cmdr);
+        await db.cmdrs.save(cmdr);
 
         res.end(JSON.stringify({result: 1, type: 'success', text: 'Your account ready!'}));
 

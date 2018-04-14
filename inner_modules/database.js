@@ -29,7 +29,7 @@ Database.prototype.connect = function (cfg, callback) {
 };
 
 Database.prototype.bind_collections = function () {
-    this.cmrds = this.db.collection('cmdrs');
+    this.cmdrs = this.db.collection('cmdrs');
     this.records = this.db.collection('records');
 };
 

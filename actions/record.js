@@ -3,6 +3,7 @@
 //
 // SIGNUP PROCEDURE
 //
+const cfg = require('../config');
 const the = require('../the');
 const db = require('../inner_modules/database').current;
 const UNI = require('../universe');
@@ -22,6 +23,13 @@ module.exports = function (req, res, _cb) {
                     rec._cmdr = cmdr.name;
                     rec._cmdr_id = cmdr.id;
                     await db.records.save(rec);
+
+                    UNI.process_record(rec);
+
+                    if (i > records.length - 30)
+                        //if (cfg.client.send_events.includes(rec.event))
+                            UNI.send_cmdr_rec(rec);
+
                     _cb(cmdr, rec);
                 }
                 res.statusCode = 200;
@@ -31,9 +39,7 @@ module.exports = function (req, res, _cb) {
                 res_text = 'invalid api-key or cmdr name';
             }
 
-            setTimeout(() => {
-                res.end(res_text);
-            }, 1);
+            res.end(res_text);
 
         } catch (e) {
             console.log(e);
