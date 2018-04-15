@@ -33,8 +33,8 @@ const app = {
         pass_c: '',
         atoken: localStorage.getItem('atoken') || ''
     },
-    tabs: ['cmdr', 'ed-ass'],
-    tab: 'ed-ass'
+    tabs: ['cmdr', 'edass', 'nav'],
+    tab: 'cmdr',
 };
 
 /*

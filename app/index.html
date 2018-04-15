@@ -6,6 +6,7 @@
     <title>ED-ASS</title>
     <link href="css/styles.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width">
+    <style>[v-if] { display: none !important; }</style>
 </head>
 <body>
 
@@ -14,27 +15,26 @@
         <input v-model="auth.email" type="text" placeholder="Player Email" autocomplete="email">
         <input v-model="auth.pass" type="password" placeholder="Password" autocomplete="current-password">
         <button type="submit">LOGIN</button>
-        <a v-on:click="auth._sign = 'up'">Register Pilot</a>
+        <button type="button" v-on:click="auth._sign = 'up'">Register Pilot</button>
     </form>
 
     <form v-on:submit.prevent="_signup" v-if="!logged && auth._sign === 'up'">
-        <input v-model="auth.email" type="text" placeholder=" * Email" autocomplete="email">
+        <input v-model="auth.email" type="text" placeholder="* Email" autocomplete="email">
         <input v-model="auth.name" type="text" placeholder="* CMDR NAME" autocomplete="username">
         <input v-model="auth.pass" type="password" placeholder=" * Password" autocomplete="new-password">
         <input v-model="auth.pass_c" type="password" placeholder=" * Confirm password" autocomplete="new-password">
         <button type="submit">REGISTER</button>
         <div v-bind:class="['msg']" v-if="auth._message">{{auth._message}}</div>
-        <a v-on:click="auth._sign = 'in'">Cancel</a>
+        <button type="button" v-on:click="auth._sign = 'in'">Cancel</button>
     </form>
 
     <div v-if="logged" class="tabs">
         <button v-on:click="_tab(i)"
                 v-for="(i, k) in tabs"
-                v-bind:class="i === tab ? 'active' : ''" class="tab">
+                v-bind:class="i === tab ? 'active' : ''" class="btn-sm">
             {{i}}
         </button>
     </div>
-
 </div>
 
 <div id="msg" v-bind:class="[cdw > 0 ? 'show':'' , type]">
@@ -42,16 +42,22 @@
 </div>
 
 <div id="cmdr" v-if="app.logged && app.tab==='cmdr'">
-    <h2>CMDR</h2>
     <p>
         CMDR: {{cmdr.name}}<br>
-        CMDR: {{cmdr.email}}<br>
+        EMAIL: {{cmdr.email}}<br>
         API_KEY: {{cmdr.api_key}}<br>
+        <br>
         <button v-on:click="_logout()" class="logout" v-if="app.logged && app.online">logout</button>
     </p>
 </div>
 
-<div id="ed-ass" v-if="app.logged && app.tab==='ed-ass'">
+<div id="nav" v-if="app.logged && app.tab==='nav'">
+    <p>
+        {{nav}}
+    </p>
+</div>
+
+<div id="edass" v-if="app.logged && app.tab==='edass'">
     <div class="scan" v-for="s in scans" v-if="s.ScanType === 'Detailed'">
         <h4>
             <b>{{s.BodyName}}</b>
@@ -155,6 +161,7 @@
 <script src="js/network.js"></script>
 <script src="js/app.js"></script>
 <script src="js/cmdr.js"></script>
-<script src="js/ed-ass.js"></script>
+<script src="js/edass.js"></script>
+<script src="js/nav.js"></script>
 
 </html>

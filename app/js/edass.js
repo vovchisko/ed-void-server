@@ -1,7 +1,7 @@
 'use strict';
 
 const EDASS = new Vue({
-    el: '#ed-ass',
+    el: '#edass',
     data: {app: app, scans: []},
     methods: {
         _add_scan: function (rec) {

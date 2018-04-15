@@ -1,12 +1,12 @@
 const CMDR = new Vue({
     el: '#cmdr',
-    data: {app: app, cmdr: {}},
+    data: {app: app, cmdr: {name: 'n/a', email: 'n/a', api_key: ''}},
     methods: {
         _logout: function () {App._logout()},
         _upd_cmdr: function (dat) {
-            Vue.set(this.cmdr, 'name', dat.name);
-            Vue.set(this.cmdr, 'email', dat.email);
-            Vue.set(this.cmdr, 'api_key', dat.api_key);
+            this.cmdr.name = dat.name;
+            this.cmdr.email = dat.email;
+            this.cmdr.api_key = dat.api_key;
         }
     }
 });
