@@ -16,6 +16,15 @@ select:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0px 1000px #141414 inset;
     transition: background-color 5000s ease-in-out 0s;
 }
+#nav .compass .ruler {
+    image-rendering: optimizeSpeed; /* STOP SMOOTHING, GIVE ME SPEED*/
+    image-rendering: -moz-crisp-edges; /* Firefox*/
+    image-rendering: -o-crisp-edges; /* Opera*/
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+    image-rendering: pixelated; /* Chrome */
+    image-rendering: optimize-contrast; /* CSS3 Proposed*/
+    -ms-interpolation-mode: nearest-neighbor; /* IE8+ */
+}
 * { box-sizing: border-box; font-family: 'Sintony', sans-serif; }
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none; }
@@ -32,7 +41,7 @@ section,
 #edass .scan h4::after,
 .cls::after { content: ""; clear: both; display: table; }
 /*
-    MAIN MENU, LOGIN
+MAIN MENU, LOGIN
 */
 #app { /* padding: 0 24px; */z-index: 3000;position: relative;line-height: 24px;}
 #app form {width: 300px;margin: 64px auto 0px auto;background: #141414;padding: 16px;clear: both;text-align: center;position: relative;top: 50px;border: 1px solid #6c4211;}
@@ -48,13 +57,13 @@ TABS
 #app .tabs { padding: 5px 15px; }
 #app .tabs button { margin: 0 10px 0 0;}
 /*
-    GLOBAL MESSAGE
+GLOBAL MESSAGE
 */
 #msg {position: absolute;left: 0;top: 20px;font-size: 20px;text-align: center;right: 0;opacity: 0;visibility: hidden;transition: all linear 400ms;}
 #msg.show { transform: translateY(20px); visibility: visible; opacity: 1; }
 #msg.warn {color: #db5555;text-transform: uppercase;}
 /*
-    ED-ASS UI/STYLE
+ED-ASS UI/STYLE
 */
 #edass h4 {text-transform: uppercase;font-size: 18px;margin: 10px 0 5px 0;padding: 0;text-align: left;}
 #edass h4 b { }
@@ -77,12 +86,9 @@ TABS
 #edass section .sub > b {font-size: 12px;color: #5d5d5d;font-weight: normal;text-transform: uppercase; /* margin-bottom: 5px; */}
 #edass section .sub em { }
 #edass section .sub em b {color: #693a10;}
-#edass section .sub em span {
-    color: #98570d;
-    text-transform: capitalize;
-}
+#edass section .sub em span { color: #98570d; text-transform: capitalize; }
 /*
-    ED-ASS LAYOUT
+ED-ASS LAYOUT
 */
 #edass {padding: 0 15px;}
 #edass .scan {}
@@ -90,22 +96,36 @@ TABS
 #edass .scan h4 b {float: left;width: 60%;font-size: 15px;}
 #edass .scan h4 div {float: left;width: 40%;text-align: right;font-size: 12px;}
 #edass .scan h4 div span { display: block;}
-#edass section { display: flex; line-height: 15px; }
+#edass section { line-height: 15px; }
 #edass section b {display: block;}
 #edass section em {width: 100%;}
 #edass section em b {text-align: left;display: block;width: 50%;float: left;}
 #edass section em span { /* text-align: right; */display: block;width: 50%;float: left;text-transform: capitalize;}
 @media (orientation: landscape) {
-    #edass section div.col { width: 50%; }
-    #edass section div.col { padding: 0 25px;}
-    #edass section div.col:first-child {padding-left: 0;}
-    #edass section div.col:last-child {padding-right: 0;}
+    .row {display: flex; }
+    .col { width: 50%; }
+    .col { padding: 0 25px;}
+    .col:first-child {padding-left: 0;}
+    .col:last-child {padding-right: 0;}
 }
 @media (orientation: portrait) {
-    #edass section div.col { width: 100%; }
-    #edass section { display: block; }
+    .col { padding: 0 25px;}
+    .col { width: 100%; }
+    .row { display: block; }
 }
 /*
     CMDR
 */
 #cmdr {padding: 0 15px;}
+/*
+    NAV
+*/
+#nav {}
+#nav .compass { overflow: hidden; width: 100%; margin: 15px 0; padding: 15px 0; background: #111 }
+#nav .compass .ruler {width: 100%;background-image: url("../img/nav-ruler.gif");background-color: transparent;background-position: 0;height: 30px;margin: 40px 0;position: relative;transition: all ease-in-out 1200ms;}
+#nav .compass .ruler .head {width: 60px;font-size: 20px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -35px 0 0 -30px;}
+#nav .compass .ruler .head:after { content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-top: 5px solid #ff8800;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;}
+
+#nav .compass .dest {width: 100%;background-image: url("../img/nav-ruler-dest.gif");background-color: transparent;background-position: 0;height: 7px;margin: 20px 0;position: relative;transition: all ease-in-out 1200ms;}
+#nav .compass .dest .head {width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #0098f9;color: #0098f9;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
+#nav .compass .dest .head:after {content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-bottom: 5px solid #0098f9;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;top: -14px;}

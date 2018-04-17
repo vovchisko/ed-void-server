@@ -5,13 +5,14 @@ const cfg = require('./config');
 const the = require('./the');
 const db = require('./inner_modules/database').current;
 const NodeStatic = require('node-static');
-const app = new NodeStatic.Server('./app');
+const app = new NodeStatic.Server('./app', { cache: 0 });
 const action_signup = require('./actions/signup');
 const action_signin = require('./actions/signin');
 const action_record = require('./actions/record');
 const UNI = require('./universe');
 
 require('http').createServer((req, res) => {
+
     if (req.url === '/signup')
         return action_signup(req, res);
 

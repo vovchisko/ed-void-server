@@ -14,6 +14,6 @@ module.exports = {
         dbname: 'ed-void',
     },
     records: {
-        dont_save: ['Status']
+        dont_save: ['_Status']
     }
 };

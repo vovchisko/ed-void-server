@@ -36,11 +36,9 @@
         </button>
     </div>
 </div>
-
 <div id="msg" v-bind:class="[cdw > 0 ? 'show':'' , type]">
     {{text}}
 </div>
-
 <div id="cmdr" v-if="app.logged && app.tab==='cmdr'">
     <p>
         CMDR: {{cmdr.name}}<br>
@@ -52,9 +50,39 @@
 </div>
 
 <div id="nav" v-if="app.logged && app.tab==='nav'">
-    <p>
-        {{nav}}
-    </p>
+    <div class="nav-surf" v-if="surf">
+        <div class="compass">
+            <div class="ruler" ref="ruler" v-bind:style="style_ruler">
+                <b class="head">{{pos.head}}</b>
+
+            </div>
+            <div class="dest" ref="dest" v-bind:style="style_dest">
+                <b class="head">{{dest.head}}</b>
+            </div>
+
+
+        </div>
+        <div class="row">
+            <div class="col pos">
+                LAT: {{pos.lat | nn(4,4)}}<br>
+                LON: {{pos.lon | nn(4,4)}}<br>
+                ALT: {{pos.alt / 1000}}<br>
+            </div>
+            <div class="col" v-if="dest.enabled">
+                LAT: {{dest.lat | nn(4,4)}}<br>
+                LON: {{dest.lon| nn(4,4)}}<br>
+                HEAD: {{dest.head| nn(0)}}<br>
+                DIST: {{dest.dist / 1000 | nn(3,3)}}<br>
+            </div>
+        </div>
+    </div>
+    <div>
+        <button class="btn-small" v-on:click="dest.enabled=!dest.enabled">TOGGLE</button>
+        <p v-if="dest.enabled">
+            LAT: <input type="text" v-model="dest.lat"><br/>
+            LON: <input type="text" v-model="dest.lon"><br/>
+        </p>
+    </div>
 </div>
 
 <div id="edass" v-if="app.logged && app.tab==='edass'">
@@ -63,12 +91,12 @@
             <b>{{s.BodyName}}</b>
             <div>
                 <span class="arrival">ARR: {{s.DistanceFromArrivalLS | nn(0)}} ls</span>
-                <span class="star" v-if="s.StarType">[ STAR ]</span>
-                <span class="planet" v-if="s.PlanetClass && !s.Landable">[ BODY ]</span>
-                <span class="landable" v-if="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
+                <span class="star" v-show="s.StarType">[ STAR ]</span>
+                <span class="planet" v-show="s.PlanetClass && !s.Landable">[ BODY ]</span>
+                <span class="landable" v-show="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
             </div>
         </h4>
-        <section v-if="s.StarType">
+        <section v-show="s.StarType" class="row">
             <div class="col">
                 <div class="main">
                     <em><b>Type</b><span>{{s.StarType}}</span></em>
@@ -90,7 +118,7 @@
                 </div>
             </div>
         </section>
-        <section v-if="s.PlanetClass">
+        <section v-if="s.PlanetClass" class="row">
             <div class="col">
                 <div class="main">
                     <em><b>Planet Class</b><span>{{s.PlanetClass}}</span></em>

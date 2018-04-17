@@ -58,7 +58,7 @@ class Universe extends EE {
         }
     }
 
-    send_cmdr_history(cmdr_id, limit = 20) {
+    send_cmdr_history(cmdr_id, limit = 15) {
         let cursor = db.records.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(limit);
         cursor.forEach((rec) => {
             rec.__from_history = true;
