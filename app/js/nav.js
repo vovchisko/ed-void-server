@@ -6,7 +6,7 @@ const NAV = new Vue({
         style_ruler: {'background-position-x': 0},
         style_dest: {'background-position-x': 0},
         pos: {lat: 0, lon: 0, alt: 0, head: 0},
-        dest: {enabled: true, body: 'MUNDII HZ-32 A 2', lat: 0, lon: 0, azi: 0, dist: 0, align: '', body_radius: 1000},
+        dest: {enabled: false, lat: 0, lon: 0, azi: 0, dist: 0, align: '', body_radius: 1200},
     },
     methods: {
         _leave_body: function (ev) { this.pos.body = '' },
