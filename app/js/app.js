@@ -2,7 +2,7 @@
 
 Vue.http.options.emulateJSON = true;
 Vue.filter('nn', function (value, frac = 3, min_frac = 0) {
-    if (typeof value !== "number") return value;
+    if (typeof value !== "number") return 'ERR';
     return (new Intl.NumberFormat('en-US', {
         maximumFractionDigits: frac,
         minimumFractionDigits: min_frac

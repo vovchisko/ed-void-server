@@ -20,9 +20,7 @@ require('http').createServer((req, res) => {
         return action_signin(req, res);
 
     if (req.url === '/record')
-        return action_record(req, res, (cmdr, rec) => {
-            if (cfg.main.log) console.log('[' + cmdr.name + ']', rec.timestamp, rec.event);
-        });
+        return action_record(req, res);
 
     req.addListener('end', function () {
         app.serve(req, res);
@@ -40,4 +38,4 @@ db.connect(cfg.db, async () => {
     console.log('localhost:' + cfg.main.web_port);
 });
 
-process.on('unhandledRejection', error => console.error('unhandledRejection', error));
+process.on('unhandledRejection', error => console.log('ERROR: unhandledRejection', error));

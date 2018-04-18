@@ -3,6 +3,10 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const shortid = require('shortid');
+const EVS = require('../events_settings');
+const EV_COLL_PREFIX = 'ev_';
+
+module.exports.current = new Database();
 
 function Database() {
     this.dburl = '';
@@ -28,17 +32,13 @@ Database.prototype.connect = function (cfg, callback) {
     });
 };
 
-Database.prototype.bind_collections = function () {
-    this.cmdrs = this.db.collection('cmdrs');
-    this.records = this.db.collection('records');
-};
 
 /**
  * Generate ID with prefix ('U' - unit, 'I' - item, and so on)
  * @param prefix
  * @returns {string}
  */
-Database.prototype.id = function (prefix = 'Х') {
+Database.prototype.gen_id = function (prefix = 'Х') {
     return prefix + '-' + shortid.generate();
 };
 
@@ -50,4 +50,30 @@ Database.prototype.generate_token = function () {
     return 'T-' + shortid.generate();
 };
 
-module.exports.current = new Database();
+Database.prototype.bind_collections = function () {
+    this.cmdrs = this.db.collection('_cmdrs');
+    for (let i in EVS) {
+        this[i] = this.db.collection(EV_COLL_PREFIX + i);
+    }
+    this.unknown = this.db.collection(EV_COLL_PREFIX + 'x');
+
+
+
+
+};
+
+Database.prototype.save_cmdr_rec = function (cmdr, rec) {
+
+    rec._id = cmdr.id + '-' + rec.timestamp;
+    rec._cmdr = cmdr.name;
+    rec._cmdr_id = cmdr.id;
+
+    let coll = rec.event;
+    if (typeof EVS[rec.event] === 'undefined') {
+        console.log('INVALID EVENT COLLECTION: ', '[' + rec.event + ']', rec);
+        coll = 'unknown';
+    }
+
+    return this[coll].save(rec);
+
+};

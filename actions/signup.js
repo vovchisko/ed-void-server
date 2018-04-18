@@ -37,7 +37,7 @@ module.exports = function (req, res) {
         }
 
         let cmdr = {
-            id: db.id('U'),
+            id: db.gen_id('U'),
             name: dat.name,
             email: dat.email,
             pass: dat.pass,

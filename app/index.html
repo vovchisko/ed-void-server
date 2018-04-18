@@ -54,35 +54,41 @@
         <div class="compass">
             <div class="ruler" ref="ruler" v-bind:style="style_ruler">
                 <b class="head">{{pos.head}}</b>
-
             </div>
-            <div class="dest" ref="dest" v-bind:style="style_dest">
-                <b class="head">{{dest.head}}</b>
+            <div class="dest" ref="dest" v-bind:style="style_dest" v-if="dest.enabled">
+                <b class="head" v-bind:class="dest.align">{{dest.head}}</b>
             </div>
-
-
         </div>
-        <div class="row">
+        <div class="row responsive">
             <div class="col pos">
-                LAT: {{pos.lat | nn(4,4)}}<br>
-                LON: {{pos.lon | nn(4,4)}}<br>
-                ALT: {{pos.alt / 1000}}<br>
+                <em><b>LAT</b><span>{{pos.lat | nn(4,4)}}</span></em>
+                <em><b>LON</b><span>{{pos.lon | nn(4,4)}}</span></em>
+                <em><b>ALT</b><span>{{pos.alt / 1000}}</span></em>
             </div>
-            <div class="col" v-if="dest.enabled">
-                LAT: {{dest.lat | nn(4,4)}}<br>
-                LON: {{dest.lon| nn(4,4)}}<br>
-                HEAD: {{dest.head| nn(0)}}<br>
-                DIST: {{dest.dist / 1000 | nn(3,3)}}<br>
+            <div class="col dest">
+
+                <div v-if="dest.enabled">
+                    <em><b>BODY</b><span>{{dest.body || 'not specified'}}</span></em>
+                    <em><b>LAT</b><span>{{dest.lat | nn(4,4,'err')}}</span></em>
+                    <em><b>LON</b><span>{{dest.lon| nn(4,4,'err')}}</span></em>
+                    <em><b>HEAD</b><span>{{dest.head| nn(0,0,'err')}}</span></em>
+                    <em><b>DIST</b><span>{{dest.dist / 1000 | nn(3,3,'err')}}</span></em>
+
+
+                    <div class="dest-form" v-if="dest.enabled">
+                        <b>LAT:</b> <input type="text" v-on:change="" v-model="dest.lat"><br/>
+                        <b>LON:</b> <input type="text" v-on:change="" v-model="dest.lon"><br/>
+                    </div>
+                </div>
+
+                <button class="btn-sm" v-bind:class="dest.enabled?'active':''"
+                        v-on:click="dest.enabled=!dest.enabled">
+                    {{ !dest.enabled ? 'COURSE COORDINATES' : 'DISMISS' }}
+                </button>
             </div>
         </div>
     </div>
-    <div>
-        <button class="btn-small" v-on:click="dest.enabled=!dest.enabled">TOGGLE</button>
-        <p v-if="dest.enabled">
-            LAT: <input type="text" v-model="dest.lat"><br/>
-            LON: <input type="text" v-model="dest.lon"><br/>
-        </p>
-    </div>
+
 </div>
 
 <div id="edass" v-if="app.logged && app.tab==='edass'">

@@ -9,6 +9,7 @@ class Universe extends EE {
         super();
         this.cmdrs = {};
         this.cmdrs_api_key = {};
+
     }
 
     init() {
@@ -58,7 +59,7 @@ class Universe extends EE {
         }
     }
 
-    send_cmdr_history(cmdr_id, limit = 15) {
+    send_cmdr_history(cmdr_id, limit = 45) {
         let cursor = db.records.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(limit);
         cursor.forEach((rec) => {
             rec.__from_history = true;
@@ -67,7 +68,6 @@ class Universe extends EE {
     }
 
     process_record(rec) {
-
         //todo: process record somehow
 
     }
