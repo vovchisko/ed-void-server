@@ -30,8 +30,10 @@ select:-webkit-autofill:focus {
 *:focus, *:active { outline: none; }
 body {margin: 0;padding: 0;font-size: 12px;background: #141414;color: #fff;}
 input[type=text]:focus,
+input[type=number]:focus,
 input[type=password]:focus { border-color: #ffb600}
 input[type=text],
+input[type=number],
 input[type=password] {font-size: 14px;line-height: 42px;height: auto;border: 1px solid #533512;color: #fff;background: transparent;padding: 0px 7px;max-width: 100%;width: 200px;background: #141414;}
 button {transition: all linear 100ms;background: #221b13;font-size: 14px;line-height: 42px;display: inline-block;padding: 0 10px;border-radius: 0;border: 1px solid #684011;text-transform: uppercase;color: #ff8800;/* height: 42px; */}
 button:hover, button:focus {background: #362410;color: #ffb600;border-color: #ff8800;outline: 0 none;}
