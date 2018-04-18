@@ -11,10 +11,6 @@ module.exports = {
     db: {
         host: '127.0.0.1',
         port: 27017,
-        dbname: 'ed-void',
-        allow_unlisted_events: true,
-    },
-    records: {
-        dont_save: ['_Status']
+        dbname: 'ed-void'
     }
 };

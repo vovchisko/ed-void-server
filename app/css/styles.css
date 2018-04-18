@@ -11,7 +11,7 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-    border: 1px solid #ffb600;
+    border: 1px solid #533512;
     -webkit-text-fill-color: #ffb600;
     -webkit-box-shadow: 0 0 0px 1000px #141414 inset;
     transition: background-color 5000s ease-in-out 0s;
@@ -29,6 +29,8 @@ select:-webkit-autofill:focus {
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none; }
 body {margin: 0;padding: 0;font-size: 12px;background: #141414;color: #fff;}
+input[type=text]:focus,
+input[type=password]:focus { border-color: #ffb600}
 input[type=text],
 input[type=password] {font-size: 14px;line-height: 42px;height: auto;border: 1px solid #533512;color: #fff;background: transparent;padding: 0px 7px;max-width: 100%;width: 200px;background: #141414;}
 button { transition: all linear 100ms;background: #221b13;font-size: 14px;line-height: 42px;display: inline-block;padding: 0 10px;border-radius: 0;border: 1px solid #684011;text-transform: uppercase;color: #ff8800;}
@@ -49,9 +51,9 @@ em span i {font-style: normal;color: #715029;}
 MAIN MENU, LOGIN
 */
 #app { /* padding: 0 24px; */z-index: 3000;position: relative;line-height: 24px;}
-#app form {width: 300px;margin: 64px auto 0px auto;background: #141414;padding: 16px;clear: both;text-align: center;position: relative;top: 50px;border: 1px solid #6c4211;}
-#app form input { width: 100%; margin-bottom: 15px; }
-#app form button { width: 100%; margin-bottom: 20px; }
+#app .form {width: 300px;margin: 64px auto 0px auto;background: #141414;padding: 16px;clear: both;text-align: center;position: relative;top: 50px;border: 1px solid #6c4211;}
+#app .form input { width: 100%; margin-bottom: 15px; }
+#app .form button { width: 100%; margin-bottom: 20px; }
 #app > span { padding: 0 5px; line-height: inherit; float: right; background: #444444; font-weight: 200; font-size: 9px; }
 #app > button { line-height: inherit; }
 /*
@@ -144,3 +146,13 @@ ED-ASS LAYOUT
 #nav .compass .dest .head.alg2:after {border-bottom-color: red;top: -14px;}
 #nav .compass .dest .head.alg2:before {content: 'wrong course vector!'; color: red; }
 #nav .block { margin: 0 15px; }
+
+/*
+    RAW
+*/
+
+#raw {}
+#raw .raw { padding: 15px; border-top: 1px solid #98570d }
+#raw .raw b { font-size: 16px; }
+#raw .raw span { font-size: 16px; color: #777}
+#raw .raw pre { font-family: "Lucida Console", Monaco, monospace; color: #e2841c; letter-spacing: 0.2px }

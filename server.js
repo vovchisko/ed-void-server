@@ -2,7 +2,6 @@
 
 
 const cfg = require('./config');
-const the = require('./the');
 const db = require('./inner_modules/database').current;
 const NodeStatic = require('node-static');
 const app = new NodeStatic.Server('./app', { cache: 0 });
@@ -35,7 +34,7 @@ require('http').createServer((req, res) => {
 db.connect(cfg.db, async () => {
     UNI.init();
     console.log('Whoosh! MASTER READY!');
-    console.log('localhost:' + cfg.main.web_port);
+    console.log('http://localhost:' + cfg.main.web_port);
 });
 
 process.on('unhandledRejection', error => console.log('ERROR: unhandledRejection', error));

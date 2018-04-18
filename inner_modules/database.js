@@ -5,11 +5,13 @@ const MongoClient = require('mongodb').MongoClient;
 const shortid = require('shortid');
 const EVS = require('../events_settings');
 const EV_COLL_PREFIX = 'ev_';
+const EV_COLL_UNKNOWN = 'Z';
 
 module.exports.current = new Database();
 
 function Database() {
     this.dburl = '';
+    this.rec = {};
 }
 
 Database.prototype.connect = function (cfg, callback) {
@@ -53,13 +55,9 @@ Database.prototype.generate_token = function () {
 Database.prototype.bind_collections = function () {
     this.cmdrs = this.db.collection('_cmdrs');
     for (let i in EVS) {
-        this[i] = this.db.collection(EV_COLL_PREFIX + i);
+        this.rec[i] = this.db.collection(EV_COLL_PREFIX + i);
     }
-    this.unknown = this.db.collection(EV_COLL_PREFIX + 'x');
-
-
-
-
+    this.rec[EV_COLL_UNKNOWN] = this.db.collection(EV_COLL_PREFIX + EV_COLL_UNKNOWN);
 };
 
 Database.prototype.save_cmdr_rec = function (cmdr, rec) {
@@ -68,12 +66,12 @@ Database.prototype.save_cmdr_rec = function (cmdr, rec) {
     rec._cmdr = cmdr.name;
     rec._cmdr_id = cmdr.id;
 
-    let coll = rec.event;
+    let c = rec.event;
     if (typeof EVS[rec.event] === 'undefined') {
-        console.log('INVALID EVENT COLLECTION: ', '[' + rec.event + ']', rec);
-        coll = 'unknown';
+        console.log('UNKNOWN EVENT NAME: ', '[' + rec.event + ']', rec);
+        c = EV_COLL_UNKNOWN;
     }
 
-    return this[coll].save(rec);
+    return this.rec[c].save(rec);
 
 };

@@ -1,14 +1,15 @@
 module.exports = {
     _default: {pipe: true, save: true},
     // basic
-    Commander: {},
+    Commander: {pipe: true},
+    Loadout: {pipe: true},
+    Status: {pipe: true},
 
     // discovery
     DiscoveryScan: {pipe: true},
     Scan: {pipe: true},
 
     // travel
-    Status: {},
     SupercruiseEntry: {pipe: true},
     SupercruiseExit: {pipe: true},
     FSDJump: {pipe: true},
@@ -18,6 +19,10 @@ module.exports = {
     Location: {pipe: true},
     StartJump: {pipe: true},
     Docked: {pipe: true},
+    Touchdown: {pipe: true},
+    DockSRV: {pipe: true},
+    LaunchSRV: {pipe: true},
+    Undocked: {pipe: true},
 
     CrewFire: {},
     LaunchFighter: {},
@@ -25,8 +30,7 @@ module.exports = {
     SellShipOnRebuy: {},
     CommunityGoalDiscard: {},
     SRVDestroyed: {},
-    DockSRV: {},
-    LaunchSRV: {},
+
     Died: {},
     AfmuRepairs: {},
     ApproachSettlement: {},
@@ -73,7 +77,6 @@ module.exports = {
     JoinACrew: {},
     LaunchDrone: {},
     LoadGame: {},
-    Loadout: {},
     Market: {},
     MarketBuy: {},
     MarketSell: {},
@@ -143,10 +146,8 @@ module.exports = {
     Synthesis: {},
     SystemsShutdown: {},
     TechnologyBroker: {},
-    Touchdown: {},
     USSDrop: {},
     UnderAttack: {},
-    Undocked: {},
     VehicleSwitch: {},
     WingAdd: {},
     WingInvite: {},

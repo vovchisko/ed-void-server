@@ -9,7 +9,6 @@ class Universe extends EE {
         super();
         this.cmdrs = {};
         this.cmdrs_api_key = {};
-
     }
 
     init() {
@@ -52,15 +51,15 @@ class Universe extends EE {
         this.wss_cmdrs.init();
     }
 
-    /* and any records to cmdr's client if it's online */
     send_cmdr_rec(rec) {
+        /* send any records to cmdr's client if it's online */
         if (this.wss_cmdrs.clients[rec._cmdr_id]) {
             this.wss_cmdrs.clients[rec._cmdr_id].c_send('rec:' + rec.event, rec);
         }
     }
 
-    send_cmdr_history(cmdr_id, limit = 45) {
-        let cursor = db.records.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(limit);
+    send_cmdr_history(cmdr_id) {
+        let cursor = db.rec.Scan.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(15);
         cursor.forEach((rec) => {
             rec.__from_history = true;
             this.send_cmdr_rec(rec);
@@ -69,7 +68,7 @@ class Universe extends EE {
 
     process_record(rec) {
         //todo: process record somehow
-
+        //console.log('process: ', rec.event)
     }
 
 

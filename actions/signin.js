@@ -19,8 +19,8 @@ module.exports = function (req, res) {
 
         const cmdr = await UNI.get_cmdr({email: dat.email});
 
-        if (!cmdr) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'no cush user is here'}));
-        if (cmdr.pass !== dat.pass) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid pass'}))
+        if (!cmdr) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}));
+        if (cmdr.pass !== dat.pass) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}))
 
         cmdr.atoken = db.generate_token();
         await db.cmdrs.save(cmdr);

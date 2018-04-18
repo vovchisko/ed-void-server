@@ -13,6 +13,8 @@ module.exports = function (req, res) {
     the.handle_request(req, res, async (req, res, buffer) => {
         //	console.log(req.headers);
         try {
+            let start = new Date().getTime();
+
             let res_text = '';
             let records = JSON.parse(buffer.toString());
             let head = req.headers;
@@ -26,11 +28,12 @@ module.exports = function (req, res) {
 
                     UNI.process_record(records[i]);
 
-                    if (i > records.length - 30)
+                    if (evs[records[i].event] && evs[records[i].event].pipe && i > records.length - 10)
                         UNI.send_cmdr_rec(records[i]);
                 }
                 res.statusCode = 200;
-                res_text = records.length > 1 ? 'proceed ' + records.length + ' records' : 'record proceed';
+                res_text = records.length > 1 ? 'proceed ' + records.length + ' records' : 'proceed';
+                res_text += ' / ' + (new Date().getTime() - start) + 'ms';
             } else {
                 res.statusCode = 498;
                 res_text = 'invalid api-key or cmdr name';

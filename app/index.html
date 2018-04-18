@@ -11,22 +11,22 @@
 <body>
 
 <div id="app">
-    <form v-on:submit.prevent="_signin" v-if="!logged && auth._sign === 'in'">
-        <input v-model="auth.email" type="text" placeholder="Player Email" autocomplete="email">
-        <input v-model="auth.pass" type="password" placeholder="Password" autocomplete="current-password">
-        <button type="submit">LOGIN</button>
+    <div class="form" v-if="!logged && auth._sign === 'in'">
+        <input v-model="auth.email" type="text" placeholder="* Email">
+        <input v-model="auth.pass" type="password" placeholder="* Password">
+        <button v-on:click="_signin()" type="button">LOGIN</button>
         <button type="button" v-on:click="auth._sign = 'up'">Register Pilot</button>
-    </form>
+    </div>
 
-    <form v-on:submit.prevent="_signup" v-if="!logged && auth._sign === 'up'">
-        <input v-model="auth.email" type="text" placeholder="* Email" autocomplete="email">
-        <input v-model="auth.name" type="text" placeholder="* CMDR NAME" autocomplete="username">
-        <input v-model="auth.pass" type="password" placeholder=" * Password" autocomplete="new-password">
-        <input v-model="auth.pass_c" type="password" placeholder=" * Confirm password" autocomplete="new-password">
-        <button type="submit">REGISTER</button>
+    <div class="form" v-if="!logged && auth._sign === 'up'">
+        <input v-model="auth.email" type="text" placeholder="* Email" autocomplete="nope">
+        <input v-model="auth.pass" type="password" placeholder=" * Password" autocomplete="nope">
+        <input v-model="auth.pass_c" type="password" placeholder=" * Confirm password" autocomplete="nope">
+        <input v-model="auth.name" type="text" placeholder="* CMDR NAME" autocomplete="nope">
+        <button v-on:click="_signup()" type="button">REGISTER</button>
         <div v-bind:class="['msg']" v-if="auth._message">{{auth._message}}</div>
         <button type="button" v-on:click="auth._sign = 'in'">Cancel</button>
-    </form>
+    </div>
 
     <div v-if="logged" class="tabs">
         <button v-on:click="_tab(i)"
@@ -47,6 +47,14 @@
         <br>
         <button v-on:click="_logout()" class="logout" v-if="app.logged && app.online">logout</button>
     </p>
+</div>
+
+<div id="raw" v-if="app.logged && app.tab==='raw'">
+    <div class="raw" v-for="(rec, key) in raw">
+        <b>{{rec.event}}</b>
+        <span>{{rec.timestamp}}</span>
+        <pre>{{rec}}</pre>
+    </div>
 </div>
 
 <div id="nav" v-if="app.logged && app.tab==='nav'">
@@ -73,7 +81,6 @@
                     <em><b>LON</b><span>{{dest.lon| nn(4,4,'err')}}</span></em>
                     <em><b>HEAD</b><span>{{dest.head| nn(0,0,'err')}}</span></em>
                     <em><b>DIST</b><span>{{dest.dist / 1000 | nn(3,3,'err')}}</span></em>
-
 
                     <div class="dest-form" v-if="dest.enabled">
                         <b>LAT:</b> <input type="text" v-on:change="" v-model="dest.lat"><br/>
@@ -116,7 +123,7 @@
             </div>
             <div class="col">
                 <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
-                    <b>BELT: {{ring.Name}}</b>
+                    <b>{{ring.Name}}</b>
                     <em><b>Class</b><span>{{ring.RingClass}}</span></em>
                     <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
                     <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
@@ -152,7 +159,6 @@
                     <em v-for="acomp in s.AtmosphereComposition"><b>{{acomp.Name}}</b><span>{{acomp.Percent | nn(2,2)}} <i>%</i></span></em>
                 </div>
 
-
                 <div class="sub materials" v-if="s.Materials">
                     <b>Materials</b>
                     <em v-for="material in s.Materials">
@@ -180,7 +186,6 @@
                 </div>
             </div>
 
-
         </section>
     </div>
     <div class="scan empty">No scans yet.</div>
@@ -197,5 +202,6 @@
 <script src="js/cmdr.js"></script>
 <script src="js/edass.js"></script>
 <script src="js/nav.js"></script>
+<script src="js/raw.js"></script>
 
 </html>
