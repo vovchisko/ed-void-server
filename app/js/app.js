@@ -35,7 +35,7 @@ const app = {
         atoken: localStorage.getItem('atoken') || ''
     },
     tabs: ['cmdr', 'edass', 'nav', 'raw'],
-    tab: 'nav',
+    tab: 'edass',
 };
 
 /*
