@@ -65,7 +65,7 @@ class Universe extends EE {
             this.send_cmdr_rec(rec);
         });
 
-        let scans = db.rec.Scan.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(5);
+        let scans = db.rec.Scan.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(20);
         scans.forEach((rec) => {
             rec.__from_history = true;
             this.send_cmdr_rec(rec);

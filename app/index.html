@@ -114,7 +114,7 @@
 </div>
 
 <div id="edass" v-if="app.logged && app.tab==='edass'">
-    <div class="scan container-fluid" v-for="s in scans" v-if="s.ScanType === 'Detailed'">
+    <div class="scan" v-for="s in scans" v-if="s.ScanType === 'Detailed'">
         <h4>
             <b>{{s.BodyName}}</b>
             <div>
@@ -124,90 +124,91 @@
                 <span class="landable" v-show="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
             </div>
         </h4>
-        <section v-show="s.StarType" class="row">
-            <div class="col-sm">
-                <div class="main">
-                    <em><b>Type</b><span>{{s.StarType}}</span></em>
-                    <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
-                    <em><b>Solar Masses</b><span>{{s.StellarMass | nn(4)}}</span></em>
-                    <em><b>Solar Radius</b><span>{{s.Radius / 696000000 | nn(4)}}</span></em>
-                    <em><b>Age</b><span>{{s.Age_MY | nn(4)}} <i>MILLION YEARS</i></span></em>
-                    <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(1) }} <i>K</i></span></em>
-                    <em><b>Rot. Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+        <div calss="container-fluid">
+            <section v-show="s.StarType" class="row">
+                <div class="col-sm">
+                    <div class="main">
+                        <em><b>Type</b><span>{{s.StarType}}</span></em>
+                        <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
+                        <em><b>Solar Masses</b><span>{{s.StellarMass | nn(4)}}</span></em>
+                        <em><b>Solar Radius</b><span>{{s.Radius / 696000000 | nn(4)}}</span></em>
+                        <em><b>Age</b><span>{{s.Age_MY | nn(4)}} <i>MILLION YEARS</i></span></em>
+                        <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(1) }} <i>K</i></span></em>
+                        <em><b>Rot. Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+                    </div>
                 </div>
-            </div>
-            <div class="col-sm">
-                <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
-                    <b>{{ring.Name}}</b>
-                    <em><b>Class</b><span>{{ring.RingClass}}</span></em>
-                    <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
-                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
-                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                <div class="col-sm">
+                    <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
+                        <b>{{ring.Name}}</b>
+                        <em><b>Class</b><span>{{ring.RingClass}}</span></em>
+                        <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
+                        <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                        <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                    </div>
                 </div>
-            </div>
-        </section>
-        <section v-if="s.PlanetClass" class="row">
-            <div class="col-sm">
-                <div class="main">
-                    <em><b>Planet Class</b><span>{{s.PlanetClass}}</span></em>
-                    <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
-                    <em><b>Tidal Lock</b><span
-                            v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
-                    <em><b>Volcanism</b><span
-                            v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
-                    <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
-                    <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <i>KM</i></span></em>
-                    <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <i>G</i></span></em>
-                    <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <i>K</i></span></em>
+            </section>
+            <section v-if="s.PlanetClass" class="row">
+                <div class="col-sm">
+                    <div class="main">
+                        <em><b>Planet Class</b><span>{{s.PlanetClass}}</span></em>
+                        <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
+                        <em><b>Tidal Lock</b><span
+                                v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
+                        <em><b>Volcanism</b><span
+                                v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
+                        <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
+                        <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <i>KM</i></span></em>
+                        <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <i>G</i></span></em>
+                        <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <i>K</i></span></em>
+                    </div>
                 </div>
-            </div>
-            <div class="col-sm">
-                <div class="sub composion">
-                    <b>Body Composition</b>
-                    <em v-for="(com ,val) in s.Composition"><b>{{val}}</b><span>{{com * 100 | nn(2)}} <i>%</i></span></em>
-                </div>
+                <div class="col-sm">
+                    <div class="sub composion">
+                        <b>Body Composition</b>
+                        <em v-for="(com ,val) in s.Composition"><b>{{val}}</b><span>{{com * 100 | nn(2)}} <i>%</i></span></em>
+                    </div>
 
-                <div class="sub atmosphere" v-if="s.Atmosphere">
-                    <b>Atmosphere</b>
-                    <em><b>Surf. Pressure</b><span>{{s.SurfacePressure / 101325 | nn(3)}} <i>ATM</i></span></em>
-                    <em><b>Atmosphere</b><span>{{s.Atmosphere || 'n/a'}}</span></em>
-                    <em><b>Type</b><span>{{s.AtmosphereType}}</span></em>
-                    <b>Composition</b>
-                    <em v-for="acomp in s.AtmosphereComposition"><b>{{acomp.Name}}</b><span>{{acomp.Percent | nn(2,2)}} <i>%</i></span></em>
-                </div>
+                    <div class="sub atmosphere" v-if="s.Atmosphere">
+                        <b>Atmosphere</b>
+                        <em><b>Surf. Pressure</b><span>{{s.SurfacePressure / 101325 | nn(3)}} <i>ATM</i></span></em>
+                        <em><b>Atmosphere</b><span>{{s.Atmosphere || 'n/a'}}</span></em>
+                        <em><b>Type</b><span>{{s.AtmosphereType}}</span></em>
+                        <b>Composition</b>
+                        <em v-for="acomp in s.AtmosphereComposition"><b>{{acomp.Name}}</b><span>{{acomp.Percent | nn(2,2)}} <i>%</i></span></em>
+                    </div>
 
-                <div class="sub materials" v-if="s.Materials">
-                    <b>Materials</b>
-                    <em v-for="material in s.Materials">
-                        <b>{{material.Name}}</b><span>{{material.Percent | nn(2,2)}} <i>%</i></span>
-                    </em>
-                </div>
+                    <div class="sub materials" v-if="s.Materials">
+                        <b>Materials</b>
+                        <em v-for="material in s.Materials">
+                            <b>{{material.Name}}</b><span>{{material.Percent | nn(2,2)}} <i>%</i></span>
+                        </em>
+                    </div>
 
-                <div class="sub orbit">
-                    <b>Orbit</b>
-                    <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <i>AU</i></span></em>
-                    <em><b>Orbital
-                        Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
-                    <em><b>Rotation
-                        Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
-                    <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
-                    <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <i>°</i></span></em>
-                    <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <i>°</i></span></em>
-                    <em><b>Axial Tilt</b><span>{{s.AxialTilt  * 180 / Math.PI | nn(2,2)}} <i>°</i></span></em>
-                </div>
+                    <div class="sub orbit">
+                        <b>Orbit</b>
+                        <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <i>AU</i></span></em>
+                        <em><b>Orbital
+                            Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+                        <em><b>Rotation
+                            Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+                        <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
+                        <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <i>°</i></span></em>
+                        <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <i>°</i></span></em>
+                        <em><b>Axial Tilt</b><span>{{s.AxialTilt  * 180 / Math.PI | nn(2,2)}} <i>°</i></span></em>
+                    </div>
 
-                <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
-                    <b>Ring: {{ring.Name}}</b>
-                    <em><b>Class</b><span>{{ring.RingClass}}</span></em>
-                    <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
-                    <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
-                    <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                    <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
+                        <b>Ring: {{ring.Name}}</b>
+                        <em><b>Class</b><span>{{ring.RingClass}}</span></em>
+                        <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <i>MT</i></span></em>
+                        <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                        <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <i>KM</i></span></em>
+                    </div>
                 </div>
-            </div>
-
-        </section>
+            </section>
+        </div>
+        <div class="scan empty">No scans yet.</div>
     </div>
-    <div class="scan empty">No scans yet.</div>
 </div>
 
 </body>
