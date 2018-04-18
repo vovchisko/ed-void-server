@@ -90,15 +90,15 @@
                         <div class="dest-form" v-if="dest.enabled">
                             <label>
                                 <b>latitude</b>
-                                <input type="text" @change="_update_dest()" v-model="dest.lat">
+                                <input type="number" @change="_update_dest()" v-model="dest.lat">
                             </label>
                             <label>
                                 <b>longitude</b>
-                                <input type="text" @change="_update_dest()" v-model="dest.lon">
+                                <input type="number" @change="_update_dest()" v-model="dest.lon">
                             </label>
                             <label>
                                 <b>body radius (KM)</b>
-                                <input type="text" @change="_update_dest()" v-model="dest.body_radius">
+                                <input type="number" @change="_update_dest()" v-model="dest.body_radius">
                             </label>
                         </div>
                     </div>
