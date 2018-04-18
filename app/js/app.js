@@ -1,12 +1,13 @@
 "use strict";
 
 Vue.http.options.emulateJSON = true;
-Vue.filter('nn', function (value, frac = 3, min_frac = 0) {
-    if (typeof value !== "number") return 'ERR';
+Vue.filter('nn', function (num, frac = 3, min_frac = 0) {
+    num = parseFloat(num);
+    if (isNaN(num) || typeof num !== "number") return 'ERR';
     return (new Intl.NumberFormat('en-US', {
         maximumFractionDigits: frac,
         minimumFractionDigits: min_frac
-    })).format(value);
+    })).format(num);
 });
 
 Vue.filter('yn', function (value) {
@@ -34,7 +35,7 @@ const app = {
         atoken: localStorage.getItem('atoken') || ''
     },
     tabs: ['cmdr', 'edass', 'nav', 'raw'],
-    tab: 'edass',
+    tab: 'nav',
 };
 
 /*

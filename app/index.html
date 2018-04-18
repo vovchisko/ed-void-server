@@ -4,12 +4,13 @@
 <head>
     <meta charset='utf-8'>
     <title>ED-ASS</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+          integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link href="css/styles.css" rel="stylesheet" type="text/css">
-    <meta name="viewport" content="width=device-width">
-    <style>[v-if] { display: none !important; }</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 <body>
-
 <div id="app">
     <div class="form" v-if="!logged && auth._sign === 'in'">
         <input v-model="auth.email" type="text" placeholder="* Email">
@@ -28,10 +29,10 @@
         <button type="button" v-on:click="auth._sign = 'in'">Cancel</button>
     </div>
 
-    <div v-if="logged" class="tabs">
-        <button v-on:click="_tab(i)"
+    <div v-if="logged" class="container-fluid tabs">
+        <button sm v-on:click="_tab(i)"
                 v-for="(i, k) in tabs"
-                v-bind:class="i === tab ? 'active' : ''" class="btn-sm">
+                v-bind:class="i === tab ? 'active' : ''">
             {{i}}
         </button>
     </div>
@@ -40,13 +41,13 @@
     {{text}}
 </div>
 <div id="cmdr" v-if="app.logged && app.tab==='cmdr'">
-    <p>
+    <div class="container-fluid">
         CMDR: {{cmdr.name}}<br>
         EMAIL: {{cmdr.email}}<br>
         API_KEY: {{cmdr.api_key}}<br>
         <br>
-        <button v-on:click="_logout()" class="logout" v-if="app.logged && app.online">logout</button>
-    </p>
+        <button v-on:click="_logout()" sm v-if="app.logged && app.online">logout</button>
+    </div>
 </div>
 
 <div id="raw" v-if="app.logged && app.tab==='raw'">
@@ -67,39 +68,52 @@
                 <b class="head" v-bind:class="dest.align">{{dest.head}}</b>
             </div>
         </div>
-        <div class="row responsive">
-            <div class="col pos">
-                <em><b>LAT</b><span>{{pos.lat | nn(4,4)}}</span></em>
-                <em><b>LON</b><span>{{pos.lon | nn(4,4)}}</span></em>
-                <em><b>ALT</b><span>{{pos.alt / 1000}}</span></em>
-            </div>
-            <div class="col dest">
-
-                <div v-if="dest.enabled">
-                    <em><b>BODY</b><span>{{dest.body || 'not specified'}}</span></em>
-                    <em><b>LAT</b><span>{{dest.lat | nn(4,4,'err')}}</span></em>
-                    <em><b>LON</b><span>{{dest.lon| nn(4,4,'err')}}</span></em>
-                    <em><b>HEAD</b><span>{{dest.head| nn(0,0,'err')}}</span></em>
-                    <em><b>DIST</b><span>{{dest.dist / 1000 | nn(3,3,'err')}}</span></em>
-
-                    <div class="dest-form" v-if="dest.enabled">
-                        <b>LAT:</b> <input type="text" v-on:change="" v-model="dest.lat"><br/>
-                        <b>LON:</b> <input type="text" v-on:change="" v-model="dest.lon"><br/>
-                    </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-6 pos">
+                    <h5>CURR. POSITION</h5>
+                    <em><b>LAT</b><span>{{pos.lat | nn(4,4)}} <i>°</i></span></em>
+                    <em><b>LON</b><span>{{pos.lon | nn(4,4)}} <i>°</i></span></em>
+                    <em><b>ALT</b><span>{{pos.alt / 1000}} <i>KM</i></span></em>
                 </div>
+                <div class="col-6 dest">
+                    <h5>DESTINATION</h5>
 
-                <button class="btn-sm" v-bind:class="dest.enabled?'active':''"
-                        v-on:click="dest.enabled=!dest.enabled">
-                    {{ !dest.enabled ? 'COURSE COORDINATES' : 'DISMISS' }}
-                </button>
+                    <div v-if="dest.enabled">
+                        <!--em><b>BODY</b><span>{{dest.body || 'not specified'}}</span></em-->
+                        <em><b>LAT</b><span>{{dest.lat | nn(4,4,'err')}} <i>°</i></span></em>
+                        <em><b>LON</b><span>{{dest.lon| nn(4,4,'err')}} <i>°</i></span></em>
+                        <em><b>HEAD</b><span>{{dest.head| nn(0,0,'err')}}</span></em>
+                        <em><b>DIST</b><span>{{dest.dist / 1000 | nn(2,2,'err')}} <i>KM</i></span></em>
+
+                        <div class="dest-form" v-if="dest.enabled">
+                            <label>
+                                <b>latitude</b>
+                                <input type="text" @change="_update_dest()" v-model="dest.lat">
+                            </label>
+                            <label>
+                                <b>longitude</b>
+                                <input type="text" @change="_update_dest()" v-model="dest.lon">
+                            </label>
+                            <label>
+                                <b>body radius (KM)</b>
+                                <input type="text" @change="_update_dest()" v-model="dest.body_radius">
+                            </label>
+                        </div>
+                    </div>
+
+                    <button sm v-bind:class="dest.enabled?'active':''"
+                            v-on:click="dest.enabled=!dest.enabled">
+                        {{ !dest.enabled ? 'COURSE COORDINATES' : 'DISMISS' }}
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 
 <div id="edass" v-if="app.logged && app.tab==='edass'">
-    <div class="scan" v-for="s in scans" v-if="s.ScanType === 'Detailed'">
+    <div class="scan container-fluid" v-for="s in scans" v-if="s.ScanType === 'Detailed'">
         <h4>
             <b>{{s.BodyName}}</b>
             <div>
@@ -110,7 +124,7 @@
             </div>
         </h4>
         <section v-show="s.StarType" class="row">
-            <div class="col">
+            <div class="col-sm">
                 <div class="main">
                     <em><b>Type</b><span>{{s.StarType}}</span></em>
                     <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
@@ -121,7 +135,7 @@
                     <em><b>Rot. Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-sm">
                 <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
                     <b>{{ring.Name}}</b>
                     <em><b>Class</b><span>{{ring.RingClass}}</span></em>
@@ -132,19 +146,21 @@
             </div>
         </section>
         <section v-if="s.PlanetClass" class="row">
-            <div class="col">
+            <div class="col-sm">
                 <div class="main">
                     <em><b>Planet Class</b><span>{{s.PlanetClass}}</span></em>
                     <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
-                    <em><b>Tidal Lock</b><span v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
-                    <em><b>Volcanism</b><span v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
+                    <em><b>Tidal Lock</b><span
+                            v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
+                    <em><b>Volcanism</b><span
+                            v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
                     <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
                     <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <i>KM</i></span></em>
                     <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <i>G</i></span></em>
                     <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <i>K</i></span></em>
                 </div>
             </div>
-            <div class="col">
+            <div class="col-sm">
                 <div class="sub composion">
                     <b>Body Composition</b>
                     <em v-for="(com ,val) in s.Composition"><b>{{val}}</b><span>{{com * 100 | nn(2)}} <i>%</i></span></em>
@@ -169,8 +185,10 @@
                 <div class="sub orbit">
                     <b>Orbit</b>
                     <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <i>AU</i></span></em>
-                    <em><b>Orbital Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
-                    <em><b>Rotation Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+                    <em><b>Orbital
+                        Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+                    <em><b>Rotation
+                        Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
                     <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
                     <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <i>°</i></span></em>
                     <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <i>°</i></span></em>
@@ -190,6 +208,7 @@
     </div>
     <div class="scan empty">No scans yet.</div>
 </div>
+
 </body>
 
 <script src="lib/underscore.js"></script>

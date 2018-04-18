@@ -5,7 +5,11 @@ const RAW = new Vue({
         raw: [],
     },
     methods: {
-        _push_raw: function (rec) { this.raw.unshift(rec); }
+        _push_raw: function (rec) {
+            this.raw.unshift(rec);
+            if (this.raw.length > 20)
+                this.raw.splice(-1, 1);
+        }
     }
 });
 
