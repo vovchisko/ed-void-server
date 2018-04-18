@@ -85,7 +85,7 @@
                         <em><b>LAT</b><span>{{dest.lat | nn(4,4,'err')}} <i>°</i></span></em>
                         <em><b>LON</b><span>{{dest.lon| nn(4,4,'err')}} <i>°</i></span></em>
                         <em><b>HEAD</b><span>{{dest.head| nn(0,0,'err')}}</span></em>
-                        <em><b>DIST</b><span>{{dest.dist / 1000 | nn(2,2,'err')}} <i>KM</i></span></em>
+                        <em><b>DIST</b><span>{{dest.dist | nn(3,3,'err')}} <i>KM</i></span></em>
 
                         <div class="dest-form" v-if="dest.enabled">
                             <label>
