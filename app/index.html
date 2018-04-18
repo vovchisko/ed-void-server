@@ -104,7 +104,7 @@
                     </div>
 
                     <button sm v-bind:class="dest.enabled?'active':''"
-                            v-on:click="dest.enabled=!dest.enabled">
+                            v-on:click="dest.enabled=!dest.enabled; _update_dest()">
                         {{ !dest.enabled ? 'COURSE COORDINATES' : 'DISMISS' }}
                     </button>
                 </div>
