@@ -3,27 +3,35 @@
 global.UNEXPLORED = 'UNEXPLORED';
 
 const cfg = require('./config');
-const db = require('./inner_modules/database').current;
+const db = require('./universe/database').current;
 const NodeStatic = require('node-static');
-const app = new NodeStatic.Server('./app', { cache: 0 });
-const action_signup = require('./actions/signup');
-const action_signin = require('./actions/signin');
-const action_record = require('./actions/record');
-const UNI = require('./universe');
+const app = new NodeStatic.Server('./app', {cache: 0});
+const action_signup = require('./universe/actions/signup');
+const action_signin = require('./universe/actions/signin');
+const action_record = require('./universe/actions/record');
+const UNI = require('./universe/universe');
 
-require('http').createServer((req, res) => {
+require('http').createServer(function (request, response) {
 
-    if (req.url === '/signup')
-        return action_signup(req, res);
+    if (request.url === '/api/record')
+        return action_record(request, response);
 
-    if (req.url === '/signin')
-        return action_signin(req, res);
+    if (request.url === '/signup')
+        return action_signup(request, response);
 
-    if (req.url === '/record')
-        return action_record(req, res);
+    if (request.url === '/signin')
+        return action_signin(request, response);
 
-    req.addListener('end', function () {
-        app.serve(req, res);
+    if (request.url === '/app')
+        return app.serveFile('/app.html', 200, {}, request, response);
+
+    request.addListener('end', function () {
+        app.serve(request, response, function (e, res) {
+            if (e && (e.status === 404)) { // If the file wasn't found
+                app.serveFile('/error.html', 404, {}, request, response);
+            }
+        });
+
     }).resume();
 
 }).listen(cfg.main.web_port);

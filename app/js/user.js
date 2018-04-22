@@ -1,6 +1,6 @@
 const USER = new Vue({
     el: '#user',
-    data: {app: app, user: {email: 'n/a', api_key: ''}, cmdr: {name: 'n/a', system: 'n/a', body: 'n/a'}},
+    data: {app: app, user: {email: 'n/a', api_key: ''}, cmdr: {name: 'n/a', system: 'n/a', body: {name: null}}},
     methods: {
         _logout: function () {App._logout()},
         _upd_user: function (dat) {

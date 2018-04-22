@@ -1,0 +1,30 @@
+/*
+    MIAN BLOCK
+*/
+.btn {border: 1px solid #ff8800;border-radius: 0;background: #ff88001c;text-transform: uppercase;color: #ff8800;padding: 10px 52px;margin: 15px 0px;}
+.btn:hover {border: 1px solid #ff8800;color: #000;background: #ff8800;}
+section { }
+section#home {height: 100%;display: block;text-align: center;margin: 0 auto;background-image: url('../img/home-bg.jpg');background-position: 50% 100%;background-size: cover;min-height: 450px;padding: 15vh 0 0 0;position: relative;}
+section#home h1 {text-transform: uppercase;letter-spacing: 1px;font-size: 40px;margin: 5px 0px;display: inline-block;position: relative;color: #ffffff;}
+section#home h1 small {font-size: 11px;display: block;position: absolute;top: 0;left: 100%;color: #bdbdbd;border: 1px solid #bdbdbd;padding: 0px 2px;opacity: 0.7;font-family: monospace;letter-spacing: 0;}
+section#home h2 {text-transform: uppercase;color: #bf4e0a;font-size: 12px;font-weight: 400;letter-spacing: 4px;}
+section#home p {color: #ffffff69;text-transform: uppercase;}
+section#home .top-line:before {border-top: 1px solid #ffffff2e;content: '';display: block;width: 300px;margin: 31px auto;}
+section#home .arrow {transition: all linear 200ms;display: block;width: 100px;position: relative;color: #8a8a8a;text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);font-size: 15px;text-decoration: none;margin: 26px auto;height: 50px;}
+section#home .arrow:after {transition: all linear 200ms;content: "";position: absolute;width: 23px;height: 23px;border-width: 0 0 2px 2px;border-style: solid;transform: rotate(-45deg);transform-origin: 50%;left: 50%;margin-left: -12px;margin-top: 27px;}
+section#home .arrow:hover {color: #e4e4e4;}
+section#home .arrow:hover:after {margin-top: 38px;}
+/*
+    ABOUT
+*/
+section#about {padding: 50px 0;}
+section#about .container {width: 70%;min-width: 320px;}
+section#about .container .row { margin-top: 50px;}
+section#about h3 {font-size: 30px;text-align: right;color: #ff8800;}
+section#about p {
+    font-size: 14px;
+    margin-top: 4px;
+}
+section#about p.links {}
+section#about p.disclamer {color: #666;margin-top: 100px; }
+
