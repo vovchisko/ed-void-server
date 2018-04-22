@@ -7,7 +7,7 @@ const RAW = new Vue({
     methods: {
         _push_raw: function (rec) {
             this.raw.unshift(rec);
-            if (this.raw.length > 20)
+            if (this.raw.length > 50)
                 this.raw.splice(-1, 1);
         }
     }

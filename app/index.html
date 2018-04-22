@@ -7,6 +7,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
           integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link href="css/override.css" rel="stylesheet" type="text/css">
     <link href="css/styles.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="mobile-web-app-capable" content="yes">
@@ -24,7 +25,6 @@
         <input v-model="auth.email" type="text" placeholder="* Email" autocomplete="nope">
         <input v-model="auth.pass" type="password" placeholder=" * Password" autocomplete="nope">
         <input v-model="auth.pass_c" type="password" placeholder=" * Confirm password" autocomplete="nope">
-        <input v-model="auth.name" type="text" placeholder="* CMDR NAME" autocomplete="nope">
         <button v-on:click="_signup()" type="button">REGISTER</button>
         <div v-bind:class="['msg']" v-if="auth._message">{{auth._message}}</div>
         <button type="button" v-on:click="auth._sign = 'in'">Cancel</button>
@@ -41,13 +41,17 @@
 <div id="msg" v-bind:class="[cdw > 0 ? 'show':'' , type]">
     {{text}}
 </div>
-<div id="cmdr" v-if="app.logged && app.tab==='cmdr'">
+<div id="user" v-if="app.logged && app.tab==='user'">
     <div class="container-fluid">
-        CMDR: {{cmdr.name}}<br>
-        EMAIL: {{cmdr.email}}<br>
-        API_KEY: {{cmdr.api_key}}<br>
-        <br>
+        <h5>CMDR INFO</h5>
+        <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
+        <em><b>SYSTEM</b><span>{{cmdr.system}}</span></em>
+        <em><b>LOC</b><span>{{cmdr.body.name || 'Deep Space' }}</span></em>
+        <h5>ACCOUNT INFO</h5>
+        <em><b>EMAIL</b><span>{{user.email}}</span></em>
+        <em><b>API_KEY</b><span>{{user.api_key}}</span></em>
         <button v-on:click="_logout()" sm v-if="app.logged && app.online">logout</button>
+
     </div>
 </div>
 
@@ -60,7 +64,11 @@
 </div>
 
 <div id="nav" v-if="app.logged && app.tab==='nav'">
-    <div class="nav-surf" v-if="surf">
+    <div class="notification hude" v-if="!cmdr.body.name">
+        <div>Approach to scanned landable body</br>to activate nav system</div>
+    </div>
+
+    <div class="nav-surf" v-if="cmdr.body.name">
         <div class="compass">
             <div class="ruler" ref="ruler" v-bind:style="style_ruler">
                 <b class="head">{{pos.head}}</b>
@@ -71,45 +79,54 @@
         </div>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-6 pos">
+                <div class="col-6 cords">
                     <h5>CURR. POSITION</h5>
                     <em><b>LAT</b><span>{{pos.lat | nn(4,4)}} <i>°</i></span></em>
                     <em><b>LON</b><span>{{pos.lon | nn(4,4)}} <i>°</i></span></em>
                     <em><b>ALT</b><span>{{pos.alt / 1000}} <i>KM</i></span></em>
                 </div>
-                <div class="col-6 dest">
+                <div class="col-6 cords">
                     <h5>DESTINATION</h5>
 
                     <div v-if="dest.enabled">
-                        <!--em><b>BODY</b><span>{{dest.body || 'not specified'}}</span></em-->
-                        <em><b>LAT</b><span>{{dest.lat | nn(4,4,'err')}} <i>°</i></span></em>
-                        <em><b>LON</b><span>{{dest.lon| nn(4,4,'err')}} <i>°</i></span></em>
-                        <em><b>HEAD</b><span>{{dest.head| nn(0,0,'err')}}</span></em>
-                        <em><b>DIST</b><span>{{dest.dist | nn(3,3,'err')}} <i>KM</i></span></em>
+                        <em><b>HEAD</b><span>{{dest.head | nn(0,0,'err')}} <i>°</i></span></em>
+                        <em><b>DIST</b><span>{{dest.dist / 1000 | nn(3,3,'err')}} <i>KM</i></span></em>
+                        <em class="editable">
+                            <b>LAT</b>
+                            <span><input type="number" @focus="$event.target.select()" @change="_update_dest()"
+                                         v-model="dest.lat"><i>°</i></span>
+                        </em>
+                        <em class="editable">
+                            <b>LON</b>
+                            <span><input type="number" @focus="$event.target.select()" @change="_update_dest()"
+                                         v-model="dest.lon"><i>°</i></span>
+                        </em>
 
-                        <div class="dest-form" v-if="dest.enabled">
-                            <label>
-                                <b>latitude</b>
-                                <input type="number" @change="_update_dest()" v-model="dest.lat">
-                            </label>
-                            <label>
-                                <b>longitude</b>
-                                <input type="number" @change="_update_dest()" v-model="dest.lon">
-                            </label>
-                            <label>
-                                <b>body radius (KM)</b>
-                                <input type="number" @change="_update_dest()" v-model="dest.body_radius">
-                            </label>
-                        </div>
                     </div>
 
                     <button sm v-bind:class="dest.enabled?'active':''"
                             v-on:click="dest.enabled=!dest.enabled; _update_dest()">
-                        {{ !dest.enabled ? 'COURSE COORDINATES' : 'DISMISS' }}
+                        {{ !dest.enabled ? 'SET COURSE' : 'DISMISS' }}
                     </button>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="container-fluid" v-if="cmdr.body.name">
+        <h5>CURRENT LOCATION</h5>
+        <div class="notification warning" v-if="!cmdr.body.scanned">
+            <div>Scan body to identify radius and gravity correctly</div>
+        </div>
+        <em><b>SYS</b><span>{{cmdr.system}}</span></em>
+        <em><b>BODY</b><span v-bind:class="cmdr.body.name?'':'false'">{{cmdr.body.name || 'FALSE'}}</span></em>
+        <em>
+            <b>RADIUS</b>
+            <span v-bind:class="cmdr.body.name?'':'false'">{{cmdr.body.radius / 1000 | nn(3,3)}} <i>KM</i></span>
+        </em>
+        <em>
+            <b>GRAVITY</b>
+            <span v-bind:class="cmdr.body.name?'':'false'">{{cmdr.body.gravity / 9.80665 | nn(4)}} <i>G</i></span>
+        </em>
     </div>
 </div>
 
@@ -122,13 +139,15 @@
                 <span class="star" v-show="s.StarType">[ STAR ]</span>
                 <span class="planet" v-show="s.PlanetClass && !s.Landable">[ BODY ]</span>
                 <span class="landable" v-show="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
+                <span class="value" v-if="s.EstimatedValue">Value: {{s.EstimatedValue | nn(0)}} Cr</span>
             </div>
         </h4>
         <div calss="container-fluid">
+
             <section v-show="s.StarType" class="row">
                 <div class="col-sm">
                     <div class="main">
-                        <em><b>Type</b><span>{{s.StarType}}</span></em>
+                        <em><b>Class</b><span>{{s.StarType}}</span></em>
                         <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
                         <em><b>Solar Masses</b><span>{{s.StellarMass | nn(4)}}</span></em>
                         <em><b>Solar Radius</b><span>{{s.Radius / 696000000 | nn(4)}}</span></em>
@@ -173,7 +192,7 @@
                         <em><b>Surf. Pressure</b><span>{{s.SurfacePressure / 101325 | nn(3)}} <i>ATM</i></span></em>
                         <em><b>Atmosphere</b><span>{{s.Atmosphere || 'n/a'}}</span></em>
                         <em><b>Type</b><span>{{s.AtmosphereType}}</span></em>
-                        <b>Composition</b>
+                        <b>Atmosphere Composition</b>
                         <em v-for="acomp in s.AtmosphereComposition"><b>{{acomp.Name}}</b><span>{{acomp.Percent | nn(2,2)}} <i>%</i></span></em>
                     </div>
 
@@ -220,7 +239,7 @@
 
 <script src="js/network.js"></script>
 <script src="js/app.js"></script>
-<script src="js/cmdr.js"></script>
+<script src="js/user.js"></script>
 <script src="js/edass.js"></script>
 <script src="js/nav.js"></script>
 <script src="js/raw.js"></script>

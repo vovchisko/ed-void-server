@@ -34,7 +34,7 @@ const app = {
         pass_c: '',
         atoken: localStorage.getItem('atoken') || ''
     },
-    tabs: ['cmdr', 'edass', 'nav', 'raw'],
+    tabs: ['user', 'edass', 'nav', 'raw'],
     tab: 'edass',
 };
 
@@ -67,8 +67,8 @@ const App = new Vue({
             }).then(res => res.json())
                 .then((dat) => {
                     if (!dat.result) return Msg.show(dat);
-                    localStorage.setItem('atoken', dat.cmdr.atoken);
-                    app.auth.atoken = dat.cmdr.atoken;
+                    localStorage.setItem('atoken', dat.user.atoken);
+                    app.auth.atoken = dat.user.atoken;
                     this._net_connect();
                 });
         },

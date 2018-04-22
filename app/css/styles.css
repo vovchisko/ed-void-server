@@ -35,7 +35,7 @@ input[type=password]:focus { border-color: #ffb600}
 input[type=text],
 input[type=number],
 input[type=password] {font-size: 14px;line-height: 42px;height: auto;border: 1px solid #533512;color: #fff;background: transparent;padding: 0px 7px;max-width: 100%;width: 200px;background: #141414;}
-button {transition: all linear 100ms;background: #221b13;font-size: 14px;line-height: 42px;display: inline-block;padding: 0 10px;border-radius: 0;border: 1px solid #684011;text-transform: uppercase;color: #ff8800;/* height: 42px; */}
+button {transition: all linear 100ms;background: #221b13;font-size: 14px;line-height: 42px;display: inline-block;padding: 0 10px;border-radius: 0;border: 1px solid #684011;text-transform: uppercase;color: #ff8800; /* height: 42px; */}
 button:hover, button:focus {background: #362410;color: #ffb600;border-color: #ff8800;outline: 0 none;}
 button:active, button.active { background: #ff8800;color: #000;border-color: #ff8800; }
 button[sm] {line-height: 32px;}
@@ -44,10 +44,11 @@ section,
 #edass h4::after,
 em::after,
 .cls::after { content: ""; clear: both; display: table; }
-em {font-style: normal;display: block;}
+em {font-style: normal;display: block; /* line-height: 15px; */}
 em b {font-weight: normal;text-transform: uppercase;color: #c56209; display: block;width: 50%;float: left;}
 em span {font-style: normal;color: #ff8800;display: block;width: 50%;float: left;}
 em span i {font-style: normal;color: #715029;}
+em span.false {color: #5d5d5d;}
 em[justify] b { text-align: right; padding-right: 5px; }
 em[justify] span { text-align: left; padding-right: 5px;}
 label {display: block;font-size: 12px;color: #452d12;text-transform: uppercase;}
@@ -84,14 +85,13 @@ ED-ASS UI/STYLE
 #edass h4 span.star {color: #6a2feb;}
 #edass h4 span.planet {color: #438e70;}
 #edass h4 span.landable {color: #2f77eb;}
+#edass h4 span.value {color: #ff8800;}
 #edass .scan:last-child { display: none; }
 #edass .scan:first-child { display: block !important; }
 #edass .scan.empty { text-align: center; color: #ff8800; padding: 100px 0; }
 #edass section {color: #ff8800;line-height: 18px;}
-#edass section div {font-size: 14px;padding-bottom: 15px;line-height: 19px;}
-#edass section em span {}
-#edass section em span.false {color: #5d5d5d;}
-#edass section .sub {font-size: 11px;line-height: 13px; /* opacity: 0.5; */}
+#edass section div { /* font-size: 13px; */padding-bottom: 15px; /* line-height: 16px; */}
+#edass section .sub {font-size: 11px;line-height: 12px; /* opacity: 0.5; */}
 #edass section .sub > b {font-size: 12px;color: #5d5d5d;font-weight: normal;text-transform: uppercase; }
 #edass section .sub em b {color: #693a10;}
 #edass section .sub em span { color: #98570d; text-transform: capitalize; }
@@ -106,14 +106,19 @@ ED-ASS LAYOUT
 #edass .scan h4 div span { display: block;}
 #edass section { line-height: 15px; }
 /*
-    CMDR
+    USER
 */
-#cmdr { }
+#user { }
+#user h5 {margin-top: 25px;font-size: 15px;color: #888;}
+#user button { margin-top: 50px}
+#user em {}
+#user em b {}
+#user em span { width: 100%; margin-bottom: 10px}
 /*
     NAV
 */
 #nav {}
-#nav .compass {overflow: hidden;width: 100%;margin: 15px 0;padding: 15px 0;background: #111;height: 171px;}
+#nav .compass {overflow: hidden;width: 100%;padding: 10px 0 0 0;background: #111;height: 155px;margin-bottom: 10px;}
 #nav .compass .ruler {width: 100%;background-image: url("../img/nav-ruler.gif");background-color: transparent;background-position: 0;height: 30px;margin: 40px 0 33px 0;position: relative;transition: all ease-in-out 1000ms;}
 #nav .compass .ruler .head {width: 50px;font-size: 14px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -30px 0 0 -25px;}
 #nav .compass .ruler .head:after { content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-top: 5px solid #ff8800;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;}
@@ -130,15 +135,14 @@ ED-ASS LAYOUT
 #nav .compass .dest .head.alg2 {border-color: red;color: red;}
 #nav .compass .dest .head.alg2:after {border-bottom-color: red;top: -14px;}
 #nav .compass .dest .head.alg2:before {content: 'wrong course vector!'; color: red; }
-#nav em {font-size: 15px;line-height: 18px;}
+#nav em {}
 #nav em span i { }
-#nav h5 {font-size: 16px;color: #5d5d5d;}
-#nav .dest em b { }
-#nav .dest em span { }
-#nav .pos em b { }
-#nav .pos em span { }
-#nav .dest-form { margin-top: 15px; }
-#nav .dest-form label input {line-height: 32px;}
+#nav h5 {font-size: 14px;color: #5d5d5d;margin-top: 5px;}
+#nav .cords em {line-height: 20px;font-size: 14px;}
+#nav .cords em b {width: 30%;}
+#nav .cords em span {width: 70%;text-align: right;white-space: nowrap; }
+#nav .cords button {margin-top: 10px;}
+#nav .cords input[type=number] {border: 0 none;width: calc(100% - 20px);text-align: right;line-height: inherit;height: auto;padding: 0;}
 /*
     RAW
 */
@@ -147,3 +151,6 @@ ED-ASS LAYOUT
 #raw .raw b { font-size: 16px; }
 #raw .raw span { font-size: 16px; color: #777}
 #raw .raw pre { font-family: "Lucida Console", Monaco, monospace; color: #e2841c; letter-spacing: 0.2px }
+.notification {text-transform: uppercase;font-weight: normal;color: #c3c3c3;display: block; padding: 15px 0;text-align: center;font-size: 14px;}
+.notification.huge {padding: 50px 0;}
+.notification.warning { color: #f20}

@@ -1,5 +1,7 @@
-module.exports = {
-    _default: {pipe: true, save: true},
+const _default = {save: true, pipe: false};
+
+const EVS = {
+
     // basic
     Commander: {pipe: true},
     Loadout: {pipe: true},
@@ -15,22 +17,21 @@ module.exports = {
     FSDJump: {pipe: true},
     ApproachBody: {pipe: true},
     LeaveBody: {pipe: true},
-    Liftoff: {pipe: true},
     Location: {pipe: true},
     StartJump: {pipe: true},
     Docked: {pipe: true},
-    Touchdown: {pipe: true},
-    DockSRV: {pipe: true},
-    LaunchSRV: {pipe: true},
     Undocked: {pipe: true},
+    Touchdown: {pipe: true},
+    Liftoff: {pipe: true},
+    LaunchSRV: {pipe: true},
+    DockSRV: {pipe: true},
+    LaunchFighter: {pipe: true},
+    DockFighter: {pipe: true},
 
     CrewFire: {},
-    LaunchFighter: {},
-    DockFighter: {},
     SellShipOnRebuy: {},
     CommunityGoalDiscard: {},
     SRVDestroyed: {},
-
     Died: {},
     AfmuRepairs: {},
     ApproachSettlement: {},
@@ -158,3 +159,16 @@ module.exports = {
     CrewHire: {},
     CargoDepot: {},
 };
+
+for (let i in EVS) {
+    if (typeof EVS[i].save === 'undefined') EVS[i].save = _default.save;
+    if (typeof EVS[i].pipe === 'undefined') EVS[i].pipe = _default.pipe;
+}
+
+
+module.exports = EVS;
+
+let count = 0;
+for (let i in EVS) {
+    count++;
+}

@@ -4,108 +4,244 @@ const cfg = require('./config');
 const extend = require('deep-extend');
 const WSM = require('./inner_modules/ws-manager');
 
+
 class Universe extends EE {
     constructor() {
         super();
-        this.cmdrs = {};
-        this.cmdrs_api_key = {};
+        this.users = {};
+        this.users_api_key = {};
     }
 
     init() {
 
-        this.wss_cmdrs = new WSM(cfg.main.ws_cmdr);
+        this.wss = new WSM(cfg.main.ws_user);
 
-        this.wss_cmdrs.auth = async (cmd, dat, callback) => {
+        this.wss.auth = async (cmd, dat, callback) => {
             if (cmd !== 'auth') return callback(null);
-            let cmdr = await this.get_cmdr({atoken: dat});
-            if (cmdr) { return callback(cmdr.id); }
+            let user = await this.get_user({atoken: dat});
+            if (user) { return callback(user._id); }
             else { callback(null); }
         };
 
-        this.wss_cmdrs.on('disconnected', async (client) => {
-            let cmdr = await this.get_cmdr({id: client.id});
-            cmdr.online = false;
-            cmdr.save();
-            console.log('CMDR', cmdr.name.toUpperCase(), 'leave');
+        this.wss.on('disconnected', async (client) => {
+            let user = await this.get_user({_id: client.id});
+            user.online = false;
+            user.save();
+            console.log('usr:', user.email, '[' + user.curr_cmdr + ']', 'leave');
         });
 
-        this.wss_cmdrs.on('connected', async (client) => {
-            let cmdr = await this.get_cmdr({id: client.id});
-            if (!cmdr) return client.close();
+        this.wss.on('connected', async (client) => {
+            let user = await this.get_user({_id: client.id});
+            if (!user) return client.close();
 
-            cmdr.online = true;
-            cmdr.save();
+            user.online = true;
+            user.save();
 
-            client.c_send('cmdr', {
-                name: cmdr.name,
-                api_key: cmdr.api_key,
-                email: cmdr.email
+            this.send_to(user._id, 'user', {
+                api_key: user.api_key,
+                email: user.email
             });
 
-            console.log('CMDR', cmdr.name.toUpperCase(), 'online');
+            this.send_to(user._id, 'cmdr', user.cmdr);
 
-            this.send_cmdr_history(cmdr.id);
+            console.log('usr:', user.email, '[' + user.curr_cmdr + ']', 'online');
+
+            this.send_usr_history(user._id);
 
         });
 
-        this.wss_cmdrs.init();
+        this.wss.init();
     }
 
-    send_cmdr_rec(rec) {
-        /* send any records to cmdr's client if it's online */
-        if (this.wss_cmdrs.clients[rec._cmdr_id]) {
-            this.wss_cmdrs.clients[rec._cmdr_id].c_send('rec:' + rec.event, rec);
+
+    send_to(uid, c, dat) {
+        if (this.wss.clients[uid]) {
+            this.wss.clients[uid].c_send(c, dat);
         }
     }
 
-    send_cmdr_history(cmdr_id) {
-        let status = db.rec.Status.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(5);
-        status.forEach((rec) => {
-            rec.__from_history = true;
-            this.send_cmdr_rec(rec);
-        });
-
-        let scans = db.rec.Scan.find({_cmdr_id: cmdr_id}).sort({timestamp: -1}).limit(20);
-        scans.forEach((rec) => {
-            rec.__from_history = true;
-            this.send_cmdr_rec(rec);
-        });
+    send_usr_history(uid) {
+        let scans = db.rec.Scan.find({_uid: uid}).sort({timestamp: -1}).limit(15);
+        scans.forEach((rec) => this.send_to(uid, 'rec:' + 'Scan', rec));
     }
 
     process_record(rec) {
-        //todo: process record somehow
-        //console.log('process: ', rec.event)
+        if (rec.event === 'Scan') return this.proc_Scan(rec);
+        if (rec.event === 'FSDJump') return this.proc_FSDJump(rec);
+        if (rec.event === 'ApproachBody') return this.proc_ApproachBody(rec);
+        if (rec.event === 'LeaveBody') return this.proc_LeaveBody(rec);
+        return;
+    }
+
+    async proc_LeaveBody(rec) {
+        let user = await this.get_user({_id: rec._uid});
+        user.cmdr.body = {
+            scanned: null,
+            name: null,
+            radius: 0,
+            gravity: 0,
+        };
+        this.send_to(rec._uid, 'cmdr', user.cmdr);
+        user.save();
+    }
+
+    async proc_ApproachBody(rec) {
+        let body = await db.bodies.findOne({BodyName: rec.Body});
+        let user = await this.get_user({_id: rec._uid});
+
+        let b = {
+            scanned: false,
+            name: rec.Body,
+            radius: 0,
+            gravity: 0,
+        };
+
+        if (body) {
+            b.scanned = true;
+            b.name = body.BodyName;
+            b.radius = body.Radius;
+            b.gravity = body.SurfaceGravity;
+        }
+        user.cmdr.body = b;
+        this.send_to(user._id, 'cmdr', user.cmdr);
+        user.save();
     }
 
 
-    async get_cmdr(by) {
-        let cmdr = null;
-        if (by.id && this.cmdrs[by.id]) {
-            return this.cmdrs[by.id];
+    async proc_FSDJump(rec) {
+        let system = await db.systems.findOne({_id: rec.StarSystem});
+
+        if (!system) {
+            system = {_id: rec.StarSystem, _submited: rec._cmdr};
+        }
+
+        for (let i in rec) {
+            if (i[0] === '_' || i === 'event' || i.includes('_Localised')) continue;
+            system[i] = rec[i];
+        }
+
+        await db.systems.save(system);
+
+        let user = await this.get_user({_id: rec._uid});
+        user.cmdr.system = system.StarSystem;
+        user.cmdr.star_pos = system.StarPos;
+
+        user.cmdr.body = {
+            scanned: null,
+            name: null,
+            radius: 0,
+            gravity: 0,
+        };
+
+        this.send_to(user._id, 'cmdr', user.cmdr);
+        user.save();
+
+    }
+
+
+    async proc_Scan(rec) {
+        let body = await db.bodies.findOne({_id: rec.BodyName});
+        let user = await this.get_user({_id: rec._uid});
+
+        //update user scan data if we waiting for it
+        if (rec.BodyName === user.cmdr.body.name) {
+
+            user.cmdr.body = {
+                scanned: true,
+                name: rec.BodyName,
+                radius: rec.Radius,
+                gravity: rec.SurfaceGravity,
+            };
+
+            this.send_to(user._id, 'cmdr', user.cmdr);
+            user.save();
+        }
+
+        if (body) {
+            if (body.ScanType === 'Detailed') return;
         } else {
-            let dat = await db.cmdrs.findOne(by);
+            body = {_id: rec.BodyName, _submited: rec._cmdr};
+        }
+
+        for (let i in rec) {
+            if (i[0] === '_' || i === 'event') continue;
+            body[i] = rec[i];
+        }
+
+
+
+        return db.bodies.save(body);
+    }
+
+
+    async get_user(by) {
+        let user = null;
+
+        if (by._id && this.users[by._id]) {
+            return this.users[by._id];
+        } else {
+            let dat = await db.users.findOne(by);
             if (dat) {
-                if (this.cmdrs[dat.id]) return this.cmdrs[dat.id]; //already loaded
-                cmdr = new CMDR(dat);
-                this.cmdrs[cmdr.id] = cmdr;
-                this.cmdrs_api_key[cmdr.api_key] = cmdr;
-                return cmdr;
+                if (this.users[dat._id]) return this.users[dat._id]; //already loaded
+                user = new USER(dat);
+                this.users[user._id] = user;
+                this.users_api_key[user.api_key] = user;
+                return user;
             }
         }
-        return cmdr;
+        return user;
     }
 }
+
+
+class USER {
+    constructor(data) {
+        this.cmdrs = {};
+        extend(this, data);
+        if (this.curr_cmdr) this.cmdr = this.cmdrs[this.curr_cmdr];
+    }
+
+    async save() {
+        let snapshot = {};
+        extend(snapshot, this);
+        for (let i in this) {
+            if (i === 'cmdr') delete snapshot[i]; //remove temporary field
+        }
+        await db.users.save(snapshot);
+    }
+
+    upd_head(head) {
+        let changed = false;
+        if (this.curr_cmdr !== head.cmdr) {
+
+            if (!this.cmdrs[head.cmdr]) {
+                this.cmdrs[head.cmdr] = {name: head.cmdr};
+                changed = true;
+            }
+
+            this.curr_cmdr = head.cmdr;
+            this.cmdr = this.cmdrs[this.curr_cmdr];
+            changed = true;
+        }
+
+        if (this.gv !== head.gv) {
+            this.gv = head.gv;
+            changed = true;
+        }
+
+        if (this.lng !== head.lng) {
+            this.lng = head.lng;
+            changed = true;
+        }
+
+        if (changed) {
+            this.save();
+        }
+    }
+}
+
 
 const UNI = new Universe();
-
-class CMDR {
-    constructor(data) {
-        extend(this, data);
-    }
-
-    save() {
-        db.cmdrs.save(this);
-    }
-}
-
 module.exports = UNI;
+
+

@@ -2,18 +2,21 @@ const NAV = new Vue({
     el: '#nav',
     data: {
         app: app,
-        surf: false,
+        cmdr: USER.cmdr,
         style_ruler: {'background-position-x': 0},
         style_dest: {'background-position-x': 0},
-        pos: {lat: 0, lon: 0, alt: 0, head: 0},
-        dest: {enabled: false, lat: 0, lon: 0, azi: 0, dist: 0, align: '', body_radius: 1200},
+        pos: {
+            lat: 0, lon: 0, alt: 0, head: 0
+        },
+        dest: {
+            enabled: false,
+            lat: 0, lon: 0, azi: 0, dist: 0,
+            align: ''
+        },
     },
     methods: {
-        _leave_body: function (ev) { this.pos.body = '' },
-        _approach_body: function (ev) {this.pos.body = '' },
         _upd_status: function (stat) {
-            this.surf = (typeof stat.Latitude === "number");
-            if (!this.surf) return;
+            if(!this.cmdr.body) return;
 
             this.pos.alt = stat.Altitude;
             this.pos.head = stat.Heading;
@@ -32,7 +35,7 @@ const NAV = new Vue({
                 let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
                 let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
                 if (initialBearing < 0) initialBearing = 360 + initialBearing;
-                this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * this.dest.body_radius;
+                this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * this.cmdr.body.radius;
                 this.dest.head = Math.floor(initialBearing);
                 isNaN(this.dest.head) ? this.dest.head = 'ERR' : null;
             }
@@ -61,10 +64,3 @@ const NAV = new Vue({
 });
 
 net.on('rec:Status', (status) => { NAV._upd_status(status) });
-net.on('rec:LeaveBody', (ev) => { NAV._leave_body(ev) });
-net.on('rec:ApproachSettlement', (ev) => { NAV._approach_body(ev) });
-net.on('rec:ApproachBody', (ev) => { NAV._approach_body(ev) });
-
-// ApproachSettlement (get close)
-// ApproachBody (closer)
-// LeaveBody (leave)

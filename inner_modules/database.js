@@ -4,8 +4,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const shortid = require('shortid');
 const EVS = require('../events_settings');
-const EV_COLL_PREFIX = 'ev_';
-const EV_COLL_UNKNOWN = 'Z';
+const EV_UNKNOWN = '_etc';
 
 module.exports.current = new Database();
 
@@ -23,8 +22,9 @@ Database.prototype.connect = function (cfg, callback) {
         if (err)
             throw new Error('DB:: CONNECTION_ERR: ' + _self.dburl);
 
-        _self.db = client.db(_self.cfg.dbname);
-        _self.db.once('close', () => {
+        _self._db = client.db(_self.cfg.dbname);
+        _self._rec = client.db(_self.cfg.dbname + '-rec');
+        _self._db.once('close', () => {
             throw new Error('DB:: CONNECTION_CLOSED: ' + _self.dburl);
         });
 
@@ -53,25 +53,30 @@ Database.prototype.generate_token = function () {
 };
 
 Database.prototype.bind_collections = function () {
-    this.cmdrs = this.db.collection('_cmdrs');
+
+    this.users = this._db.collection('_users');
+    this.bodies = this._db.collection('_bodies');
+    this.systems = this._db.collection('_systems');
+
     for (let i in EVS) {
-        this.rec[i] = this.db.collection(EV_COLL_PREFIX + i);
+        if (EVS[i].save) this.rec[i] = this._rec.collection(i);
     }
-    this.rec[EV_COLL_UNKNOWN] = this.db.collection(EV_COLL_PREFIX + EV_COLL_UNKNOWN);
+
+    this.rec[EV_UNKNOWN] = this._rec.collection(EV_UNKNOWN);
 };
 
-Database.prototype.save_cmdr_rec = function (cmdr, rec) {
+Database.prototype.save_user_rec = function (user, rec) {
 
-    rec._id = cmdr.id + '-' + rec.timestamp;
-    rec._cmdr = cmdr.name;
-    rec._cmdr_id = cmdr.id;
+    rec._id = user._id + '/' + user.curr_cmdr + '/' + rec.timestamp;
+    rec.timestamp = new Date(rec.timestamp);
+    rec._cmdr = user.curr_cmdr;
+    rec._uid = user._id;
+    rec._lng = user.lng;
+    rec._gv = user.gv;
 
     let c = rec.event;
-    if (typeof EVS[rec.event] === 'undefined') {
-        console.log('UNKNOWN EVENT NAME: ', '[' + rec.event + ']', rec);
-        c = EV_COLL_UNKNOWN;
-    }
+
+    if (typeof EVS[rec.event] === 'undefined') c = EV_UNKNOWN;
 
     return this.rec[c].save(rec);
-
 };

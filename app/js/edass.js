@@ -5,11 +5,25 @@ const EDASS = new Vue({
     data: {app: app, scans: []},
     methods: {
         _add_scan: function (rec) {
-            if (rec.__from_history) {
-                this.scans.push(rec);
-            } else {
-                this.scans.unshift(rec);
+            for (let i = 0; i < this.scans.length; i++) {
+                if (rec.BodyName === this.scans[i].BodyName) {
+                    this.scans[i] = rec;
+                    return;
+                }
             }
+
+            //sort by timestamp
+            this.scans.push(rec);
+            this.scans.sort((a, b) => {
+                //new on top
+                if (a.timestamp > b.timestamp) { return -1; }
+                if (a.timestamp < b.timestamp) { return 1; }
+                return 0;
+            });
+
+            // cut
+            if (this.scans.length > 50)
+                this.scans.splice(-1, 1);
         }
     }
 });
