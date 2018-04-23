@@ -40,10 +40,10 @@ require('http').createServer(function (request, response) {
 // WS ON WEB LOGIN PROCEDURE
 //
 
-db.connect(cfg.db, async () => {
+db.connect(() => {
     UNI.init();
     console.log('Whoosh! MASTER READY!');
     console.log('http://localhost:' + cfg.main.web_port);
 });
 
-process.on('unhandledRejection', error => console.log('ERROR: unhandledRejection', error));
+process.on('unhandledRejection', (error) => console.log('ERROR: unhandledRejection', error.stack));

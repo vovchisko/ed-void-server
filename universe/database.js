@@ -3,80 +3,79 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const shortid = require('shortid');
-const EVS = require('./events_settings');
-const EV_UNKNOWN = '_etc';
+const crypto = require('crypto');
+
+class Database {
+    constructor() {
+        //databases links
+        this.db_void = null;
+        this.db_journals = null;
+
+        //journals collections links
+        this.journals = {};
+
+        //database settings
+        this.cfg = {
+            host: '127.0.0.1',
+            port: 27017,
+            db_void: 'ed-void',
+            db_journals: 'ed-void-rec',
+        };
+    }
+
+
+    connect(callback) {
+        MongoClient
+            .connect('mongodb://' + this.cfg.host + ':' + this.cfg.port)
+            .then((client) => {
+
+                this.db_void = client.db(this.cfg.db_void);
+                this.db_journals = client.db(this.cfg.db_journals);
+
+                this.db_void.once('close', () => { throw new Error('DB:: CONNECTION_CLOSED: db_void') });
+                this.db_journals.once('close', () => { throw new Error('DB:: CONNECTION_CLOSED: db_journals'); });
+
+                this.bind_collections();
+
+                callback();
+            })
+            .catch((err) => {
+                throw err;
+            });
+    }
+
+    gen_id() {
+        return shortid.generate();
+    }
+
+    generate_api_key() {
+        return 'A' + shortid.generate() + shortid.generate();
+    };
+
+    generate_token() {
+        return 'T' + shortid.generate() + shortid.generate();
+    };
+
+    bind_collections() {
+        this.reports = this.db_void.collection('reports');
+        this.cmdrs = this.db_void.collection('cmdrs');
+        this.users = this.db_void.collection('users');
+        this.bodies = this.db_void.collection('bodies');
+        this.systems = this.db_void.collection('systems');
+    };
+
+    hash(string) {
+        return crypto.createHash('md5').update(string).digest('hex');
+    }
+
+    journal(journal_id) {
+        if (!this.journals[journal_id]) {
+            this.journals[journal_id] = this.db_journals.collection(journal_id);
+        }
+        return this.journals[journal_id];
+    }
+}
 
 module.exports.current = new Database();
 
-function Database() {
-    this.dburl = '';
-    this.rec = {};
-}
 
-Database.prototype.connect = function (cfg, callback) {
-    const _self = this;
-    this.cfg = cfg;
-    this.dburl = 'mongodb://' + this.cfg.host + ':' + this.cfg.port;
-
-    MongoClient.connect(_self.dburl, function (err, client) {
-        if (err)
-            throw new Error('DB:: CONNECTION_ERR: ' + _self.dburl);
-
-        _self._db = client.db(_self.cfg.dbname);
-        _self._rec = client.db(_self.cfg.dbname + '-rec');
-        _self._db.once('close', () => {
-            throw new Error('DB:: CONNECTION_CLOSED: ' + _self.dburl);
-        });
-
-        _self.bind_collections();
-
-        callback();
-    });
-};
-
-
-/**
- * Generate ID with prefix ('U' - unit, 'I' - item, and so on)
- * @param prefix
- * @returns {string}
- */
-Database.prototype.gen_id = function (prefix = 'Х') {
-    return prefix + '-' + shortid.generate();
-};
-
-Database.prototype.generate_api_key = function () {
-    return 'A-' + shortid.generate() + shortid.generate() + shortid.generate();
-};
-
-Database.prototype.generate_token = function () {
-    return 'T-' + shortid.generate();
-};
-
-Database.prototype.bind_collections = function () {
-
-    this.users = this._db.collection('users');
-    this.bodies = this._db.collection('bodies');
-    this.systems = this._db.collection('systems');
-
-    for (let i in EVS) {
-        if (EVS[i].save) this.rec[i] = this._rec.collection(i);
-    }
-
-    this.rec[EV_UNKNOWN] = this._rec.collection(EV_UNKNOWN);
-};
-
-Database.prototype.save_user_rec = function (user, rec) {
-
-    rec._id = user._id + '/' + user.curr_cmdr + '/' + rec.timestamp;
-    rec.timestamp = new Date(rec.timestamp);
-    rec._cmdr = user.curr_cmdr;
-    rec._uid = user._id;
-    rec._lng = user.lng;
-    rec._gv = user.gv;
-
-    let c = rec.event;
-
-    if (typeof EVS[rec.event] === 'undefined') c = EV_UNKNOWN;
-
-    return this.rec[c].save(rec);
-};

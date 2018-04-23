@@ -57,6 +57,7 @@ const App = new Vue({
                 .then((dat) => {
                     if (!dat.result) return Msg.show(dat);
                     this._signin();
+                    this.auth._sign = 'in';
                 });
         },
         _signin: function () {

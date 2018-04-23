@@ -29,9 +29,9 @@ module.exports = function (req, res) {
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'this email already used'}));
 
         let user = {
-            _id: db.gen_id('U'),
+            _id: db.gen_id(),
             email: dat.email,
-            pass: dat.pass,
+            pass: db.hash(dat.pass),
             api_key: db.generate_api_key(),
             dev: false,
             cmdrs: [],
@@ -43,7 +43,6 @@ module.exports = function (req, res) {
 
         res.end(JSON.stringify({result: 1, type: 'success', text: 'Your account ready!'}));
 
-        UNI.get_user({_id: user._id}).catch((e) => {});
     });
 };
 

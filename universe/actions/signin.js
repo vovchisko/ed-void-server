@@ -20,7 +20,7 @@ module.exports = function (req, res) {
         const user = await UNI.get_user({email: dat.email});
 
         if (!user) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}));
-        if (user.pass !== dat.pass) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}))
+        if (user.pass !== db.hash(dat.pass)) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}))
 
         user.atoken = db.generate_token();
         await db.users.save(user);
