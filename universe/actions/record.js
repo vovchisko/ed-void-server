@@ -1,11 +1,9 @@
 "use strict";
-
-//
-// SIGNUP PROCEDURE
-//
-const cfg = require('../../config');
+/*
+    API v.0.2
+    Process records form cleint
+*/
 const the = require('../the');
-const db = require('../database').current;
 const UNI = require('../universe');
 
 
@@ -32,7 +30,6 @@ module.exports = function (req, res) {
                 res.statusCode = 200;
                 res_text = records.length > 3 ? 'proceed ' + records.length + ' records' : 'proceed';
                 res_text += ' / ' + (new Date().getTime() - start) + 'ms';
-
 
             } else {
                 res.statusCode = 498;

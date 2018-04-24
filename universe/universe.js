@@ -130,6 +130,7 @@ class Universe extends EE {
             b.radius = body.Radius;
             b.gravity = body.SurfaceGravity;
         }
+
         cmdr.loc.body = b;
         if (cmdr.uid) {
             this.send_to(cmdr.uid, 'cmdr', cmdr);

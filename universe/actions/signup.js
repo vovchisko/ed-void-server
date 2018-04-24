@@ -3,7 +3,6 @@
 //
 const the = require('../the');
 const db = require('../database').current;
-const UNI = require('../universe');
 
 module.exports = function (req, res) {
     the.handle_request(req, res, async (req, res, buffer) => {
