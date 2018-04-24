@@ -13,7 +13,7 @@ module.exports = function (req, res) {
     the.handle_request(req, res, async (req, res, buffer) => {
 
         let res_text = '';
-        let log = 'REC:';
+        let log = 'REC: ';
 
         try {
             let start = new Date().getTime();
@@ -24,13 +24,13 @@ module.exports = function (req, res) {
 
             let user = await UNI.get_user({api_key: head.api_key});
             if (user) {
-                log += `${user._id} [ CMDR ${head.cmdr} ] load:${records.length} ... `;
+                log += `${user._id} [ CMDR ${head.cmdr} ] ${records.length > 1 ? records.length + ' events' : records[0].event} ... `;
 
                 for (let i = 0; i < records.length; i++)
                     await UNI.record(user, head, records[i], (i > records.length - 5));
 
                 res.statusCode = 200;
-                res_text = records.length > 1 ? 'proceed ' + records.length + ' records' : 'proceed';
+                res_text = records.length > 3 ? 'proceed ' + records.length + ' records' : 'proceed';
                 res_text += ' / ' + (new Date().getTime() - start) + 'ms';
 
 

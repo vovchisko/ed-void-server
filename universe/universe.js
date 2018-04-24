@@ -5,7 +5,7 @@ const EE = require('eventemitter3');
 const cfg = require('../config');
 const extend = require('deep-extend');
 const WSM = require('./ws-manager');
-const PRE = require('./rec_pre_process');
+const pre = require('./rec_pre_process');
 
 class Universe extends EE {
     constructor() {
@@ -65,12 +65,12 @@ class Universe extends EE {
         }
     }
 
-
+    /* ADD NEW ROCORD TO DATABASE */
     async record(user, head, rec, in_pack = false) {
-        // add specific fields for some records...
-        PRE.process(rec);
+        // do some pre-processing
+        pre.process(rec);
 
-        // make sure we have all additional fields proceed from header
+        // make sure we have all data for current user
         await user.upd_head(head);
 
         // is cmdr is here?
@@ -85,34 +85,36 @@ class Universe extends EE {
 
         await user.journal().save(rec);
 
-        UNI.post_process(user, rec);
-
-        if (PIPE_EVENTS.includes(rec.event) && !in_pack)
+        if (!in_pack && PIPE_EVENTS.includes(rec.event))
             UNI.send_to(user._id, `rec:${rec.event}`, rec);
 
+        UNI.process(user.cmdr, rec);
     }
 
 
-    post_process(user, rec) {
-        if (rec.event === 'Scan') return this.proc_Scan(user, rec);
-        if (rec.event === 'FSDJump') return this.proc_FSDJump(user, rec);
-        if (rec.event === 'ApproachBody') return this.proc_ApproachBody(user, rec);
-        if (rec.event === 'LeaveBody') return this.proc_LeaveBody(user, rec);
+    process(cmdr, rec) {
+        if (rec.event === 'Scan') return this.proc_Scan(cmdr, rec);
+        if (rec.event === 'FSDJump') return this.proc_FSDJump(cmdr, rec);
+        if (rec.event === 'ApproachBody') return this.proc_ApproachBody(cmdr, rec);
+        if (rec.event === 'LeaveBody') return this.proc_LeaveBody(cmdr, rec);
         return;
     }
 
-    async proc_LeaveBody(user, rec) {
-        user.cmdr.body = {
+    async proc_LeaveBody(cmdr, rec) {
+        cmdr.body = {
             scanned: false,
             name: null,
             r: 0,
             g: 0,
         };
-        this.send_to(user._id, 'cmdr', user.cmdr);
-        return user.save_cmdr();
+
+        if (cmdr.uid) {
+            this.send_to(cmdr.uid, 'cmdr', cmdr);
+            return cmdr.save();
+        }
     }
 
-    async proc_ApproachBody(user, rec) {
+    async proc_ApproachBody(cmdr, rec) {
         let body = await db.bodies.findOne({BodyName: rec.Body});
 
         let b = {
@@ -128,12 +130,14 @@ class Universe extends EE {
             b.radius = body.Radius;
             b.gravity = body.SurfaceGravity;
         }
-        user.cmdr.loc.body = b;
-        this.send_to(user._id, 'cmdr', user.cmdr);
-        await user.save_cmdr();
+        cmdr.loc.body = b;
+        if (cmdr.uid) {
+            this.send_to(cmdr.uid, 'cmdr', cmdr);
+            await cmdr.save();
+        }
     }
 
-    async proc_FSDJump(user, rec) {
+    async proc_FSDJump(cmdr, rec) {
         let system = await db.systems.findOne({_id: rec.StarSystem});
 
         if (!system) {
@@ -147,32 +151,35 @@ class Universe extends EE {
 
         await db.systems.save(system);
 
-        user.cmdr.loc.system.name = system.StarSystem;
-        user.cmdr.loc.system.coord = system.StarPos;
-        user.cmdr.body = {
+        cmdr.loc.system.name = system.StarSystem;
+        cmdr.loc.system.coord = system.StarPos;
+        cmdr.body = {
             scanned: null,
             name: null,
             radius: 0,
             gravity: 0,
         };
 
-        this.send_to(user._id, 'cmdr', user.cmdr);
-        await user.save_cmdr();
+        if (cmdr.uid) {
+            this.send_to(cmdr.uid, 'cmdr', cmdr);
+            await cmdr.save();
+        }
+
     }
 
-    async proc_Scan(user, rec) {
+    async proc_Scan(cmdr, rec) {
         let body = await db.bodies.findOne({_id: rec.BodyName});
 
-        //update user scan data if we waiting for it
-        if (rec.BodyName === user.cmdr.body.name) {
-            user.cmdr.loc.body = {
+        //update cmr scan data if we waiting for it
+        if (cmdr.uid && rec.BodyName === cmdr.body.name) {
+            cmdr.loc.body = {
                 scanned: true,
                 name: rec.BodyName,
                 r: rec.Radius,
                 g: rec.SurfaceGravity,
             };
-            this.send_to(user._id, 'cmdr', user.cmdr);
-            await user.save_cmdr();
+            this.send_to(cmdr.uid, 'cmdr', cmdr);
+            await  cmdr.save();
         }
 
         // process scan
@@ -219,7 +226,6 @@ class USER {
         this.cmdr_name = null;
         this.online = false;
         extend(this, data);
-
     }
 
     init() {
@@ -229,32 +235,21 @@ class USER {
     async save() {
         let snapshot = {};
         extend(snapshot, this);
-
         delete snapshot.cmdr; //remove temporary field from snapshot
-
         await db.users.save(snapshot);
-    }
-
-    async save_cmdr() {
-        let snapshot = {};
-        extend(snapshot, this.cmdr);
-        await db.cmdrs.save(snapshot);
     }
 
     async upd_head(head) {
         let changed = false;
-
         if (this.cmdr_name !== head.cmdr) {
             await this.set_cmdr(head.cmdr);
             changed = true;
         }
-
         if (this.gv !== head.gv || this.lng !== head.lng) {
             this.gv = head.gv;
             this.lng = head.lng;
             changed = true;
         }
-
         if (changed) return this.save();
     }
 
@@ -262,15 +257,15 @@ class USER {
         if (!name) return console.log(`USR:${this._id} has no cmdr yet`);
         //get commander with all the things
 
-        if (this.cmdr) await this.save_cmdr();
+        if (this.cmdr) await this.cmdr.save();
 
         let c = await db.cmdrs.findOne({uid: this._id, name: name});
 
         if (c) {
-            this.cmdr = c;
+            this.cmdr = new CMDR(c);
             this.cmdr_name = c.name;
         } else {
-            this.cmdr = {
+            this.cmdr = new CMDR({
                 _id: db.gen_id(),
                 uid: this._id,
                 name: name,
@@ -278,7 +273,7 @@ class USER {
                     system: {name: null, coord: [0, 0, 0]},
                     body: {name: null, r: 0, g: 0, scanned: false},
                 }
-            };
+            });
             this.cmdr_name = this.cmdr.name;
         }
 
@@ -289,10 +284,30 @@ class USER {
         if (this.cmdr)
             return db.journal(`[${this._id}] ${this.cmdr.name}`);
     }
-
-
 }
 
+
+class CMDR {
+    constructor(cmdr_data) {
+        this._id = null;
+        this.uid = null;
+        this.name = null;
+        this.loc = {
+            system: {name: null, coord: [0, 0, 0]},
+            body: {name: null, r: 0, g: 0, scanned: false}
+        };
+
+        extend(this, cmdr_data);
+    }
+
+    async save() {
+        if (!this._id) return; //we can create dummy cmdr and use int in processing
+        let snapshot = {};
+        extend(snapshot, this);
+        await db.cmdrs.save(snapshot);
+    }
+
+}
 
 const UNI = new Universe();
 module.exports = UNI;

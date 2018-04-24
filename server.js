@@ -1,6 +1,6 @@
 'use strict';
 
-global.UNEXPLORED = 'UNEXPLORED';
+
 
 const cfg = require('./config');
 const db = require('./universe/database').current;

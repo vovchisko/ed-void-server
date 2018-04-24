@@ -40,7 +40,9 @@ class Database {
                 callback();
             })
             .catch((err) => {
-                throw err;
+                console.error(err.name + ':\n' + err.message);
+                console.error('SHUTDOWN!');
+                process.exit(-1);
             });
     }
 

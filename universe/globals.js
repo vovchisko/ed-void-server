@@ -22,3 +22,5 @@ global.PIPE_EVENTS = [
     'LaunchFighter',
     'DockFighter'
 ];
+
+global.UNEXPLORED = 'UNEXPLORED';
