@@ -54,6 +54,7 @@
                 v-bind:class="i === tab ? 'active' : ''">
             {{i}}
         </button>
+        <span>CONN: {{online}}</span>
     </div>
 </div>
 <div id="msg" v-bind:class="[cdw > 0 ? 'show':'' , type]">
@@ -65,8 +66,8 @@
             <div class="col-sm">
                 <h5>CMDR INFO</h5>
                 <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
-                <em><b>SYSTEM</b><span>{{cmdr.system}}</span></em>
-                <em><b>LOC</b><span>{{cmdr.body ? cmdr.body.name || 'Deep Space' : 'Deep Space' }}</span></em>
+                <em><b>SYSTEM</b><span>{{cmdr.loc.system.name}}</span></em>
+                <em><b>LOC</b><span>{{cmdr.loc.body.name || 'Deep Space' }}</span></em>
             </div>
             <div class="col-sm">
                 <h5>ACCOUNT INFO</h5>
@@ -119,11 +120,11 @@
 </div>
 
 <div id="nav" v-if="app.logged && app.tab==='nav'">
-    <div class="notification hude" v-if="!cmdr.body.name">
+    <div class="notification hude" v-if="!cmdr.loc.body.name">
         <div>Approach to scanned landable body</br>to activate nav system</div>
     </div>
 
-    <div class="nav-surf" v-if="cmdr.body.name">
+    <div class="nav-surf" v-if="cmdr.loc.body.name">
         <div class="compass">
             <div class="ruler" ref="ruler" v-bind:style="style_ruler">
                 <b class="head">{{pos.head}}</b>
@@ -167,20 +168,20 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid" v-if="cmdr.body.name">
+    <div class="container-fluid" v-if="cmdr.loc.body.name">
         <h5>CURRENT LOCATION</h5>
-        <div class="notification warning" v-if="!cmdr.body.scanned">
+        <div class="notification warning" v-if="!cmdr.loc.body.scanned">
             <div>Scan body to identify radius and gravity correctly</div>
         </div>
-        <em><b>SYS</b><span>{{cmdr.system}}</span></em>
-        <em><b>BODY</b><span v-bind:class="cmdr.body.name?'':'false'">{{cmdr.body.name || 'FALSE'}}</span></em>
+        <em><b>SYS</b><span>{{cmdr.loc.system.name}}</span></em>
+        <em><b>BODY</b><span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.name || 'FALSE'}}</span></em>
         <em>
             <b>RADIUS</b>
-            <span v-bind:class="cmdr.body.name?'':'false'">{{cmdr.body.radius / 1000 | nn(3,3)}} <i>KM</i></span>
+            <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.r / 1000 | nn(3,3)}} <i>KM</i></span>
         </em>
         <em>
             <b>GRAVITY</b>
-            <span v-bind:class="cmdr.body.name?'':'false'">{{cmdr.body.gravity / 9.80665 | nn(4)}} <i>G</i></span>
+            <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.g / 9.80665 | nn(4)}} <i>G</i></span>
         </em>
     </div>
 </div>
@@ -289,7 +290,8 @@
 
 <script src="lib/underscore.js"></script>
 <script src="lib/ee3.js"></script>
-<script src="lib/vue.js"></script>
+<!--script src="lib/vue.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.min.js"></script>
 <script src="lib/vue-resource.js"></script>
 
 <script src="js/network.js"></script>

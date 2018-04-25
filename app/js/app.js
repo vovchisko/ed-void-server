@@ -19,8 +19,6 @@ Vue.filter('isval', function (value) {
     return value ? value : 'FALSE';
 });
 
-const log = console.log;
-
 const net = new Network();
 
 const app = {
@@ -109,8 +107,9 @@ const Msg = new Vue({
  */
 net.on('_close', (code, reason) => {
     app.online = false;
+    console.log('disconnect', reason)
     if (reason === 'unauthorized' || reason === 'other-client-comes') App._logout();
-    if (app.logged || reason === 're-auth') setTimeout(() => App._net_connect(), 500);
+    if (app.logged) setTimeout(() => App._net_connect(), 2500);
 });
 net.on('welcome', (dat) => {
     app.online = true;

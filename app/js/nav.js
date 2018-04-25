@@ -16,7 +16,7 @@ const NAV = new Vue({
     },
     methods: {
         _upd_status: function (stat) {
-            if(!this.cmdr.body) return;
+            if(!this.cmdr.loc.body) return;
 
             this.pos.alt = stat.Altitude;
             this.pos.head = stat.Heading;
@@ -35,7 +35,7 @@ const NAV = new Vue({
                 let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
                 let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
                 if (initialBearing < 0) initialBearing = 360 + initialBearing;
-                this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * this.cmdr.body.radius;
+                this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * this.cmdr.loc.body.r;
                 this.dest.head = Math.floor(initialBearing);
                 isNaN(this.dest.head) ? this.dest.head = 'ERR' : null;
             }

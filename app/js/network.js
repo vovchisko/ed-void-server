@@ -28,7 +28,7 @@ class Network extends EventEmitter {
         };
         this.ws.onclose = function (e) {
             _net.emit('_close', e.code, e.reason);
-            console.info('net:_close', e.code, e.reason);
+            console.info('net:_close', e.code, e.reason, e);
 
         };
 

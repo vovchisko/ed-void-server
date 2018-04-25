@@ -22,9 +22,6 @@ module.exports = function (req, res) {
         if (!user) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}));
         if (user.pass !== db.hash(dat.pass)) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}))
 
-        user.atoken = db.generate_token();
-        await db.users.save(user);
-
         let jdata = {
             result: 1, type: 'success', user: {
                 atoken: user.atoken, //todo: let's do different keys here

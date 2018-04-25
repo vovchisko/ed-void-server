@@ -10,11 +10,12 @@ const pre = require('./rec_pre_process');
 class Universe extends EE {
     constructor() {
         super();
+        this.wss = null;
         this.users = {};
         this.users_api_key = {};
     }
 
-    init() {
+    init_wss_server() {
 
         this.wss = new WSM(cfg.main.ws_user);
 
@@ -28,6 +29,7 @@ class Universe extends EE {
         this.wss.on('disconnected', async (client) => {
             let user = await this.get_user({_id: client.id});
             user.online = false;
+            //user.atoken = db.generate_token();
             user.save();
             console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] leave`);
         });
@@ -40,10 +42,9 @@ class Universe extends EE {
             user.save();
 
             this.send_to(user._id, 'user', {
+                email: user.email,
                 api_key: user.api_key,
-                email: user.email
             });
-
             this.send_to(user._id, 'cmdr', user.cmdr);
 
             console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] joined`);
@@ -60,7 +61,7 @@ class Universe extends EE {
 
 
     send_to(uid, c, dat) {
-        if (this.wss.clients[uid]) {
+        if (this.wss && this.wss.clients[uid]) {
             this.wss.clients[uid].c_send(c, dat);
         }
     }
@@ -82,7 +83,6 @@ class Universe extends EE {
         rec._lng = user.lng;
         rec._gv = user.gv;
 
-
         await user.journal().save(rec);
 
         if (!in_pack && PIPE_EVENTS.includes(rec.event))
@@ -101,7 +101,7 @@ class Universe extends EE {
     }
 
     async proc_LeaveBody(cmdr, rec) {
-        cmdr.body = {
+        cmdr.loc.body = {
             scanned: false,
             name: null,
             r: 0,
@@ -127,8 +127,8 @@ class Universe extends EE {
         if (body) {
             b.scanned = true;
             b.name = body.BodyName;
-            b.radius = body.Radius;
-            b.gravity = body.SurfaceGravity;
+            b.r = body.Radius;
+            b.g = body.SurfaceGravity;
         }
 
         cmdr.loc.body = b;
@@ -154,11 +154,11 @@ class Universe extends EE {
 
         cmdr.loc.system.name = system.StarSystem;
         cmdr.loc.system.coord = system.StarPos;
-        cmdr.body = {
+        cmdr.loc.body = {
             scanned: null,
             name: null,
-            radius: 0,
-            gravity: 0,
+            r: 0,
+            g: 0,
         };
 
         if (cmdr.uid) {
@@ -172,7 +172,7 @@ class Universe extends EE {
         let body = await db.bodies.findOne({_id: rec.BodyName});
 
         //update cmr scan data if we waiting for it
-        if (cmdr.uid && rec.BodyName === cmdr.body.name) {
+        if (cmdr.uid && rec.BodyName === cmdr.loc.body.name) {
             cmdr.loc.body = {
                 scanned: true,
                 name: rec.BodyName,
@@ -255,9 +255,9 @@ class USER {
     }
 
     async set_cmdr(name) {
-        if (!name) return console.log(`USR:${this._id} has no cmdr yet`);
-        //get commander with all the things
+        if (!name) return;
 
+        //get commander with all the things
         if (this.cmdr) await this.cmdr.save();
 
         let c = await db.cmdrs.findOne({uid: this._id, name: name});

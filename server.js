@@ -41,7 +41,7 @@ require('http').createServer(function (request, response) {
 //
 
 db.connect(() => {
-    UNI.init();
+    UNI.init_wss_server();
     console.log('Whoosh! MASTER READY!');
     console.log('http://localhost:' + cfg.main.web_port);
 });

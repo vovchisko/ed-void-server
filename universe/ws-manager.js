@@ -14,11 +14,12 @@ function parse_json(string) {
 
 }
 
-let log = () => {}//console.log;
+let log = console.log;
 
 class WSM extends EE3 {
     constructor(port) {
         super();
+        this.cpu = 2;
         this.port = port;
         this.clients = {};
         this.auth = function () { throw new Error('Auth function not specified!'); }
@@ -47,22 +48,28 @@ class WSM extends EE3 {
                     conn.valid_stat = CLIENT_VALIDATING;
                     _self.auth(msg.c, msg.dat, function (id) {
                         if (id) {
+
+                            conn.id = id;
+                            conn.valid_stat = CLIENT_VALID;
+
                             if (_self.clients[id]) {
-                                _self.clients[id].close(1000, 'other-client-comes'); // <-- this client seems previously connected.
-                                conn.close(1000, 're-auth'); // <-- this client seems new. but neet to reconnect.
-                                return true;
-
+                                //console.log('>>>>', _self.clients[id]._c.length, _self.cpu, _self.clients[id]._c);
+                                if (_self.clients[id]._c.length >= _self.cpu) {
+                                    _self.clients[id]._c[0].close(1000, 'other-client-comes');
+                                }
                             } else {
-                                conn.id = id;
-                                conn.valid_stat = CLIENT_VALID;
-
-                                _self.clients[id] = conn;
-                                _self.clients[id].c_send = c_send;
-                                _self.emit('connected', _self.clients[id]);
-                                _self.clients[id].c_send('welcome');
-
+                                _self.clients[id] = {
+                                    id: id,
+                                    _c: [],
+                                    c_send: c_send
+                                };
                             }
 
+                            _self.clients[id]._c.push(conn);
+                            _self.clients[id].c_send('welcome', {connections: _self.clients[id]._c.length});
+                            _self.emit('connected', _self.clients[id], _self.clients[id]._c.indexOf(conn));
+
+                            log(`@ ${conn.id} (${_self.clients[id]._c.length}) one link added`);
                         } else {
                             log('login failed');
                             conn.close(1000, 'unauthorized');
@@ -72,10 +79,17 @@ class WSM extends EE3 {
             });
 
             conn.on('close', function () {
+
                 if (conn.id !== null && conn.valid_stat === CLIENT_VALID) {
-                    log('@' + conn.id + ' disconnected');
-                    _self.emit('disconnected', conn);
-                    delete _self.clients[conn.id];
+                    let i_disc = _self.clients[conn.id]._c.indexOf(conn);
+                    _self.clients[conn.id]._c.splice(i_disc, 1);
+
+                    log(`@ ${conn.id} (${_self.clients[conn.id]._c.length}) one link lost`);
+
+                    if (!_self.clients[conn.id]._c.length) {
+                        _self.emit('disconnected', conn);
+                        delete _self.clients[conn.id];
+                    }
                 }
             });
             conn.onerror = function (e) {
@@ -90,9 +104,11 @@ class WSM extends EE3 {
 }
 
 function c_send(c, dat) {
-    if (this.readyState !== WebSocket.OPEN) return console.log('client can`t get msg:', this.id, '; ws-state:', this.readyState);
-    let mes = JSON.stringify({c: c, dat: dat});
-    this.send(mes);
+    for (let i = 0; i < this._c.length; i++) {
+        if (this._c[i].readyState !== WebSocket.OPEN) continue;
+        let mes = JSON.stringify({c: c, dat: dat});
+        this._c[i].send(mes);
+    }
 }
 
 

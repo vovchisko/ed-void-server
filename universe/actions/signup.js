@@ -32,6 +32,7 @@ module.exports = function (req, res) {
             email: dat.email,
             pass: db.hash(dat.pass),
             api_key: db.generate_api_key(),
+            atoken: db.generate_token(),
             dev: false,
             cmdrs: [],
             lng: '',
