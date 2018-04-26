@@ -55,3 +55,10 @@ exports.handle_request = function (req, res, cb) {
     });
 };
 
+exports.parse_json = function (string) {
+    try {
+        return JSON.parse(string);
+    } catch (e) {
+        return null;
+    }
+};

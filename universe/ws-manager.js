@@ -53,7 +53,6 @@ class WSM extends EE3 {
                             conn.valid_stat = CLIENT_VALID;
 
                             if (_self.clients[id]) {
-                                //console.log('>>>>', _self.clients[id]._c.length, _self.cpu, _self.clients[id]._c);
                                 if (_self.clients[id]._c.length >= _self.cpu) {
                                     _self.clients[id]._c[0].close(1000, 'other-client-comes');
                                 }

@@ -10,6 +10,7 @@ const action_signup = require('./universe/actions/signup');
 const action_signin = require('./universe/actions/signin');
 const action_record = require('./universe/actions/record');
 const UNI = require('./universe/universe');
+const CLL = require('./universe/collector');
 
 require('http').createServer(function (request, response) {
 
@@ -41,7 +42,8 @@ require('http').createServer(function (request, response) {
 //
 
 db.connect(() => {
-    UNI.init_wss_server();
+    UNI.init();
+    CLL.init();
     console.log('Whoosh! MASTER READY!');
     console.log('http://localhost:' + cfg.main.web_port);
 });

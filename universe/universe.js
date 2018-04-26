@@ -15,7 +15,7 @@ class Universe extends EE {
         this.users_api_key = {};
     }
 
-    init_wss_server() {
+    init() {
 
         this.wss = new WSM(cfg.main.ws_user);
 
@@ -29,7 +29,6 @@ class Universe extends EE {
         this.wss.on('disconnected', async (client) => {
             let user = await this.get_user({_id: client.id});
             user.online = false;
-            //user.atoken = db.generate_token();
             user.save();
             console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] leave`);
         });
