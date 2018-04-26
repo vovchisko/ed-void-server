@@ -2,10 +2,10 @@ const _GLOBALS = require('./globals');
 
 const db = require('./database').current;
 const EE = require('eventemitter3');
-const cfg = require('../config');
 const extend = require('deep-extend');
-const WSM = require('./ws-manager');
 const pre = require('./rec_pre_process');
+const clients = require('./cleints');
+
 
 class Universe extends EE {
     constructor() {
@@ -16,57 +16,25 @@ class Universe extends EE {
     }
 
     init() {
-
-        this.wss = new WSM(cfg.main.ws_user);
-
-        this.wss.auth = async (cmd, dat, callback) => {
-            if (cmd !== 'auth') return callback(null);
-            let user = await this.get_user({atoken: dat});
-            if (user) { return callback(user._id); }
-            else { callback(null); }
-        };
-
-        this.wss.on('disconnected', async (client) => {
-            let user = await this.get_user({_id: client.id});
-            user.online = false;
-            user.save();
-            console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] leave`);
-        });
-
-        this.wss.on('connected', async (client) => {
-            let user = await this.get_user({_id: client.id});
-            if (!user) return client.close();
-
-            user.online = true;
-            user.save();
-
-            this.send_to(user._id, 'user', {
-                email: user.email,
-                api_key: user.api_key,
-            });
-            this.send_to(user._id, 'cmdr', user.cmdr);
-
-            console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] joined`);
-
-            // todo: send user history... or maybe not only this?
-            if (user.journal()) {
-                let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(15);
-                scans.forEach((rec) => this.send_to(user._id, 'rec:' + 'Scan', rec));
-            }
-        });
-
-        this.wss.init();
+        console.log('UNIVERSE: OK');
     }
 
-
-    send_to(uid, c, dat) {
-        if (this.wss && this.wss.clients[uid]) {
-            this.wss.clients[uid].c_send(c, dat);
-        }
-    }
 
     /* ADD NEW ROCORD TO DATABASE */
-    async record(user, head, rec, in_pack = false) {
+    async record(rec, cmdr, gv = null, lng = null) {
+
+
+
+        /*
+        todo: SO!
+        - get cmdr by name (it should exists AND SHOULD BE REAL)
+        - cmdr CAN be in "simulation" mode - it means we don't send anything to it's client.
+        - if cmdr has user id - find this user ... and actually that's it.s
+        */
+
+        // todo: REWRITE THIS FUNTION SO IT CAN WORK WELL WITH WS
+
+
         // do some pre-processing
         pre.process(rec);
 

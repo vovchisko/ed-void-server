@@ -22,6 +22,7 @@ class WSM extends EE3 {
         this.cpu = 2;
         this.port = port;
         this.clients = {};
+        this._logging = false;
         this.auth = function () { throw new Error('Auth function not specified!'); }
     }
 
@@ -68,9 +69,10 @@ class WSM extends EE3 {
                             _self.clients[id].c_send('welcome', {connections: _self.clients[id]._c.length});
                             _self.emit('connected', _self.clients[id], _self.clients[id]._c.indexOf(conn));
 
-                            log(`@ ${conn.id} (${_self.clients[id]._c.length}) one link added`);
+                            if (_self._logging) console.log(`@ ${conn.id} (${_self.clients[id]._c.length}) one link added`);
+
                         } else {
-                            log('login failed');
+                            if (_self._logging) console.log('ws login failed', msg.c, msg.dat);
                             conn.close(1000, 'unauthorized');
                         }
                     });
@@ -83,7 +85,7 @@ class WSM extends EE3 {
                     let i_disc = _self.clients[conn.id]._c.indexOf(conn);
                     _self.clients[conn.id]._c.splice(i_disc, 1);
 
-                    log(`@ ${conn.id} (${_self.clients[conn.id]._c.length}) one link lost`);
+                    if (_self._logging) console.log(`@ ${conn.id} (${_self.clients[conn.id]._c.length}) one link lost`);
 
                     if (!_self.clients[conn.id]._c.length) {
                         _self.emit('disconnected', conn);

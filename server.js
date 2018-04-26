@@ -1,7 +1,6 @@
 'use strict';
 
 
-
 const cfg = require('./config');
 const db = require('./universe/database').current;
 const NodeStatic = require('node-static');
@@ -10,7 +9,9 @@ const action_signup = require('./universe/actions/signup');
 const action_signin = require('./universe/actions/signin');
 const action_record = require('./universe/actions/record');
 const UNI = require('./universe/universe');
-const CLL = require('./universe/collector');
+const JCOLL = require('./universe/jcollector');
+const CLIENTS = require('./universe/cleints');
+
 
 require('http').createServer(function (request, response) {
 
@@ -37,14 +38,21 @@ require('http').createServer(function (request, response) {
 
 }).listen(cfg.main.web_port);
 
+console.log('WEB-SERVER ON PORT: ' + cfg.main.web_port);
+
 //
 // WS ON WEB LOGIN PROCEDURE
 //
 
 db.connect(() => {
+    console.log('DATABSE: CONNECTED ' + cfg.database.host + ':' + cfg.database.port);
+    console.log('  VOID_DB - ' + cfg.database.db_void);
+    console.log('   JRN_DB - ' + cfg.database.db_journals);
+
     UNI.init();
-    CLL.init();
-    console.log('Whoosh! MASTER READY!');
+    JCOLL.init();
+    CLIENTS.init();
+
     console.log('http://localhost:' + cfg.main.web_port);
 });
 

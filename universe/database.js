@@ -4,6 +4,8 @@
 const MongoClient = require('mongodb').MongoClient;
 const shortid = require('shortid');
 const crypto = require('crypto');
+const extend = require('deep-extend');
+const cfg = require('../config');
 
 class Database {
     constructor() {
@@ -15,12 +17,12 @@ class Database {
         this.journals = {};
 
         //database settings
-        this.cfg = {
+        this.cfg = extend({
             host: '127.0.0.1',
             port: 27017,
             db_void: 'ed-void',
             db_journals: 'ed-void-rec',
-        };
+        }, cfg);
     }
 
 
@@ -40,9 +42,7 @@ class Database {
                 callback();
             })
             .catch((err) => {
-                console.error(err.name + ':\n' + err.message);
-                console.error('SHUTDOWN!');
-                process.exit(-1);
+                throw err;
             });
     }
 

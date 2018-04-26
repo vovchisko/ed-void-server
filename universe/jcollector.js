@@ -4,11 +4,9 @@ const cfg = require('../config');
 const WSM = require('./ws-manager');
 const UNI = require('./universe');
 
-class Collector {
+class JCollector {
     constructor() {
         this.wss_journals = null;
-
-
     }
 
     init() {
@@ -16,7 +14,6 @@ class Collector {
         this.wss_journals.cpu = 1;
 
         this.wss_journals.auth = async (cmd, dat, callback) => {
-            console.log(cmd,dat)
             if (cmd !== 'auth') return callback(null);
             let juser = await UNI.get_user({api_key: dat});
             if (juser) { return callback(juser._id); }
@@ -25,22 +22,25 @@ class Collector {
 
         this.wss_journals.on('disconnected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
-            console.log(`USR:${juser._id} [ CMDR ${juser.cmdr_name} ] journal disconnected`);
+            console.log(`JCOLL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - disconnected`);
         });
 
         this.wss_journals.on('connected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
             if (!juser) return client.close();
 
-            console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] journal connected`);
+            console.log(`JCOLL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - connected`);
         });
 
         this.wss_journals.on('message', (client, c, dat) => {
-            console.log(c);
+            if (c === 'rec') {
+                UNI.record(dat.rec, dat.cmdr, dat.gv, dat.lng)
+                    .catch((e) => console.log(`UNI.record failed`, e));
+            }
         });
 
         this.wss_journals.init();
-        console.log('collector listening...')
+        console.log(`JCOLL: [${cfg.main.ws_journals}] - OK`);
     }
 
     send_to(uid, c, dat) {
@@ -51,7 +51,7 @@ class Collector {
 
 }
 
-const CLL = new Collector();
-module.exports = CLL;
+const JCOLL = new JCollector();
+module.exports = JCOLL;
 
 
