@@ -5,20 +5,11 @@ const CLIENT_NOOB = 0;
 const CLIENT_VALIDATING = 1;
 const CLIENT_VALID = 2;
 
-function parse_json(string) {
-    try {
-        return JSON.parse(string);
-    } catch (e) {
-        return null;
-    }
-
-}
-
-let log = console.log;
 
 class WSM extends EE3 {
     constructor(port) {
         super();
+        this.name = 'WSM';
         this.cpu = 2;
         this.port = port;
         this.clients = {};
@@ -26,6 +17,14 @@ class WSM extends EE3 {
         this.auth = function () { throw new Error('Auth function not specified!'); }
     }
 
+    parse_json(string) {
+        try {
+            return JSON.parse(string);
+        } catch (e) {
+            console.log(this.name, 'JSON-ERROR!', e);
+            return null;
+        }
+    }
 
     init() {
 
@@ -39,7 +38,7 @@ class WSM extends EE3 {
 
             conn.on('message', function (message) {
 
-                let msg = parse_json(message);
+                let msg = _self.parse_json(message);
                 if (!msg) return conn.close(1000, 'invalid protocol');
                 if (conn.valid_stat === CLIENT_VALIDATING) return;
                 if (conn.valid_stat === CLIENT_VALID)
@@ -69,10 +68,10 @@ class WSM extends EE3 {
                             _self.clients[id].c_send('welcome', {connections: _self.clients[id]._c.length});
                             _self.emit('connected', _self.clients[id], _self.clients[id]._c.indexOf(conn));
 
-                            if (_self._logging) console.log(`@ ${conn.id} (${_self.clients[id]._c.length}) one link added`);
+                            if (_self._logging) console.log(_self.name + ` ${conn.id} (${_self.clients[id]._c.length}) one link added`);
 
                         } else {
-                            if (_self._logging) console.log('ws login failed', msg.c, msg.dat);
+                            if (_self._logging) console.log(_self.name + 'ws login failed', msg.c, msg.dat);
                             conn.close(1000, 'unauthorized');
                         }
                     });
@@ -85,7 +84,7 @@ class WSM extends EE3 {
                     let i_disc = _self.clients[conn.id]._c.indexOf(conn);
                     _self.clients[conn.id]._c.splice(i_disc, 1);
 
-                    if (_self._logging) console.log(`@ ${conn.id} (${_self.clients[conn.id]._c.length}) one link lost`);
+                    if (_self._logging) console.log(_self.name + ` ${conn.id} (${_self.clients[conn.id]._c.length}) one link lost`);
 
                     if (!_self.clients[conn.id]._c.length) {
                         _self.emit('disconnected', conn);
@@ -94,7 +93,7 @@ class WSM extends EE3 {
                 }
             });
             conn.onerror = function (e) {
-                log('ws-err: cc-master.init.clients_wss > ', e.code);
+                if (_self._logging) console.log(_self.name + 'ws-err: cc-master.init.clients_wss > ', e.code);
             };
 
         });

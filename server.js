@@ -50,8 +50,8 @@ db.connect(() => {
     console.log('   JRN_DB - ' + cfg.database.db_journals);
 
     UNI.init();
-    JCOLL.init();
     CLIENTS.init();
+    JCOLL.init();
 
     console.log('http://localhost:' + cfg.main.web_port);
 });

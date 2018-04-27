@@ -3,6 +3,7 @@ const _GLOBALS = require('./globals');
 const cfg = require('../config');
 const WSM = require('./ws-manager');
 const UNI = require('./universe');
+const CLS = require('./cleints');
 
 class JCollector {
     constructor() {
@@ -12,6 +13,7 @@ class JCollector {
     init() {
         this.wss_journals = new WSM(cfg.main.ws_journals);
         this.wss_journals.cpu = 1;
+        this.wss_journals.name = 'WSM@JCOLL';
 
         this.wss_journals.auth = async (cmd, dat, callback) => {
             if (cmd !== 'auth') return callback(null);
@@ -34,7 +36,10 @@ class JCollector {
 
         this.wss_journals.on('message', (client, c, dat) => {
             if (c === 'rec') {
-                UNI.record(dat.rec, dat.cmdr, dat.gv, dat.lng)
+                if (dat.pipe && PIPE_EVENTS.includes(dat.rec.event))
+                    CLS.send_to(client.id, 'rec:' + dat.rec.event, dat);
+
+                UNI.record(client.id, dat, dat.pipe)
                     .catch((e) => console.log(`UNI.record failed`, e));
             }
         });

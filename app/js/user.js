@@ -17,10 +17,10 @@ const USER = new Vue({
             this.user.email = dat.email;
             this.user.api_key = dat.api_key;
         },
-        _upd_cmdr: function (dat) {
-            this.cmdr.name = dat.name;
-            Vue.set(this.cmdr, 'loc', dat.loc);
-            console.log(dat)
+        _upd_cmdr: function (cmdr) {
+            if(!cmdr) return;
+            this.cmdr.name = cmdr.name;
+            Vue.set(this.cmdr, 'loc', cmdr.loc);
         }
     }
 });
