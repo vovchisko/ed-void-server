@@ -186,6 +186,14 @@ console.log('WEB-SERVER ON PORT: ' + cfg.main.web_port);
 
 DB.connect(cfg.database, () => {
 
+    /*
+     * Would be nice if Universe just fire events about updates in th same format as messages.
+     * So universe just update main DB and fire events about it and about things should be broadcasted.
+     *
+     * Stuff like "get_user" or something should be moved to database models.
+     * 
+     *
+     */
 
     console.log('DATABSE: CONNECTED ' + cfg.database.host + ':' + cfg.database.port);
     console.log('  VOID_DB - ' + cfg.database.db_void);
