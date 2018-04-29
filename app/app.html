@@ -112,19 +112,19 @@
 </div>
 
 <div id="raw" v-if="app.logged && app.tab==='raw'">
-    <div class="raw" v-for="(rec, key) in raw">
-        <b>{{rec.event}}</b>
-        <span>{{rec.timestamp}}</span>
-        <pre>{{rec}}</pre>
+    <div class="raw">
+        <b>STATUS</b>
+        <pre>{{status}}</pre>
+    </div>
+    <div class="raw" v-for="(n, key) in raw">
+        <b>{{n.c}}</b>
+        <span>{{n.dat.timestamp || 'no timestamp'}}</span>
+        <pre>{{n.dat}}</pre>
     </div>
 </div>
 
 <div id="nav" v-if="app.logged && app.tab==='nav'">
-    <div class="notification hude" v-if="!cmdr.loc.body.name">
-        <div>Approach to scanned landable body</br>to activate nav system</div>
-    </div>
-
-    <div class="nav-surf" v-if="cmdr.loc.body.name">
+    <div class="nav-surf" v-if="pos.alt">
         <div class="compass">
             <div class="ruler" ref="ruler" v-bind:style="style_ruler">
                 <b class="head">{{pos.head}}</b>
@@ -168,21 +168,32 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid" v-if="cmdr.loc.body.name">
+
+    <div class="container-fluid">
         <h5>CURRENT LOCATION</h5>
-        <div class="notification warning" v-if="!cmdr.loc.body.scanned">
-            <div>Scan body to identify radius and gravity correctly</div>
+        <div v-if="!pos.alt">
+            <em><b>SYS</b><span>{{cmdr.loc.system.name}}</span></em>
+            <em><b></b><span>Seep Space</span></em>
+            <div class="notification huge">
+                <div>NAV-mode will turns on automatically on approach.</div>
+            </div>
         </div>
-        <em><b>SYS</b><span>{{cmdr.loc.system.name}}</span></em>
-        <em><b>BODY</b><span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.name || 'FALSE'}}</span></em>
-        <em>
-            <b>RADIUS</b>
-            <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.r / 1000 | nn(3,3)}} <i>KM</i></span>
-        </em>
-        <em>
-            <b>GRAVITY</b>
-            <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.g / 9.80665 | nn(4)}} <i>G</i></span>
-        </em>
+        <div v-if="pos.alt">
+            <em><b>BODY</b><span
+                    v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.name || 'FALSE'}}</span></em>
+            <em>
+                <b>RADIUS</b>
+                <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.r / 1000 | nn(3,3)}} <i>KM</i></span>
+            </em>
+            <em>
+                <b>GRAVITY</b>
+                <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.g / 9.80665 | nn(4)}} <i>G</i></span>
+            </em>
+            <div class="notification warn" v-if="pos.alt && !cmdr.loc.body.scanned">
+                <div>Scan body to identify radius and gravity correctly</div>
+            </div>
+        </div>
+
     </div>
 </div>
 

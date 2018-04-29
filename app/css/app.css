@@ -81,7 +81,7 @@ ED-ASS LAYOUT
 */
 #user { }
 #user h5 {margin-top: 36px;font-size: 20px;color: #fff;}
-#user button {/* margin-top: 50px */}
+#user button { /* margin-top: 50px */}
 #user em {}
 #user em b {}
 #user em span { width: 100%; margin-bottom: 10px}
@@ -94,10 +94,10 @@ ED-ASS LAYOUT
 */
 #nav {}
 #nav .compass {overflow: hidden;width: 100%;padding: 10px 0 0 0;background: #111;height: 155px;margin-bottom: 10px;}
-#nav .compass .ruler {width: 100%;background-image: url("../img/nav-ruler.gif");background-color: transparent;background-position: 0;height: 30px;margin: 40px 0 33px 0;position: relative;transition: all ease-in-out 1000ms;}
+#nav .compass .ruler {width: 100%;background-image: url("../img/nav-ruler.gif");background-color: transparent;background-position: 0;height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
 #nav .compass .ruler .head {width: 50px;font-size: 14px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -30px 0 0 -25px;}
 #nav .compass .ruler .head:after { content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-top: 5px solid #ff8800;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;}
-#nav .compass .dest {width: 100%;background-image: url("../img/nav-ruler-dest.gif");background-color: transparent;background-position: 0 0;height: 7px;position: relative;transition: all ease-in-out 1000ms;}
+#nav .compass .dest {width: 100%;background-image: url("../img/nav-ruler-dest.gif");background-color: transparent;background-position: 0 0;height: 7px;position: relative;transition: all linear 1000ms;}
 #nav .compass .dest .head {width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #555;color: #555;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
 #nav .compass .dest .head:after {content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-bottom: 5px solid #555;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;top: -14px;}
 #nav .compass .dest .head:before {content: "vector";color: #676767;display: block;position: absolute;left: 50%;margin: 5px 0 0 -100px;top: -42px;width: 200px;text-align: center;text-transform: uppercase;font-size: 13px;}
@@ -128,4 +128,4 @@ ED-ASS LAYOUT
 #raw .raw pre { font-family: "Lucida Console", Monaco, monospace; color: #e2841c; letter-spacing: 0.2px }
 .notification {text-transform: uppercase;font-weight: normal;color: #c3c3c3;display: block; padding: 15px 0;text-align: center;font-size: 14px;}
 .notification.huge {padding: 50px 0;}
-.notification.warning { color: #f20}
+.notification.warn { color: #f20}

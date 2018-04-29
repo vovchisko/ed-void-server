@@ -1,17 +1,15 @@
 //
 // SIGNUP PROCEDURE
 //
-const the = require('../the');
-const db = require('../database').current;
-const UNI = require('../universe');
+
+const server = require('../../server');
+const UNI = server.UNI;
+const DB = server.DB;
 
 module.exports = function (req, res) {
-    the.handle_request(req, res, async (req, res, buffer) => {
+    server.handle_request(req, res, async (req, res, buffer) => {
 
-        let dat = null;
-        try {
-            dat = JSON.parse(buffer.toString());
-        } catch (e) { }
+        let dat = server.parse_json(buffer.toString());
 
         if (!dat) return res.end(JSON.stringify({result: 0, type: 'fail', text: 'request was failed'}));
         if (!dat.email) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'email is required'}));
@@ -20,7 +18,11 @@ module.exports = function (req, res) {
         const user = await UNI.get_user({email: dat.email});
 
         if (!user) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}));
-        if (user.pass !== db.hash(dat.pass)) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}))
+        if (user.pass !== DB.hash(dat.pass)) return res.end(JSON.stringify({
+            result: 0,
+            type: 'warn',
+            text: 'invalid email or pass'
+        }));
 
         let jdata = {
             result: 1, type: 'success', user: {

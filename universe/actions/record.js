@@ -3,30 +3,33 @@
     API v.0.2
     Process records form cleint
 */
-const the = require('../the');
-const UNI = require('../universe');
 
+const server = require('../../server');
+const UNI = require('../universe');
+const pre = require('../pre');
 
 module.exports = function (req, res) {
-    the.handle_request(req, res, async (req, res, buffer) => {
+    server.handle_request(req, res, async (req, res, buffer) => {
 
         let res_text = '';
         let log = 'REC: ';
 
         try {
             let start = new Date().getTime();
-            let records = JSON.parse(buffer.toString());
-
+            let records = server.parse_json(buffer.toString());
             let head = req.headers;
-
 
             let user = await UNI.get_user({api_key: head.api_key});
             if (user) {
                 log += `${user._id} [ CMDR ${head.cmdr} ] ${records.length > 1 ? records.length + ' events' : records[0].event} ... `;
 
                 for (let i = 0; i < records.length; i++) {
-                    await UNI.record(user, head, records[i], !(i > records.length - 5));
+                    pre.process(records[i]);
+                    if (i > (records.length - 5)) UNI.broadcast(user._id, 'rec:' + records[i].event, records[i]);
+                    await UNI.record(user, records[i], head.cmdr, head.gv, head.lng);
+                    if (records[i].event === 'Status') log = '';//don't log status
                 }
+
                 res.statusCode = 200;
                 res_text = records.length > 3 ? 'proceed ' + records.length + ' records' : 'proceed';
                 res_text += ' / ' + (new Date().getTime() - start) + 'ms';
@@ -45,7 +48,7 @@ module.exports = function (req, res) {
         }
 
         res.end(res_text);
-        console.log(log + res_text);
+        if (log) console.log(log + res_text);
     });
 };
 

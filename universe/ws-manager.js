@@ -1,10 +1,11 @@
+"use strict";
+
+
 const WebSocket = require('ws');
 const EE3 = require('eventemitter3');
-
 const CLIENT_NOOB = 0;
 const CLIENT_VALIDATING = 1;
 const CLIENT_VALID = 2;
-
 
 class WSM extends EE3 {
     constructor(port) {
@@ -111,5 +112,7 @@ function c_send(c, dat) {
     }
 }
 
-
 module.exports = WSM;
+
+
+

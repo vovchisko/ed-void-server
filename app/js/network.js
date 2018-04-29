@@ -23,8 +23,7 @@ class Network extends EventEmitter {
             let m = JSON.parse(msg.data);
             if (net.warn_unlistened && !_net._events[m.c]) console.warn('master::no_listeners', m.c, m.dat);
             _net.emit(m.c, m.dat);
-            if (m.c.includes('rec:'))
-                _net.emit('rec:any', m.dat);
+            _net.emit('net:any', m);
         };
         this.ws.onclose = function (e) {
             _net.emit('_close', e.code, e.reason);

@@ -1,4 +1,5 @@
-// estimates ...
+'use strict';
+
 module.exports = {
 
     process: function (rec) {

@@ -1,11 +1,9 @@
 'use strict';
 
-
 const MongoClient = require('mongodb').MongoClient;
 const shortid = require('shortid');
 const crypto = require('crypto');
 const extend = require('deep-extend');
-const cfg = require('../config');
 
 class Database {
     constructor() {
@@ -17,16 +15,17 @@ class Database {
         this.journals = {};
 
         //database settings
-        this.cfg = extend({
+        this.cfg = {
             host: '127.0.0.1',
             port: 27017,
             db_void: 'ed-void',
             db_journals: 'ed-void-rec',
-        }, cfg);
+        };
     }
 
 
-    connect(callback) {
+    connect(cfg, callback) {
+        extend(this.cfg, cfg);
         MongoClient
             .connect('mongodb://' + this.cfg.host + ':' + this.cfg.port)
             .then((client) => {
@@ -77,7 +76,6 @@ class Database {
         return this.journals[journal_id];
     }
 }
-
-module.exports.current = new Database();
-
+const DB = new Database()
+module.exports = DB;
 
