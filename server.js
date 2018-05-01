@@ -170,7 +170,7 @@ require('http').createServer(function (request, response) {
         return action_signin(request, response);
 
     if (request.url === '/app')
-        return app.serveFile('/app.html', 200, {}, request, response);
+        return app.serveFile('/app-root.html', 200, {}, request, response);
 
     request.addListener('end', function () {
         app.serve(request, response, function (e, res) {

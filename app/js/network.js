@@ -16,7 +16,7 @@ class Network extends EventEmitter {
         this.ws.onopen = function () {
             _net.wtoken = wtoken;
             _net.send('auth', _net.wtoken);
-            console.info('net::auth:', _net.wtoken);
+            //console.info('net::auth:', _net.wtoken);
         };
 
         this.ws.onmessage = function (msg) {
@@ -27,14 +27,14 @@ class Network extends EventEmitter {
         };
         this.ws.onclose = function (e) {
             _net.emit('_close', e.code, e.reason);
-            console.info('net:_close', e.code, e.reason, e);
+            //console.info('net:_close', e.code, e.reason, e);
 
         };
 
         this.ws.onerror = function (err) {
             _net.emit('_error', err);
             _net.ws = null;
-            console.info('net:_error', err);
+            //console.info('net:_error', err);
         }
     };
 

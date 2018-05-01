@@ -1,6 +1,9 @@
 "use strict";
 
 Vue.http.options.emulateJSON = true;
+Vue.config.productionTip = false;
+
+
 Vue.filter('nn', function (num, frac = 3, min_frac = 0) {
     num = parseFloat(num);
     if (isNaN(num) || typeof num !== "number") return 'ERR';
@@ -37,7 +40,7 @@ const app = {
 };
 
 /*
- *      MAIN MENU 
+ *      MAIN MENU
  */
 const App = new Vue({
     el: '#app',
@@ -80,7 +83,6 @@ const App = new Vue({
             localStorage.removeItem('wtoken');
             net.disconnect();
         },
-
     }
 });
 
@@ -107,7 +109,6 @@ const Msg = new Vue({
  */
 net.on('_close', (code, reason) => {
     app.online = false;
-    console.log('disconnect', reason)
     if (reason === 'unauthorized' || reason === 'other-client-comes') App._logout();
     if (app.logged) setTimeout(() => App._net_connect(), 2500);
 });
