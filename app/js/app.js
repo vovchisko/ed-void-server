@@ -1,8 +1,6 @@
 "use strict";
 
-Vue.http.options.emulateJSON = true;
 Vue.config.productionTip = false;
-
 
 Vue.filter('nn', function (num, frac = 3, min_frac = 0) {
     num = parseFloat(num);
@@ -35,19 +33,20 @@ const app = {
         pass_c: '',
         wtoken: localStorage.getItem('wtoken') || ''
     },
-    tabs: ['user', 'edass', 'nav', 'raw'],
-    tab: 'user',
+    tabs: ['user', 'edass', 'nav', 'report'],
+    tab: localStorage.getItem('tab') || 'user',
 };
 
 /*
  *      MAIN MENU
  */
-const App = new Vue({
+let App = new Vue({
     el: '#app',
     data: app,
     methods: {
         _tab: function (tab) {
             this.tab = tab;
+            localStorage.setItem('tab', tab);
         },
         _signup: function () {
             fetch('/signup', {
@@ -71,6 +70,8 @@ const App = new Vue({
                     if (!dat.result) return Msg.show(dat);
                     localStorage.setItem('wtoken', dat.user.wtoken);
                     app.auth.wtoken = dat.user.wtoken;
+                    app.dev = !!dat.user.dev;
+                    app.tabs.push('raw');
                     this._net_connect();
                 });
         },

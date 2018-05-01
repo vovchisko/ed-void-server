@@ -38,9 +38,9 @@ const cfg = server.cfg = require('./config');
 const DB = server.DB = require('./universe/database');
 const UNI = server.UNI = require('./universe/universe');
 
-const action_signup = require('./universe/actions/signup');
-const action_signin = require('./universe/actions/signin');
-const action_record = require('./universe/actions/record');
+const action_signup = require('./universe/api/signup');
+const action_signin = require('./universe/api/signin');
+const action_record = require('./universe/api/record');
 
 
 class Clients {
@@ -154,34 +154,24 @@ class JCollector {
 const CLS = server.CLS = new Clients();
 const JCL = server.JCL = new JCollector();
 
-
 //
 // WS ON WEB LOGIN PROCEDURE
 //
 require('http').createServer(function (request, response) {
 
-    if (request.url === '/api/record')
-        return action_record(request, response);
+    if (request.url === '/api/record') return action_record(request, response);
+    if (request.url === '/signup') return action_signup(request, response);
+    if (request.url === '/signin') return action_signin(request, response);
+    if (request.url === '/app') return app.serveFile('/app-root.html', 200, {}, request, response);
 
-    if (request.url === '/signup')
-        return action_signup(request, response);
-
-    if (request.url === '/signin')
-        return action_signin(request, response);
-
-    if (request.url === '/app')
-        return app.serveFile('/app-root.html', 200, {}, request, response);
-
-    request.addListener('end', function () {
-        app.serve(request, response, function (e, res) {
-            if (e && (e.status === 404)) { // If the file wasn't found
-                app.serveFile('/error.html', 404, {}, request, response);
-            }
+    request.addListener('end', () => {
+        app.serve(request, response, function (err, res) {
+            if (err && (err.status === 404)) app.serveFile('/error.html', 404, {}, request, response);
         });
-
     }).resume();
 
 }).listen(cfg.main.web_port);
+
 console.log('WEB-SERVER ON PORT: ' + cfg.main.web_port);
 
 DB.connect(cfg.database, () => {
