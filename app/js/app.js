@@ -30,7 +30,7 @@ const app = {
         email: window.location.hash.substr(1) || '',
         pass: '',
         pass_c: '',
-        atoken: localStorage.getItem('atoken') || ''
+        wtoken: localStorage.getItem('wtoken') || ''
     },
     tabs: ['user', 'edass', 'nav', 'raw'],
     tab: 'user',
@@ -66,18 +66,18 @@ const App = new Vue({
             }).then(res => res.json())
                 .then((dat) => {
                     if (!dat.result) return Msg.show(dat);
-                    localStorage.setItem('atoken', dat.user.atoken);
-                    app.auth.atoken = dat.user.atoken;
+                    localStorage.setItem('wtoken', dat.user.wtoken);
+                    app.auth.wtoken = dat.user.wtoken;
                     this._net_connect();
                 });
         },
         _net_connect: function () {
-            net.init(app.auth.atoken);
+            net.init(app.auth.wtoken);
         },
         _logout: function () {
             app.logged = false;
-            app.auth.atoken = '';
-            localStorage.removeItem('atoken');
+            app.auth.wtoken = '';
+            localStorage.removeItem('wtoken');
             net.disconnect();
         },
 
@@ -119,6 +119,6 @@ net.on('welcome', (dat) => {
 
 document.onreadystatechange = () => {
     if (document.readyState === 'complete') {
-        if (app.auth.atoken) { App._net_connect(); }
+        if (app.auth.wtoken) { App._net_connect(); }
     }
 };

@@ -26,8 +26,9 @@ module.exports = function (req, res) {
 
         let jdata = {
             result: 1, type: 'success', user: {
-                atoken: user.atoken, //todo: let's do different keys here
-                name: user.cmdr,
+                wtoken: user.wtoken,
+                api_key: user.api_key,
+                name: user.cmdr_name,
                 email: user.email
             }
         };

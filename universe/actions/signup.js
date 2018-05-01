@@ -29,7 +29,7 @@ module.exports = function (req, res) {
             email: dat.email,
             pass: DB.hash(dat.pass),
             api_key: DB.generate_api_key(),
-            atoken: DB.generate_token(),
+            wtoken: DB.generate_token(),
         };
 
         await DB.users.save(user);

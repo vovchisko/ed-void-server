@@ -4,19 +4,19 @@ class Network extends EventEmitter {
         super();
         this.warn_unlistened = false;
         this.ws = null;
-        this.atoken = null;
+        this.wtoken = null;
     }
 
 
-    init(atoken) {
+    init(wtoken) {
         const _net = this;
 
         this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
 
         this.ws.onopen = function () {
-            _net.atoken = atoken;
-            _net.send('auth', _net.atoken);
-            console.info('net::auth:', _net.atoken);
+            _net.wtoken = wtoken;
+            _net.send('auth', _net.wtoken);
+            console.info('net::auth:', _net.wtoken);
         };
 
         this.ws.onmessage = function (msg) {

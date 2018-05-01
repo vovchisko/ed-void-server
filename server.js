@@ -55,7 +55,7 @@ class Clients {
         this.wss_clients.name = 'WSM@CLS';
         this.wss_clients.auth = async (cmd, dat, callback) => {
             if (cmd !== 'auth') return callback(null);
-            let user = await UNI.get_user({atoken: dat});
+            let user = await UNI.get_user({wtoken: dat});
             if (user) { return callback(user._id); }
             else { callback(null); }
         };
@@ -191,7 +191,7 @@ DB.connect(cfg.database, () => {
      * So universe just update main DB and fire events about it and about things should be broadcasted.
      *
      * Stuff like "get_user" or something should be moved to database models.
-     * 
+     *
      *
      */
 
