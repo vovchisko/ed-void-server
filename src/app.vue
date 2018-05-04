@@ -1,0 +1,67 @@
+<template>
+    <div id="app">
+        <auth v-if="!data.auth.is_logged"></auth>
+        <navbar v-if="data.auth.is_logged"/>
+        <div class="container-fluid" v-if="data.auth.is_logged">
+            <cmdr v-if=" data.tabs.c_tab === 'cmdr'"></cmdr>
+            <vass v-if="data.tabs.c_tab==='vass'"></vass>
+            <navi v-if="data.tabs.c_tab==='navi'"></navi>
+            <repo v-if="data.tabs.c_tab==='repo'"></repo>
+            <dev v-if="data.tabs.c_tab==='dev'"></dev>
+        </div>
+    </div>
+
+</template>
+
+<script>
+
+
+    import Auth from './components/auth.vue'
+    import Navbar from './components/navbar.vue'
+    import Data from './services/data'
+    import Vue from 'vue'
+
+    import Cmdr from './components/cmdr.vue'
+    import Navi from './components/navi.vue'
+    import Vass from './components/vass.vue'
+    import Repo from './components/repo.vue'
+    import Dev from './components/dev.vue'
+
+
+    export default {
+        name: 'app',
+        data: () => {return {data: Data}},
+        components: {
+            Navbar, Auth, Cmdr, Navi, Vass, Dev, Repo
+        },
+    }
+
+
+    Vue.config.productionTip = false;
+
+    Vue.filter('nn', function (num, frac = 3, min_frac = 0) {
+        num = parseFloat(num);
+        if (isNaN(num) || typeof num !== "number") return 'ERR';
+        return (new Intl.NumberFormat('en-US', {
+            maximumFractionDigits: frac,
+            minimumFractionDigits: min_frac
+        })).format(num);
+    });
+
+    Vue.filter('yn', function (value) {
+        if (typeof value !== "boolean") return value;
+        return value ? 'TRUE' : 'FALSE';
+    });
+
+    Vue.filter('isval', function (value) {
+        return value ? value : 'FALSE';
+    });
+
+</script>
+
+<style lang="scss">
+    @import '~bootstrap/dist/css/bootstrap-reboot.css';
+    @import '~bootstrap/dist/css/bootstrap-grid.css';
+    @import 'styles/global';
+    #app > pre { margin: 0; font-size: 0.75rem; line-height: 0.75rem; overflow: visible;}
+</style>

@@ -1,0 +1,1 @@
+all assets should be tarnslated to base64 BEFORE build.
