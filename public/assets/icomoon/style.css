@@ -1,0 +1,106 @@
+@font-face {
+  font-family: 'icomoon';
+  src:
+    url('fonts/icomoon.ttf?zctam8') format('truetype'),
+    url('fonts/icomoon.woff?zctam8') format('woff'),
+    url('fonts/icomoon.svg?zctam8#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+i {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.i-chevron-up:before {
+  content: "\e910";
+}
+.i-chevron-right:before {
+  content: "\e911";
+}
+.i-chevron-left:before {
+  content: "\e912";
+}
+.i-chevron-down:before {
+  content: "\e913";
+}
+.i-menu:before {
+  content: "\e914";
+}
+.i-wrench:before {
+  content: "\e915";
+}
+.i-fuel:before {
+  content: "\e916";
+}
+.i-pencil-ruler:before {
+  content: "\e917";
+}
+.i-wind:before {
+  content: "\e918";
+}
+.i-satellite-receiver:before {
+  content: "\e919";
+}
+.i-satellite:before {
+  content: "\e91a";
+}
+.i-aim:before {
+  content: "\e900";
+}
+.i-compass:before {
+  content: "\e901";
+}
+.i-profile-card:before {
+  content: "\e902";
+}
+.i-bookmark:before {
+  content: "\e903";
+}
+.i-gear:before {
+  content: "\e904";
+}
+.i-star:before {
+  content: "\e905";
+}
+.i-pulse:before {
+  content: "\e906";
+}
+.i-planet-earth:before {
+  content: "\e907";
+}
+.i-planet-ringed:before {
+  content: "\e908";
+}
+.i-globe:before {
+  content: "\e909";
+}
+.i-edit:before {
+  content: "\e90a";
+}
+.i-file-add:before {
+  content: "\e90b";
+}
+.i-file:before {
+  content: "\e90c";
+}
+.i-wifi:before {
+  content: "\e90d";
+}
+.i-wifi-low:before {
+  content: "\e90e";
+}
+.i-wifi-alert:before {
+  content: "\e90f";
+}

@@ -1,6 +1,6 @@
 <template>
     <div id="navi">
-        <div class="navi-surf" v-if="navi.pos.alt">
+        <div class="navi-surf" v-if="!navi.pos.alt">
             <div class="compass">
                 <div class="ruler" v-bind:style="navi.style_ruler">
                     <b class="head">{{navi.pos.head}}</b>
@@ -60,7 +60,7 @@
             </div>
             <div v-if="navi.pos.alt">
                 <em><b>BODY</b><span
-                        v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.name || 'FALSE'}}</span></em>
+                    v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.name || 'FALSE'}}</span></em>
                 <em>
                     <b>RADIUS</b>
                     <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.r / 1000 | nn(3,3)}} <i>KM</i></span>
@@ -147,10 +147,32 @@
         }
     }
 
-
 </script>
 
 <style lang="scss">
+    @import "../styles/vars";
+
+    // NAV MODULE
+
+    #navi {}
+    #navi .compass {overflow: hidden; background: #111;height: 145px;margin: 0 -5px 10px -5px;}
+    #navi .compass .ruler { background: transparent url('../assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
+    #navi .compass .ruler .head {width: 50px;font-size: 14px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -30px 0 0 -25px;}
+    #navi .compass .ruler .head:after { content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-top: 5px solid #ff8800;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;}
+    #navi .compass .dest { background: transparent url('../assets/nav-ruler-dest.gif') 0 0; width: 100%;height: 7px;position: relative;transition: all linear 1000ms;}
+    #navi .compass .dest .head {width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #555;color: #555;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
+    #navi .compass .dest .head:after {content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-bottom: 5px solid #555;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;top: -14px;}
+    #navi .compass .dest .head:before {content: "vector";color: #676767;display: block;position: absolute;left: 50%;margin: 5px 0 0 -100px;top: -42px;width: 200px;text-align: center;text-transform: uppercase;font-size: 13px;}
+    #navi .compass .dest .head.alg0 {border-color: #0098f9;color: #0098f9;}
+    #navi .compass .dest .head.alg0:after {border-bottom-color: #0098f9;top: -14px;}
+    #navi .compass .dest .head.alg0:before {content: '[ ok ]'; color: #0098f9; }
+    #navi .compass .dest .head.alg1 {border-color: #FF8800;color: #FF8800;}
+    #navi .compass .dest .head.alg1:after {border-bottom-color: #FF8800;top: -14px;}
+    #navi .compass .dest .head.alg1:before {content: 'missaligment'; color: #FF8800; }
+    #navi .compass .dest .head.alg2 {border-color: red;color: red;}
+    #navi .compass .dest .head.alg2:after {border-bottom-color: red;top: -14px;}
+    #navi .compass .dest .head.alg2:before {content: 'wrong course vector!'; color: red; }
+    #navi .cords input[type=number] {border: 0 none;width: calc(100% - 20px);text-align: right;line-height: inherit;height: auto;padding: 0;}
 
 </style>
 

@@ -18,7 +18,6 @@
             </div>
         </div>
 
-
         <h5>ED-VOID CLIENT INSTALLATION</h5>
         <div class="row">
             <div class="col-sm-6">
@@ -27,9 +26,9 @@
                     on your PC.<br>
                     - Run and follow the instructions
                 </p>
-                <p class="help">If you need help - visit our <a href="https://discord.gg/s7qchpj" target="_blank">Discord
-                    Server</a></p>
-                <br><br><br>
+                <p class="help">If you need help - visit our
+                    <a href="https://discord.gg/s7qchpj" target="_blank">Discord Server</a></p>
+
             </div>
         </div>
 
@@ -40,7 +39,6 @@
     import Data from '../services/data';
     import Net from '../services/network';
     import Vue from 'vue';
-    import extend from 'deep-extend';
 
     export default {
         name: 'cmdr',
@@ -61,7 +59,7 @@
 
     Net.on('cmdr', (cmdr) => {
         if (!cmdr) return false;
-        extend(Data.cmdr, cmdr);
+        Vue.set(Data, 'cmdr', cmdr);
     });
 
     Net.on('user', (user) => {

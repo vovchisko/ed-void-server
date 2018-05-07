@@ -254,6 +254,12 @@ class CMDR {
     }
 }
 
+class SYSTEM {
+    constructor(system_data) {
+        this.id=null
+    }
+}
+
 const UNI = new Universe();
 module.exports = UNI;
 

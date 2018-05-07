@@ -41,7 +41,7 @@
                             <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
                             <em><b>Tidal Lock</b><span v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
                             <em><b>Volcanism</b><span
-                                    v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
+                                v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
                             <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
                             <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <i>KM</i></span></em>
                             <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <i>G</i></span></em>
@@ -74,9 +74,9 @@
                             <b>Orbit</b>
                             <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <i>AU</i></span></em>
                             <em><b>Orbital
-                                Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+                                   Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
                             <em><b>Rotation
-                                Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
+                                   Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <i>DAYS</i></span></em>
                             <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
                             <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <i>°</i></span></em>
                             <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <i>°</i></span></em>
@@ -99,7 +99,6 @@
 </template>
 
 <script>
-
 
     import Net from '../services/network';
     import Data from '../services/data';
@@ -134,5 +133,23 @@
 </script>
 
 <style lang="scss">
+    @import "../styles/vars";
 
+    #vass h4 {text-transform: uppercase;font-size: 1.1rem;margin: 10px 0 5px 0; padding: 5px; text-align: left;background: #100f0f;}
+    #vass h4 b { font-size: 1rem; }
+    #vass h4 div { text-align: right; font-size: 0.8rem;}
+    #vass h4 span { display: inline-block; margin-left: 1rem }
+    #vass h4 span.arrival {color: #d1d2a3;text-align: right;}
+    #vass h4 span.star {color: $purple}
+    #vass h4 span.planet {color: $green;}
+    #vass h4 span.landable {color: $blue;}
+    #vass h4 span.value {color: $orange;}
+    #vass .scan:last-child { display: none; }
+    #vass .scan:first-child { display: block !important; }
+    #vass .scan.empty { text-align: center; color: $orange; padding: 100px 0; }
+    #vass .sub { }
+    #vass .sub > b { color: #5d5d5d;font-weight: normal;text-transform: uppercase; }
+    #vass .sub em { font-size: 0.7rem; line-height: 0.8rem; }
+    #vass .sub em b {color: #693a10;}
+    #vass .sub em span { color: #98570d; text-transform: capitalize; }
 </style>

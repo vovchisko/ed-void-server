@@ -4,17 +4,14 @@
         <navbar v-if="data.auth.is_logged"/>
         <div class="container-fluid" v-if="data.auth.is_logged">
             <cmdr v-if=" data.tabs.c_tab === 'cmdr'"></cmdr>
-            <vass v-if="data.tabs.c_tab==='vass'"></vass>
-            <navi v-if="data.tabs.c_tab==='navi'"></navi>
-            <repo v-if="data.tabs.c_tab==='repo'"></repo>
-            <dev v-if="data.tabs.c_tab==='dev'"></dev>
+            <vass v-if="data.tabs.c_tab === 'vass'"></vass>
+            <navi v-if="data.tabs.c_tab === 'navi'"></navi>
+            <repo v-if="data.tabs.c_tab === 'repo'"></repo>
+            <dev v-if="data.tabs.c_tab === 'dev'"></dev>
         </div>
     </div>
-
 </template>
-
 <script>
-
 
     import Auth from './components/auth.vue'
     import Navbar from './components/navbar.vue'
@@ -26,7 +23,6 @@
     import Vass from './components/vass.vue'
     import Repo from './components/repo.vue'
     import Dev from './components/dev.vue'
-
 
     export default {
         name: 'app',
@@ -62,6 +58,7 @@
 <style lang="scss">
     @import '~bootstrap/dist/css/bootstrap-reboot.css';
     @import '~bootstrap/dist/css/bootstrap-grid.css';
-    @import 'styles/global';
-    #app > pre { margin: 0; font-size: 0.75rem; line-height: 0.75rem; overflow: visible;}
+    @import 'styles/fonts';
+    @import 'styles/vars';
+    @import 'styles/base';
 </style>

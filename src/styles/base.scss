@@ -1,0 +1,65 @@
+@import 'vars';
+/*
+  BOOTSTRAP OVERRIDE
+*/
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-auto,
+.col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-sm-auto,
+.col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-md-auto,
+.col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-lg-auto,
+.col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl, .col-xl-auto,
+.container-fluid { padding: 5px;}
+.row { margin: 0 -5px}
+/*
+  AUTOFILL STYLES IN CHROME
+*/
+input, textarea, select {
+  &:-webkit-autofill {
+    border: 1px solid darken($ui-fg, 25%);
+    -webkit-text-fill-color: darken($ui-act-fg, 25%);
+    -webkit-box-shadow: 0 0 0px 1000px $ui-bg inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+* { box-sizing: border-box; }
+*::placeholder { color: #444; }
+*:focus, *:active { outline: none !important; }
+html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 16px; line-height: 18px }
+#{$all-inputs} {
+  @include basic-ui();
+  &:active, &:focus {
+    color: $ui-act-fg;
+    border-color: $ui-act-fg;
+    + label { color: $ui-act-fg}
+  }
+  + label { margin: 0; font-size: 1rem; line-height: 1rem}
+}
+button {
+  @include basic-ui();
+  border: 1px solid $ui-fg;
+  transition: all ease-out 50ms;
+  &:active {
+    border: 1px solid $ui-act-fg;
+    text-shadow: -2px -4px 0 rgba(0, 255, 240, .35), 2px 4px 0 rgba(255, 0, 230, .35);
+    box-shadow: -2px -4px 0 0 rgba(0, 255, 240, .35), 2px 4px 0 0 rgba(255, 0, 230, .35);
+  }
+  &.active {
+    color: $ui-act-fg;
+    border-color: $ui-act-fg;
+    text-shadow: -1px -2px 0 rgba(0, 255, 240, .25), 1px 2px 0 rgba(255, 0, 230, .25);
+    box-shadow: -1px -2px 0 0 rgba(0, 255, 240, .25), 1px 2px 0 0 rgba(255, 0, 230, .25);
+  }
+}
+button, label { @include hcaps();}
+.wide { width: 100%; display: block; }
+//
+//
+// BASE DATA LISTS
+//
+em {font-style: normal;display: block; }
+em b {font-weight: normal;text-transform: uppercase;color: #c56209; display: block;width: 50%;float: left;}
+em span {font-style: normal;color: #ff8800;display: block;width: 50%;float: left;}
+em span i {font-style: normal;color: #715029;}
+em span.false {color: #5d5d5d;}
+em[justify] b { text-align: right; padding-right: 5px; }
+em[justify] span { text-align: left; padding-right: 5px;}
+em::after, .cls::after { content: ""; clear: both; display: table; }
