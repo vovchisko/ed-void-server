@@ -54,7 +54,7 @@
                 Vue.set(Data, 'cmdr', null);
                 Data.user.email = null;
                 Data.user.api_key = null;
-                localStorage.removeItem('wtoken');
+                Data.save();
             }
         }
     }

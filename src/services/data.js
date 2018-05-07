@@ -1,24 +1,6 @@
 //import Net from './network';
 //Net.on('net:any', (c, rec) => { console.log(c, rec)});
 
-
-const EMPTY_CMDR = {
-    "name": null,
-    "loc": {
-        "system": {
-            "name": null,
-            "coord": [0, 0, 0]
-        },
-        "body": {
-            "name": null,
-            "r": null,
-            "g": null,
-        }
-    },
-    "last_rec": null
-};
-
-
 class DataStorage {
     constructor() {
         this.tabs = {
@@ -29,7 +11,7 @@ class DataStorage {
                 'repo': {base: 'Reporting', inject: ''},
                 'dev': {base: 'ED-VIOD/DEV', inject: ''}
             },
-            c_tab: localStorage.getItem('c_tab') || 'cmdr'
+            c_tab: 'cmdr'
         };
         this.auth = {
             is_logged: false,
@@ -40,9 +22,10 @@ class DataStorage {
         this.cmdr = {
             name: null,
             loc: {
-                system: {name: null},
-                body: {name: null},
-            }
+                system: {name: null, coord:[0,0,0]},
+                body: {name: null, r: null, g: null},
+            },
+            last_rec: null
         };
         this.user = {
             email: 'n/a',
@@ -66,6 +49,24 @@ class DataStorage {
             },
             recent: []
         };
+
+        this.init();
+    }
+
+    init() {
+        //read wtoken
+        let wtoken = localStorage.getItem('wtoken');
+        if (wtoken) this.auth.wtoken = wtoken;
+
+        //read wtoken
+        let c_tab = localStorage.getItem('c_tab');
+        if (c_tab) this.tabs.c_tab = c_tab;
+    }
+
+    save() {
+        //save some data to locastorage
+        localStorage.setItem('wtoken', this.auth.wtoken);
+        localStorage.setItem('c_tab', this.tabs.c_tab);
     }
 
     upd_cmdr(cmdr) {
@@ -75,8 +76,6 @@ class DataStorage {
     upd_user(cmdr) {
         // extend user data with passed
     }
-
-
 }
 
 

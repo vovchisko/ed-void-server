@@ -46,7 +46,6 @@ class Network extends EventEmitter3 {
             _net.stat.error = true;
             _net.emit('_error', err);
             _net.ws = null;
-
         }
     };
 

@@ -34,8 +34,8 @@
         methods: {
             do_nav: function (t) {
                 this.nav.c_tab = t;
-                localStorage.setItem('c_tab', t);
                 this.m_toggle(false);
+                Data.save();
             },
             m_toggle: function (t = null) {
                 if (t === null) return this.toggle = !this.toggle;
