@@ -5,7 +5,6 @@ const server = require('../server');
 
 class Universe {
     constructor() {
-
         this.users = {};
         this.cmdrs = {};
         this.users_api_key = {};
@@ -78,16 +77,10 @@ class Universe {
     }
 
     async proc_FSDJump(cmdr, rec) {
-        let system = await DB.systems.findOne({_id: rec.StarSystem});
 
-        if (!system) system = {_id: rec.StarSystem, _submited: rec._cmdr};
+        let sys = await this.spawn_system(rec.StarSystem, rec.StarPos);
 
-        for (let i in rec) {
-            if (i[0] === '_' || i === 'event' || i.includes('_Localised')) continue;
-            system[i] = rec[i];
-        }
-
-        await DB.systems.save(system);
+        sys.append(cmdr, rec);
 
         cmdr.touch({
             loc: {
@@ -129,9 +122,15 @@ class Universe {
     }
 
     broadcast(uid, c, dat) {
+        //todo: nice place to fire event
         if (this.alive) server.CLS.send_to(uid, c, dat);
     }
 
+    /**
+     * Get user by mongodb query. Is also can be cached in Universe Instance
+     * @param {object} by is MongoDB query.
+     * @returns {Promise<USER>}
+     */
     async get_user(by) {
         let user = null;
 
@@ -153,6 +152,12 @@ class Universe {
         return user;
     }
 
+    /**
+     * Load or create cmdr for user
+     * @param {string} uid User ID
+     * @param {string} name CMDR Name
+     * @returns {Promise<CMDR>}
+     */
     async get_cmdr(uid, name) {
 
         let cmdr_id = uid + '/' + name;
@@ -176,17 +181,61 @@ class Universe {
         return this.cmdrs[cmdr_id];
     }
 
-    async get_system(by, create = false) {
-        let sys = await DB.systems.findOne(by);
-        if (sys) return new SYSTEM(sys);
-        if (!create) return null;
-        if (!by.name) return null;
+    /**
+     * Get or create system with name and coordinates
+     * @param {string} name
+     * @param {array} pos SparPos[x,y,z]
+     * @returns {Promise<SYSTEM>}
+     */
+    async spawn_system(name, pos) {
+        let id = Universe.system_id(name, pos);
+        let s = await DB.systems.findOne({_id: id});
+
+        if (s) return new SYSTEM(s);
+
+        //todo: shoudl we do socme cache like with cmdrs or users?
+        return new SYSTEM({
+            _id: id,
+            name: name,
+            pos: pos,
+        });
+    }
+
+
+    /**
+     * Create ID from name and coordinates [x,y,z]
+     * @param {string} name
+     * @param {array} pos SparPos[x,y,z]
+     * @returns {string} Cool System ID
+     */
+    static system_id(name, pos) {
+        return name + '@' + pos.map(x => Math.round(x * 32)).join(':');
+    }
+
+}
+
+
+class SYSTEM {
+    constructor(sys) {
+        this._id = null;
+        this.name = null;
+        this._submited = null;
+        extend(this, sys);
+    }
+
+    append(cmdr, rec) {
+        if (rec.event === 'FSDJump')
+            return this;
 
 
     }
 
-
+    async save() {
+        //no temporary fields here...
+        await DB.systems.save(this);
+    }
 }
+
 
 class USER {
     constructor(data) {
@@ -232,7 +281,6 @@ class USER {
     }
 }
 
-
 class CMDR {
     constructor(cmdr_data) {
         this._id = null;
@@ -261,19 +309,6 @@ class CMDR {
         delete snapshot._ch;
         await DB.cmdrs.save(snapshot);
         this._ch = false;
-    }
-}
-
-class SYSTEM {
-    constructor(name) {
-        this._id = null;
-        this.name = null;
-
-        extend(this, sys);
-    }
-
-    apply(cmdr, scan) {
-
     }
 }
 

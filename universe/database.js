@@ -31,9 +31,9 @@ class Database {
             .then((client) => {
                 this.db_void = client.db(this.cfg.db_void);
                 this.db_journals = client.db(this.cfg.db_journals);
+                this.bind_collections();
                 this.db_void.once('close', () => { throw new Error('DB:: CONNECTION_CLOSED: db_void') });
                 this.db_journals.once('close', () => { throw new Error('DB:: CONNECTION_CLOSED: db_journals'); });
-                this.bind_collections();
                 callback();
             })
             .catch((err) => {
@@ -74,6 +74,6 @@ class Database {
     }
 }
 
-const DB = new Database()
+const DB = new Database();
 module.exports = DB;
 

@@ -189,8 +189,7 @@ require('http').createServer(function (request, response) {
         });
 
     }).resume();
-
-
+    
 }).listen(cfg.main.api_port);
 console.log('API-SERVER ON PORT: ' + cfg.main.api_port);
 
