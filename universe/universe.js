@@ -176,6 +176,16 @@ class Universe {
         return this.cmdrs[cmdr_id];
     }
 
+    async get_system(by, create = false) {
+        let sys = await DB.systems.findOne(by);
+        if (sys) return new SYSTEM(sys);
+        if (!create) return null;
+        if (!by.name) return null;
+
+
+    }
+
+
 }
 
 class USER {
@@ -255,8 +265,15 @@ class CMDR {
 }
 
 class SYSTEM {
-    constructor(system_data) {
-        this.id=null
+    constructor(name) {
+        this._id = null;
+        this.name = null;
+
+        extend(this, sys);
+    }
+
+    apply(cmdr, scan) {
+
     }
 }
 

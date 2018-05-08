@@ -21,7 +21,7 @@ module.exports = function (req, res) {
 
             let user = await UNI.get_user({api_key: head.api_key});
             if (user) {
-                log += `${user._id} [ CMDR ${head.cmdr} ] ${records.length > 1 ? records.length + ' events' : records[0].event} ... `;
+                log += `${user._id} [CMDR ${head.cmdr}] ${records.length > 1 ? records.length : records[0].event} ... `;
 
                 for (let i = 0; i < records.length; i++) {
                     pre.process(records[i]);
@@ -31,7 +31,7 @@ module.exports = function (req, res) {
                 }
 
                 res.statusCode = 200;
-                res_text = records.length > 3 ? 'proceed ' + records.length + ' records' : 'proceed';
+                res_text = records.length > 1 ? records.length + ' rec. proceed' : 'proceed';
                 res_text += ' / ' + (new Date().getTime() - start) + 'ms';
 
             } else {
