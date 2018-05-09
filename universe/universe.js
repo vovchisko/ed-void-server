@@ -277,7 +277,7 @@ class Universe {
     }
 
     static body_id(system_id, body_name) {
-        return system_id + '@' + body_name;
+        return system_id + '/' + body_name;
     }
 
 }
