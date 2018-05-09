@@ -290,11 +290,10 @@ class BODY {
         this.submited = null;
         this.last_update = null;
         this.type = null;
-        extend(this,body)
+        extend(this, body)
     }
 
     append(cmdr, rec) {
-
 
         // all
         dot.copy('BodyName', 'name', rec, this);
@@ -315,6 +314,7 @@ class BODY {
             this.type = 'planet';
             this.landable = !!rec.Landable;
 
+            dot.copy('PlanetClass', 'planet_class', rec, this);
             dot.copy('MassEM', 'mass_em', rec, this);
             dot.copy('SurfaceGravity', 'surf_gravity', rec, this);
             dot.copy('SurfacePressure', 'surf_presure', rec, this);
@@ -326,16 +326,24 @@ class BODY {
             dot.copy('Atmosphere', 'atmo', rec, this);
             dot.copy('AtmosphereType', 'atmo_type', rec, this);
 
+            dot.copy('ReserveLevel', 'reserve_level', rec, this);
+
             if (rec.AtmosphereComposition) {
                 this.atmo_composition = {};
                 for (let i in rec.AtmosphereComposition) this.atmo_composition[rec.AtmosphereComposition[i].Name] = rec.AtmosphereComposition[i].Percent;
             }
+
+            if (rec.Materials) {
+                this.materials = {};
+                for (let i in rec.Materials) this.materials[rec.Materials[i].Name] = rec.Materials[i].Percent;
+            }
+
         }
 
+        dot.copy('Parents', 'parents', rec, this);
 
         //orbit
         dot.copy('SemiMajorAxis', 'o_smaxis', rec, this);
-        dot.copy('Eccentricity', 'o_eccentricity', rec, this);
         dot.copy('Eccentricity', 'o_eccentricity', rec, this);
         dot.copy('OrbitalInclination', 'o_inclination', rec, this);
         dot.copy('Periapsis', 'o_periapsis', rec, this);
@@ -347,24 +355,22 @@ class BODY {
         dot.copy('TidalLock', 'rot_tidal_lock', rec, this);
 
         // ?
-        dot.copy('ReserveLevel', 'reserve_level', rec, this);
+        dot.copy('EstimatedValue', 'estimated_value', rec, this);
 
+        if (rec.Rings) {
+            this.rings = [];
+            for (let i in rec.Rings) {
 
-//stars
-        let x = ["Rings",
-            "",
-            "",
-            "",
-            "",
-            "EstimatedValue",
-            "",
-            "Materials",
-            "Parents",
-            "",
-            "",
-            "",
-            "",
-        ];
+                this.rings.push({
+                    name: rec.Rings[i].Name,
+                    clas: rec.Rings[i].RingClass,
+                    mass: rec.Rings[i].MassMT,
+                    r_inner: rec.Rings[i].InnerRad,
+                    r_outer: rec.Rings[i].OuterRad,
+                });
+
+            }
+        }
 
 
         if (!this.submited || this.submited > rec.timestamp) {
