@@ -67,3 +67,11 @@ console.log(m);
 m.name = 'Gunter Yes!';
 
 console.log(m);
+
+
+
+
+let arr1 = [1,2,3];
+let arr2 = arr1.slice(); // NOT SPLICE!!!
+
+console.log(arr1, arr2);

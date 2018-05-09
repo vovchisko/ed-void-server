@@ -1,4 +1,7 @@
 'use strict';
+
+// @link: https://ed.miggy.org/fd-journal-docs/
+
 const extend = require('deep-extend');
 const DB = require('./database');
 const server = require('../server');
@@ -71,7 +74,7 @@ class Universe {
     async proc_NavBeaconScan(cmdr, rec) {
 
         cmdr.metrics.curr_ds = rec.NumBodies;
-        console.log(cmdr.loc.system, rec.NumBodies);
+
         cmdr.touch();
 
         await UNI.get_system(cmdr.loc.system.id)
@@ -84,7 +87,7 @@ class Universe {
 
     }
 
-    async proc_LeaveBody(cmdr, rec) {
+    async proc_LeaveBody(cmdr, LeaveBody) {
         cmdr.touch({
             loc: {
                 body: {
@@ -96,14 +99,14 @@ class Universe {
         });
     }
 
-    async proc_ApproachBody(cmdr, rec) {
+    async proc_ApproachBody(cmdr, ApproachBody) {
 
-        let body = await DB.bodies.findOne({BodyName: rec.Body});
+        let body = await DB.bodies.findOne({BodyName: ApproachBody.Body});
 
         cmdr.touch({
             loc: {
                 body: {
-                    name: rec.Body,
+                    name: ApproachBody.Body,
                     r: body ? body.Radius : null,
                     g: body ? body.SurfaceGravity : null,
                 }
@@ -111,11 +114,10 @@ class Universe {
         });
     }
 
-
-    async proc_Location(cmdr, rec) {
-        let sys = await this.spawn_system(rec.StarSystem, rec.StarPos);
+    async proc_Location(cmdr, Location) {
+        let sys = await this.spawn_system(Location.StarSystem, Location.StarPos);
         if (!sys) return;
-        await sys.append(cmdr, rec);
+        await sys.append(cmdr, Location);
         cmdr.touch({
             loc: {
                 system: {name: sys.name, starpos: sys.starpos, id: sys._id},
@@ -123,10 +125,10 @@ class Universe {
         });
     }
 
-    async proc_FSDJump(cmdr, rec) {
-        let sys = await this.spawn_system(rec.StarSystem, rec.StarPos);
+    async proc_FSDJump(cmdr, FSDJump) {
+        let sys = await this.spawn_system(FSDJump.StarSystem, FSDJump.StarPos);
         if (!sys) return;
-        sys.append(cmdr, rec);
+        sys.append(cmdr, FSDJump);
         cmdr.touch({
             loc: {
                 system: {name: sys.name, starpos: sys.starpos, id: sys._id},
@@ -136,35 +138,45 @@ class Universe {
         });
     }
 
-    async proc_Scan(cmdr, rec) {
-        let body = await DB.bodies.findOne({_id: rec.BodyName});
+    async proc_Scan(cmdr, Scan) {
 
-        // process scan
-        if (body) {
-            if (body.ScanType === 'Detailed') return;
-        } else {
-            body = {_id: rec.BodyName, _submited: rec._cmdr};
-        }
-
-        //create body record
-        for (let i in rec) {
-            if (i[0] === '_' || i === 'event') continue;
-            body[i] = rec[i];
-        }
-        await DB.bodies.save(body).catch((e) => {console.log(e)});
+        let body = await this.spawn_body(Scan.BodyName, cmdr.loc.system.id);
+        if (!body) return;
+        body.append(cmdr, Scan);
 
         //update cmr scan data if we waiting for it
-        if (cmdr.uid && rec.BodyName === cmdr.loc.body.name) {
+        if (cmdr.uid && Scan.BodyName === cmdr.loc.body.name) {
             cmdr.touch({
                 loc: {
                     body: {
-                        name: rec.BodyName,
-                        r: rec.Radius,
-                        g: rec.SurfaceGravity,
+                        name: Scan.BodyName,
+                        r: Scan.Radius,
+                        g: Scan.SurfaceGravity,
                     }
                 }
             });
         }
+    }
+
+    async spawn_body(body_name, system_id) {
+
+        //find system
+        let sys = await this.get_system(system_id);
+        if (!sys) return null;
+
+        let body_id = Universe.body_id(system_id, body_name);
+        let b = await DB.systems.findOne({_id: body_id});
+
+        //todo: shoudl we do socme cache like with cmdrs or users?
+        if (b) return new BODY(b);
+        return new BODY({
+            _id: body_id,
+            sys_id: sys._id, // or by sys id
+            sys_name: sys.name, // to make search by system easy
+            starpos: sys.starpos.slice(), // to make search by pos easy
+            name: body_name,
+            type: null,
+        });
     }
 
     broadcast(uid, c, dat) {
@@ -227,6 +239,7 @@ class Universe {
         return this.cmdrs[cmdr_id];
     }
 
+
     /**
      * Get or create system with name and starposinates
      * @param {string} name
@@ -263,18 +276,96 @@ class Universe {
         return name + '@' + starpos.map(x => Math.round(x * 32)).join(':');
     }
 
+    static body_id(system_id, body_name) {
+        return system_id + '@' + body_name;
+    }
+
 }
 
 class BODY {
-    construct(body) {
+    constructor(body) {
         this._id = null;
         this.name = null;
         this.submited_by = null;
         this.submited = null;
         this.last_update = null;
+        this.type = null;
+        extend(this,body)
     }
 
     append(cmdr, rec) {
+
+
+        // all
+        dot.copy('BodyName', 'name', rec, this);
+        dot.copy('BodyID', 'body_id', rec, this);
+        dot.copy('DistanceFromArrivalLS', 'arrival', rec, this);
+        dot.copy('Radius', 'radius', rec, this);
+
+        if (rec.StarType) { //starts
+            this.type = 'star';
+            dot.copy('AbsoluteMagnitude', 'star_absm', rec, this);
+            dot.copy('Age_MY', 'age', rec, this);
+            dot.copy('StellarMass', 'mass_sol', rec, this);
+            dot.copy('StarType', 'star_class', rec, this);
+            dot.copy('Luminosity', 'luminosity', rec, this);
+        }
+
+        if (rec.PlanetClass) { // planets/moons
+            this.type = 'planet';
+            this.landable = !!rec.Landable;
+
+            dot.copy('MassEM', 'mass_em', rec, this);
+            dot.copy('SurfaceGravity', 'surf_gravity', rec, this);
+            dot.copy('SurfacePressure', 'surf_presure', rec, this);
+            dot.copy('SurfaceTemperature', 'surf_temperature', rec, this);
+            dot.copy('TerraformState', 'terraform_state', rec, this);
+            dot.copy('Volcanism', 'volcanism', rec, this);
+            dot.copy('Composition', 'composition', rec, this);
+
+            dot.copy('Atmosphere', 'atmo', rec, this);
+            dot.copy('AtmosphereType', 'atmo_type', rec, this);
+
+            if (rec.AtmosphereComposition) {
+                this.atmo_composition = {};
+                for (let i in rec.AtmosphereComposition) this.atmo_composition[rec.AtmosphereComposition[i].Name] = rec.AtmosphereComposition[i].Percent;
+            }
+        }
+
+
+        //orbit
+        dot.copy('SemiMajorAxis', 'o_smaxis', rec, this);
+        dot.copy('Eccentricity', 'o_eccentricity', rec, this);
+        dot.copy('Eccentricity', 'o_eccentricity', rec, this);
+        dot.copy('OrbitalInclination', 'o_inclination', rec, this);
+        dot.copy('Periapsis', 'o_periapsis', rec, this);
+        dot.copy('OrbitalPeriod', 'o_period', rec, this);
+
+        //rotation
+        dot.copy('RotationPeriod', 'rot_period', rec, this);
+        dot.copy('AxialTilt', 'rot_axial_tilt', rec, this);
+        dot.copy('TidalLock', 'rot_tidal_lock', rec, this);
+
+        // ?
+        dot.copy('ReserveLevel', 'reserve_level', rec, this);
+
+
+//stars
+        let x = ["Rings",
+            "",
+            "",
+            "",
+            "",
+            "EstimatedValue",
+            "",
+            "Materials",
+            "Parents",
+            "",
+            "",
+            "",
+            "",
+        ];
+
 
         if (!this.submited || this.submited > rec.timestamp) {
             dot.copy('timestamp', 'submited', rec, this);
@@ -283,12 +374,13 @@ class BODY {
         if (this.last_update < rec.timestamp)
             this.last_update = rec.timestamp;
 
+
         return this.save();
     }
 
     async save() {
         //no temporary fields here...
-        await DB.systems.save(this);
+        await DB.bodies.save(this);
     }
 }
 
