@@ -19,134 +19,51 @@ console.log('ID v2 :', name + '@' + sys_pos.map(x => Math.round(x * 32)).join(':
 console.log('...and hash');
 console.log('ID v3 :', hashCode(name + '@' + sys_pos.map(x => Math.round(x * 32)).join(':')));
 
-
-// DOT!
-
-
 const dot = require('dot-object');
 
-const scan = JSON.parse(`{
-    "_id" : "Location/2018-02-18T20:19:08Z",
-        "timestamp" : "2018-02-18T20:19:08.000Z",
-        "event" : "Location",
-        "Docked" : true,
-        "StationName" : "Vela Port",
-        "StationType" : "Coriolis",
-        "StarSystem" : "Amarak",
-        "StarPos" : [
-        -68.438,
-        26,
-        26.469
-    ],
-        "SystemAllegiance" : "Federation",
-        "SystemEconomy" : "$economy_HighTech;",
-        "SystemEconomy_Localised" : "Высокие технологии",
-        "SystemGovernment" : "$government_Corporate;",
-        "SystemGovernment_Localised" : "Корпоративная",
-        "SystemSecurity" : "$SYSTEM_SECURITY_high;",
-        "SystemSecurity_Localised" : "Высок. ур. безопасности",
-        "Population" : 10248421,
-        "Body" : "Vela Port",
-        "BodyType" : "Station",
-        "Factions" : [
-        {
-            "Name" : "Pilots Federation Local Branch",
-            "FactionState" : "None",
-            "Government" : "Democracy",
-            "Influence" : 0,
-            "Allegiance" : "PilotsFederation"
-        },
-        {
-            "Name" : "Tarutaalli Group",
-            "FactionState" : "None",
-            "Government" : "Corporate",
-            "Influence" : 0.051,
-            "Allegiance" : "Federation",
-            "PendingStates" : [
-                {
-                    "State" : "Boom",
-                    "Trend" : 1
-                }
-            ]
-        },
-        {
-            "Name" : "Amarak Comms Partners",
-            "FactionState" : "Boom",
-            "Government" : "Corporate",
-            "Influence" : 0.442,
-            "Allegiance" : "Federation"
-        },
-        {
-            "Name" : "Amarak Dominion",
-            "FactionState" : "CivilWar",
-            "Government" : "Dictatorship",
-            "Influence" : 0.05,
-            "Allegiance" : "Independent"
-        },
-        {
-            "Name" : "Amarak Silver Family",
-            "FactionState" : "Boom",
-            "Government" : "Anarchy",
-            "Influence" : 0.037,
-            "Allegiance" : "Independent"
-        },
-        {
-            "Name" : "Syndicate of LHS 3385",
-            "FactionState" : "Retreat",
-            "Government" : "Anarchy",
-            "Influence" : 0.048,
-            "Allegiance" : "Independent"
-        },
-        {
-            "Name" : "Amarak Republic Party",
-            "FactionState" : "Boom",
-            "Government" : "Democracy",
-            "Influence" : 0.333,
-            "Allegiance" : "Federation"
-        },
-        {
-            "Name" : "Ronin of Amarak",
-            "FactionState" : "CivilWar",
-            "Government" : "Anarchy",
-            "Influence" : 0.039,
-            "Allegiance" : "Independent",
-            "PendingStates" : [
-                {
-                    "State" : "Boom",
-                    "Trend" : 0
-                }
-            ]
+let rec = {Population: 1000, Va1: 10, x: 8723.123112};
+let sys = {something: 15.12837};
+
+dot.copy('Population', 'population', rec, sys);
+dot.copy('Va1', 'va1', rec, sys);
+dot.copy('something', 'something', rec, sys);
+dot.copy('x', 'x', rec, sys, x => Math.floor(x * 100));
+
+
+console.log(sys);
+
+class Magic {
+    constructor() {
+        this.name = 'Gunter No!';
+        this.changed = false;
+        this.test = 1;
+        return new Proxy(this, this);
+    }
+
+    get(target, prop) {
+        //console.log('get', prop);
+        return this[prop] || undefined;
+    }
+
+    set(target, prop, value) {
+        console.log('set', prop, value);
+        if (this[prop] !== value || !value) {
+            this[prop] = value;
+            this.changed = true;
         }
-    ],
-        "SystemFaction" : "   Amarak Comms Partners   ",
-        "FactionState" : "Boom",
-        "_gv" : "2.4"
-}`);
-
-
-let res = {};
-
-let traslate = {
-    'StarSystem': 'name',
-    'StarPos.0': 'pos.0',
-    'StarPos.1': 'pos.1',
-    'StarPos.2': 'pos.2',
-    'SystemSecurity': 'security',
-    'SystemAllegiance': 'allegiance',
-    'SystemGovernment': 'gov',
-    'SystemFaction': 'faction',
-    'FactionState': 'state',
-    'Population': 'population',
-};
-
-
-for (let i in traslate) {
-    // what about modifiers on fly ?
-
-    dot.copy(i, traslate[i], scan, res);
+    }
 }
 
-scan.StarPos[0] = 9999999;
+let m = new Magic();
 
+delete m.test;
 
-console.log(res);
+console.log(m);
+
+m.name = 'Gunter No!';
+
+console.log(m);
+
+m.name = 'Gunter Yes!';
+
+console.log(m);

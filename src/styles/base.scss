@@ -55,11 +55,11 @@ button, label { @include hcaps();}
 //
 // BASE DATA LISTS
 //
-em {font-style: normal;display: block; }
-em b {font-weight: normal;text-transform: uppercase;color: #c56209; display: block;width: 50%;float: left;}
-em span {font-style: normal;color: #ff8800;display: block;width: 50%;float: left;}
-em span i {font-style: normal;color: #715029;}
-em span.false {color: #5d5d5d;}
-em[justify] b { text-align: right; padding-right: 5px; }
-em[justify] span { text-align: left; padding-right: 5px;}
+em {font-style: normal;display: block; font-size: 0.9rem}
+em > b {font-weight: normal;text-transform: uppercase;color: #c56209; display: block;width: 50%;float: left;}
+em > span {font-style: normal;color: #ff8800;display: block;width: 50%;float: left;}
+em > span i {font-style: normal;color: #715029;}
+em > span.false {color: #5d5d5d;}
+em[justify] > b { text-align: right; padding-right: 5px; }
+em[justify] > span { text-align: left; padding-right: 5px;}
 em::after, .cls::after { content: ""; clear: both; display: table; }

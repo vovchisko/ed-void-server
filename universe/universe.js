@@ -2,6 +2,7 @@
 const extend = require('deep-extend');
 const DB = require('./database');
 const server = require('../server');
+const dot = require('dot-object');
 
 class Universe {
     constructor() {
@@ -45,8 +46,42 @@ class Universe {
     process(cmdr, rec) {
         if (rec.event === 'Scan') return this.proc_Scan(cmdr, rec);
         if (rec.event === 'FSDJump') return this.proc_FSDJump(cmdr, rec);
+        if (rec.event === 'Location') return this.proc_Location(cmdr, rec);
         if (rec.event === 'ApproachBody') return this.proc_ApproachBody(cmdr, rec);
         if (rec.event === 'LeaveBody') return this.proc_LeaveBody(cmdr, rec);
+        if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec); //todo: << this is probably useless
+        if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
+    }
+
+    async proc_DiscoveryScan(cmdr, rec) {
+
+        cmdr.metrics.curr_ds += rec.Bodies;
+        cmdr.touch();
+
+        await  UNI.get_system(cmdr.loc.system.id)
+            .then((system) => {
+                if (!system) return;
+                if (cmdr.metrics.curr_ds > system.ds_count)
+                    system.ds_count = cmdr.metrics.curr_ds;
+                return system.save();
+            });
+
+    }
+
+    async proc_NavBeaconScan(cmdr, rec) {
+
+        cmdr.metrics.curr_ds = rec.NumBodies;
+        console.log(cmdr.loc.system, rec.NumBodies);
+        cmdr.touch();
+
+        await UNI.get_system(cmdr.loc.system.id)
+            .then((system) => {
+                if (!system) return;
+                if (cmdr.metrics.curr_ds > system.ds_count)
+                    system.ds_count = cmdr.metrics.curr_ds;
+                return system.save();
+            });
+
     }
 
     async proc_LeaveBody(cmdr, rec) {
@@ -76,17 +111,28 @@ class Universe {
         });
     }
 
-    async proc_FSDJump(cmdr, rec) {
 
+    async proc_Location(cmdr, rec) {
         let sys = await this.spawn_system(rec.StarSystem, rec.StarPos);
-
-        sys.append(cmdr, rec);
-
+        if (!sys) return;
+        await sys.append(cmdr, rec);
         cmdr.touch({
             loc: {
-                system: {name: system.StarSystem, coord: system.StarPos},
-                body: {name: null, r: null, g: null,}
-            }
+                system: {name: sys.name, starpos: sys.starpos, id: sys._id},
+            },
+        });
+    }
+
+    async proc_FSDJump(cmdr, rec) {
+        let sys = await this.spawn_system(rec.StarSystem, rec.StarPos);
+        if (!sys) return;
+        sys.append(cmdr, rec);
+        cmdr.touch({
+            loc: {
+                system: {name: sys.name, starpos: sys.starpos, id: sys._id},
+                body: {name: null, r: null, g: null}
+            },
+            metrics: {curr_ds: 0}
         });
     }
 
@@ -105,7 +151,7 @@ class Universe {
             if (i[0] === '_' || i === 'event') continue;
             body[i] = rec[i];
         }
-        await DB.bodies.save(body);
+        await DB.bodies.save(body).catch((e) => {console.log(e)});
 
         //update cmr scan data if we waiting for it
         if (cmdr.uid && rec.BodyName === cmdr.loc.body.name) {
@@ -172,7 +218,7 @@ class Universe {
                     uid: uid,
                     name: name,
                     loc: {
-                        system: {name: null, coord: [0, 0, 0]},
+                        system: {name: null, starpos: [0, 0, 0]},
                         body: {name: null, r: null, g: null},
                     }
                 });
@@ -182,13 +228,13 @@ class Universe {
     }
 
     /**
-     * Get or create system with name and coordinates
+     * Get or create system with name and starposinates
      * @param {string} name
-     * @param {array} pos SparPos[x,y,z]
+     * @param {array} starpos SparPos[x,y,z]
      * @returns {Promise<SYSTEM>}
      */
-    async spawn_system(name, pos) {
-        let id = Universe.system_id(name, pos);
+    async spawn_system(name, starpos) {
+        let id = Universe.system_id(name, starpos);
         let s = await DB.systems.findOne({_id: id});
 
         if (s) return new SYSTEM(s);
@@ -197,38 +243,114 @@ class Universe {
         return new SYSTEM({
             _id: id,
             name: name,
-            pos: pos,
+            starpos: starpos,
         });
     }
 
+    async get_system(system_id) {
+        let s = await DB.systems.findOne({_id: system_id});
+        if (s) return new SYSTEM(s);
+        return null;
+    }
 
     /**
-     * Create ID from name and coordinates [x,y,z]
+     * Create ID from name and starposinates [x,y,z]
      * @param {string} name
-     * @param {array} pos SparPos[x,y,z]
+     * @param {array} starpos SparPos[x,y,z]
      * @returns {string} Cool System ID
      */
-    static system_id(name, pos) {
-        return name + '@' + pos.map(x => Math.round(x * 32)).join(':');
+    static system_id(name, starpos) {
+        return name + '@' + starpos.map(x => Math.round(x * 32)).join(':');
     }
 
 }
 
+class BODY {
+    construct(body) {
+        this._id = null;
+        this.name = null;
+        this.submited_by = null;
+        this.submited = null;
+        this.last_update = null;
+    }
+
+    append(cmdr, rec) {
+
+        if (!this.submited || this.submited > rec.timestamp) {
+            dot.copy('timestamp', 'submited', rec, this);
+            this.submited_by = cmdr.name;
+        }
+        if (this.last_update < rec.timestamp)
+            this.last_update = rec.timestamp;
+
+        return this.save();
+    }
+
+    async save() {
+        //no temporary fields here...
+        await DB.systems.save(this);
+    }
+}
 
 class SYSTEM {
     constructor(sys) {
         this._id = null;
         this.name = null;
-        this._submited = null;
+        this.submited_by = null;
+        this.submited = null;
+        this.last_update = null;
+        this.ds_count = 0;
         extend(this, sys);
     }
 
     append(cmdr, rec) {
-        if (rec.event === 'FSDJump')
-            return this;
+
+        dot.copy('StarSystem', 'name', rec, this);
+
+        if (rec.StarPos) {
+            dot.copy('StarPos.0', 'starpos.0', rec, this, x => Math.floor(x * 32));
+            dot.copy('StarPos.1', 'starpos.1', rec, this, x => Math.floor(x * 32));
+            dot.copy('StarPos.2', 'starpos.2', rec, this, x => Math.floor(x * 32));
+        }
+
+        dot.copy('SystemAllegiance', 'allegiance', rec, this);
+        dot.copy('SystemEconomy', 'economy', rec, this);
+        dot.copy('SystemGovernment', 'government', rec, this);
+        dot.copy('SystemSecurity', 'security', rec, this);
+        dot.copy('Population', 'population', rec, this);
+        dot.copy('SystemFaction', 'faction', rec, this);
+
+        if (rec.Factions) {
+            this.factions = [];
+            for (let i in rec.Factions) {
+                dot.copy('Factions.' + i + '.Name', 'factions.' + i + '.name', rec, this);
+                dot.copy('Factions.' + i + '.FactionState', 'factions.' + i + '.state', rec, this);
+                dot.copy('Factions.' + i + '.Government', 'factions.' + i + '.government', rec, this);
+                dot.copy('Factions.' + i + '.Influence', 'factions.' + i + '.influence', rec, this);
+                dot.copy('Factions.' + i + '.Allegiance', 'factions.' + i + '.allegiance', rec, this);
+
+                if (rec.Factions[i].PendingStates) {
+                    for (let s in rec.Factions[i].PendingStates) {
+                        dot.set(
+                            `factions.${i}.pending.${rec.Factions[i].PendingStates[s].State}`,
+                            rec.Factions[i].PendingStates[s].Trend,
+                            this);
+                    }
+                }
+            }
+        }
 
 
+        if (!this.submited || this.submited > rec.timestamp) {
+            dot.copy('timestamp', 'submited', rec, this);
+            this.submited_by = cmdr.name;
+        }
+        if (this.last_update < rec.timestamp)
+            this.last_update = rec.timestamp;
+
+        return this.save();
     }
+
 
     async save() {
         //no temporary fields here...
@@ -289,16 +411,18 @@ class CMDR {
         this.name = null;
         this.last_rec = new Date(0);
         this.loc = {
-            system: {name: null, coord: [0, 0, 0]},
-            body: {name: null, r: null, g: null}
+            system: {name: null, starpos: [0, 0, 0], id: null},
+            body: {name: null, r: null, g: null},
         };
+        this.metrics = {curr_ds: 0};
+        this.status = {};
         extend(this, cmdr_data);
     }
 
-    touch(data) {
-        extend(this, data);
+    touch(data = null) {
+        if (data) extend(this, data);
         this._ch = true;
-        UNI.broadcast(this.uid, 'cmdr', this);
+        if (this.uid) UNI.broadcast(this.uid, 'cmdr', this);
     }
 
     async save() {

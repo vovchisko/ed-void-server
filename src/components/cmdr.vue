@@ -6,6 +6,9 @@
                 <h5>CMDR INFO</h5>
                 <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
                 <em><b>SYSTEM</b><span>{{cmdr.loc.system.name}}</span></em>
+                <em><b>&nbsp;</b><span class="false">
+                    <span v-for="x in cmdr.loc.system.starpos"> {{x/32}}; </span>
+                </span></em>
                 <em><b>LOC</b><span>{{cmdr.loc.body.name || 'Deep Space' }}</span></em>
             </div>
             <div class="col-sm">
@@ -38,7 +41,7 @@
 <script>
     import Data from '../services/data';
     import Net from '../services/network';
-    import Vue from 'vue';
+    import extend from 'deep-extend';
 
     export default {
         name: 'cmdr',
@@ -49,17 +52,17 @@
                 Net.disconnect();
                 Data.auth.is_logged = false;
                 Data.auth.wtoken = '';
-                Vue.set(Data, 'cmdr', null);
                 Data.user.email = null;
                 Data.user.api_key = null;
                 Data.save();
+                Data.nullify();
             }
         }
     }
 
     Net.on('cmdr', (cmdr) => {
         if (!cmdr) return false;
-        Vue.set(Data, 'cmdr', cmdr);
+        extend(Data.cmdr, cmdr);
     });
 
     Net.on('user', (user) => {
