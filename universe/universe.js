@@ -329,12 +329,12 @@ class BODY {
             dot.copy('ReserveLevel', 'reserve_level', rec, this);
 
             if (rec.AtmosphereComposition) {
-                this.atmo_composition = {};
+                if (!this.atmo_composition) this.atmo_composition = {};
                 for (let i in rec.AtmosphereComposition) this.atmo_composition[rec.AtmosphereComposition[i].Name] = rec.AtmosphereComposition[i].Percent;
             }
 
             if (rec.Materials) {
-                this.materials = {};
+                if (!this.materials) this.materials = {};
                 for (let i in rec.Materials) this.materials[rec.Materials[i].Name] = rec.Materials[i].Percent;
             }
 
@@ -358,9 +358,8 @@ class BODY {
         dot.copy('EstimatedValue', 'estimated_value', rec, this);
 
         if (rec.Rings) {
-            this.rings = [];
+            if (!this.rings) this.rings = [];
             for (let i in rec.Rings) {
-
                 this.rings.push({
                     name: rec.Rings[i].Name,
                     clas: rec.Rings[i].RingClass,
@@ -368,7 +367,6 @@ class BODY {
                     r_inner: rec.Rings[i].InnerRad,
                     r_outer: rec.Rings[i].OuterRad,
                 });
-
             }
         }
 
