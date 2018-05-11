@@ -91,10 +91,8 @@ class Clients {
 
             console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] joined`);
 
-            if (user.journal()) {
-                let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(4);
-                scans.forEach((rec) => this.send_to(user._id, 'rec:' + 'Scan', rec));
-            }
+            UNI.refill_user(user._id);
+
 
             user.online = true;
             user.save();
@@ -133,14 +131,14 @@ class JCollector {
 
         this.wss_journals.on('disconnected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
-            console.log(`JCL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - disconnected`);
+            console.log(`JCL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - journal disconnected`);
         });
 
         this.wss_journals.on('connected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
             if (!juser) return client.close();
 
-            console.log(`JCL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - connected`);
+            console.log(`JCL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - journal connected`);
         });
 
         this.wss_journals.on('message', async (client, c, dat) => {
@@ -195,16 +193,11 @@ require('http').createServer(function (request, response) {
 }).listen(cfg.main.api_port);
 console.log('API-SERVER ON PORT: ' + cfg.main.api_port);
 
-DB.connect(cfg.database, () => {
+DB.connect(cfg.database, init);
 
-    /*
-     * Would be nice if Universe just fire events about updates in th same format as messages.
-     * So universe just update main DB and fire events about it and about things should be broadcasted.
-     *
-     * Stuff like "get_user" or something should be moved to database models.
-     *
-     *
-     */
+process.on('unhandledRejection', (error) => console.log('ERROR: unhandledRejection', error));
+
+function init() {
 
     console.log('DATABSE: CONNECTED ' + cfg.database.host + ':' + cfg.database.port);
     console.log('  VOID_DB - ' + cfg.database.db_void);
@@ -215,17 +208,8 @@ DB.connect(cfg.database, () => {
     UNI.init();
 
     console.log('http://localhost:' + cfg.main.api_port);
+}
 
-    setInterval(() => {
-        for (let uid in CLS.wss_clients.clients) {
-            //         console.log('ping', uid);
-            //         CLS.send_to(uid, 'ping', {d: Math.random()})
-        }
-    }, 1000);
-});
-
-
-process.on('unhandledRejection', (error) => console.log('ERROR: unhandledRejection', error));
 
 
 

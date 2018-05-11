@@ -2,6 +2,7 @@
 
 // @link: https://ed.miggy.org/fd-journal-docs/
 
+const EE3 = require('eventemitter3');
 const extend = require('deep-extend');
 const DB = require('./database');
 const server = require('../server');
@@ -9,8 +10,12 @@ const pick = server.tools.pick;
 const pickx = server.tools.pickx;
 const convert = server.tools.convert;
 
-class Universe {
+const EV_USRUPD = 'uni-usr';
+const EV_USRPIPE = 'uni-pipe';
+
+class Universe extends EE3 {
     constructor() {
+        super();
         this.users = {};
         this.cmdrs = {};
         this.users_api_key = {};
@@ -26,12 +31,29 @@ class Universe {
         this.autosave = setInterval(() => {
             for (let c in this.cmdrs) this.cmdrs[c].save();
             for (let u in this.users) this.users[u].save();
-        }, 5200);
+        }, 5000);
 
     }
 
+
+    refill_user(uid) {
+        return this.get_user({_by: id})
+            .then((user) => {
+
+
+                if (user.journal()) {
+                    let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(4);
+                    scans.forEach((rec) => this.send_to(user._id, 'rec:' + 'Scan', rec));
+                }
+            })
+            .catch((e) => {
+                console.log(`UNI::refill_user(${uid}) - can't refill user;`);
+            });
+    }
+
+
     /* ONLY FOR NEW RECORDS */
-    async record(user, rec, cmdr_name, gv, lng) {
+    async record(user, rec, cmdr_name, gv, lng, records_left = 0) {
 
         if (cmdr_name !== user.cmdr_name) await user.set_cmdr(cmdr_name);
 
@@ -40,6 +62,8 @@ class Universe {
         rec._lng = lng;
         rec._gv = gv;
 
+        if (records_left < 5) UNI.emit(EV_USRPIPE, user._id, 'rec:' + rec.event, rec);
+        
         await user.journal().save(rec);
 
         await UNI.process(user.cmdr, rec);
@@ -302,6 +326,7 @@ class Universe {
 
 }
 
+
 class BODY {
     constructor(body) {
         this._id = null;
@@ -484,8 +509,8 @@ class USER {
         this.cmdr_name = name;
         if (!this.cmdrs.includes(name)) this.cmdrs.push(name);
         this._ch = true;
-        UNI.broadcast(this._id, 'user', this);
-        UNI.broadcast(this._id, 'cmdr', this);
+        UNI.emit(EV_USRUPD, this._id, 'user', this);
+        UNI.emit(EV_USRUPD, this._id, 'cmdr', this);
     }
 
     async save() {
@@ -512,8 +537,9 @@ class CMDR {
         this.name = null;
         this.last_rec = new Date(0);
         this.loc = {
-            system: {name: null, starpos: [0, 0, 0], id: null},
-            body: {name: null, id: null, r: null, g: null},
+            system_id: null,
+            starpos: [0, 0, 0],
+            body_id: null,
         };
         this.metrics = {curr_ds: 0};
         this.status = {};
@@ -523,7 +549,7 @@ class CMDR {
     touch(data = null) {
         if (data) extend(this, data);
         this._ch = true;
-        if (this.uid) UNI.broadcast(this.uid, 'cmdr', this);
+        if (this.uid) UNI.emit(EV_USRUPD, this.uid, 'cmdr', this);
     }
 
     async save() {
