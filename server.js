@@ -8,6 +8,7 @@ global.PIPE_EVENTS = [
     'SupercruiseEntry', 'SupercruiseExit', 'FSDJump', 'ApproachBody', 'LeaveBody', 'Location', 'StartJump', 'Docked', 'Undocked', 'Touchdown', 'Liftoff', 'LaunchSRV', 'DockSRV', 'LaunchFighter', 'DockFighter'
 ];
 
+
 exports = module.exports = server;
 
 const NodeStatic = require('node-static');
@@ -41,6 +42,7 @@ function parse_json(string) {
 server.handle_request = handle_request;
 server.parse_json = parse_json;
 
+const tools = server.tools = require('./universe/tools');
 const cfg = server.cfg = require('./universe/config');
 const DB = server.DB = require('./universe/database');
 const UNI = server.UNI = require('./universe/universe');
@@ -189,7 +191,7 @@ require('http').createServer(function (request, response) {
         });
 
     }).resume();
-    
+
 }).listen(cfg.main.api_port);
 console.log('API-SERVER ON PORT: ' + cfg.main.api_port);
 

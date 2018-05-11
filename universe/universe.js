@@ -5,7 +5,9 @@
 const extend = require('deep-extend');
 const DB = require('./database');
 const server = require('../server');
-const dot = require('dot-object');
+const pick = server.tools.pick;
+const pickx = server.tools.pickx;
+const convert = server.tools.convert;
 
 class Universe {
     constructor() {
@@ -158,6 +160,12 @@ class Universe {
         }
     }
 
+    /**
+     * Get or create body
+     * @param body_name
+     * @param system_id
+     * @returns {Promise<BODY>}
+     */
     async spawn_body(body_name, system_id) {
 
         //find system
@@ -177,6 +185,17 @@ class Universe {
             name: body_name,
             type: null,
         });
+    }
+
+    /**
+     * get Body
+     * @param body_id
+     * @returns {Promise<BODY>}
+     */
+    async get_body(body_id) {
+        let b = await DB.bodies.findOne({_id: body_id});
+        if (b) return new BODY(b);
+        return null;
     }
 
     broadcast(uid, c, dat) {
@@ -277,7 +296,8 @@ class Universe {
     }
 
     static body_id(system_id, body_name) {
-        return system_id + '/' + body_name;
+        let n = body_name.replace(system_id.split('@')[0], '').trim();
+        return system_id + '/' + (n ? n : '*');
     }
 
 }
@@ -295,67 +315,62 @@ class BODY {
 
     append(cmdr, rec) {
 
-        // all
-        dot.copy('BodyName', 'name', rec, this);
-        dot.copy('BodyID', 'body_id', rec, this);
-        dot.copy('DistanceFromArrivalLS', 'arrival', rec, this);
-        dot.copy('Radius', 'radius', rec, this);
+        this.type = 'cluster'
 
-        if (rec.StarType) { //starts
-            this.type = 'star';
-            dot.copy('AbsoluteMagnitude', 'star_absm', rec, this);
-            dot.copy('Age_MY', 'age', rec, this);
-            dot.copy('StellarMass', 'mass_sol', rec, this);
-            dot.copy('StarType', 'star_class', rec, this);
-            dot.copy('Luminosity', 'luminosity', rec, this);
+        if (rec.StarType) this.type = 'star';
+        if (rec.PlanetClass) this.type = 'planet';
+
+        pickx(rec, this,
+            ['BodyName', 'name'],
+            ['BodyID', 'body_id'],
+            ['DistanceFromArrivalLS', 'arrival'],
+            ['Radius', 'radius'],
+
+            //starts
+            ['Luminosity', 'luminosity'],
+            ['StarType', 'class'],
+            ['AbsoluteMagnitude', 'star_absm'],
+            ['Age_MY', 'age'],
+            ['StellarMass', 'mass', convert.Sol2GT],
+
+            //planets
+            ['Landable', 'landable', convert.toBool, true],
+            ['PlanetClass', 'class'],
+            ['MassEM', 'mass', convert.Earth2GT],
+            ['SurfaceGravity', 'surf_gravity', convert.GF2Gravity],
+            ['SurfacePressure', 'surf_presure'],
+            ['SurfaceTemperature', 'surf_temperature'],
+            ['TerraformState', 'terraform_state'],
+            ['Volcanism', 'volcanism'],
+            ['Composition', 'composition'],
+            ['Atmosphere', 'atmo'],
+            ['AtmosphereType', 'atmo_type'],
+            ['ReserveLevel', 'reserve_level'],
+
+            //orbit / rotatation / position
+            ['Parents', 'parents'],
+            ['SemiMajorAxis', 'o_smaxis'],
+            ['Eccentricity', 'o_eccentricity'],
+            ['OrbitalInclination', 'o_inclination'],
+            ['Periapsis', 'o_periapsis'],
+            ['OrbitalPeriod', 'o_period'],
+            ['RotationPeriod', 'rot_period'],
+            ['AxialTilt', 'rot_axial_tilt'],
+            ['TidalLock', 'rot_tidal_lock'],
+
+            //estimate added by pre.process
+            ['EstimatedValue', 'estimated_value'],
+        );
+
+        if (rec.AtmosphereComposition) {
+            if (!this.atmo_composition) this.atmo_composition = {};
+            for (let i in rec.AtmosphereComposition) this.atmo_composition[rec.AtmosphereComposition[i].Name] = rec.AtmosphereComposition[i].Percent;
         }
 
-        if (rec.PlanetClass) { // planets/moons
-            this.type = 'planet';
-            this.landable = !!rec.Landable;
-
-            dot.copy('PlanetClass', 'planet_class', rec, this);
-            dot.copy('MassEM', 'mass_em', rec, this);
-            dot.copy('SurfaceGravity', 'surf_gravity', rec, this);
-            dot.copy('SurfacePressure', 'surf_presure', rec, this);
-            dot.copy('SurfaceTemperature', 'surf_temperature', rec, this);
-            dot.copy('TerraformState', 'terraform_state', rec, this);
-            dot.copy('Volcanism', 'volcanism', rec, this);
-            dot.copy('Composition', 'composition', rec, this);
-
-            dot.copy('Atmosphere', 'atmo', rec, this);
-            dot.copy('AtmosphereType', 'atmo_type', rec, this);
-
-            dot.copy('ReserveLevel', 'reserve_level', rec, this);
-
-            if (rec.AtmosphereComposition) {
-                if (!this.atmo_composition) this.atmo_composition = {};
-                for (let i in rec.AtmosphereComposition) this.atmo_composition[rec.AtmosphereComposition[i].Name] = rec.AtmosphereComposition[i].Percent;
-            }
-
-            if (rec.Materials) {
-                if (!this.materials) this.materials = {};
-                for (let i in rec.Materials) this.materials[rec.Materials[i].Name] = rec.Materials[i].Percent;
-            }
-
+        if (rec.Materials) {
+            if (!this.materials) this.materials = {};
+            for (let i in rec.Materials) this.materials[rec.Materials[i].Name] = rec.Materials[i].Percent;
         }
-
-        dot.copy('Parents', 'parents', rec, this);
-
-        //orbit
-        dot.copy('SemiMajorAxis', 'o_smaxis', rec, this);
-        dot.copy('Eccentricity', 'o_eccentricity', rec, this);
-        dot.copy('OrbitalInclination', 'o_inclination', rec, this);
-        dot.copy('Periapsis', 'o_periapsis', rec, this);
-        dot.copy('OrbitalPeriod', 'o_period', rec, this);
-
-        //rotation
-        dot.copy('RotationPeriod', 'rot_period', rec, this);
-        dot.copy('AxialTilt', 'rot_axial_tilt', rec, this);
-        dot.copy('TidalLock', 'rot_tidal_lock', rec, this);
-
-        // ?
-        dot.copy('EstimatedValue', 'estimated_value', rec, this);
 
         if (rec.Rings) {
             if (!this.rings) this.rings = [];
@@ -363,21 +378,19 @@ class BODY {
                 this.rings.push({
                     name: rec.Rings[i].Name,
                     clas: rec.Rings[i].RingClass,
-                    mass: rec.Rings[i].MassMT,
-                    r_inner: rec.Rings[i].InnerRad,
-                    r_outer: rec.Rings[i].OuterRad,
+                    mass: rec.Rings[i].MassMT / 1000, //GT
+                    r_inner: rec.Rings[i].InnerRad / 1000,
+                    r_outer: rec.Rings[i].OuterRad / 1000,
                 });
             }
         }
 
-
-        if (!this.submited || this.submited > rec.timestamp) {
-            dot.copy('timestamp', 'submited', rec, this);
+        if (!this.submited_by /*|| this.submited > rec.timestamp*/) {
             this.submited_by = cmdr.name;
+            this.submited = rec.timestamp;
         }
         if (this.last_update < rec.timestamp)
             this.last_update = rec.timestamp;
-
 
         return this.save();
     }
@@ -400,45 +413,37 @@ class SYSTEM {
     }
 
     append(cmdr, rec) {
-
-        dot.copy('StarSystem', 'name', rec, this);
-
-        if (rec.StarPos) {
-            dot.copy('StarPos.0', 'starpos.0', rec, this, x => Math.floor(x * 32));
-            dot.copy('StarPos.1', 'starpos.1', rec, this, x => Math.floor(x * 32));
-            dot.copy('StarPos.2', 'starpos.2', rec, this, x => Math.floor(x * 32));
-        }
-
-        dot.copy('SystemAllegiance', 'allegiance', rec, this);
-        dot.copy('SystemEconomy', 'economy', rec, this);
-        dot.copy('SystemGovernment', 'government', rec, this);
-        dot.copy('SystemSecurity', 'security', rec, this);
-        dot.copy('Population', 'population', rec, this);
-        dot.copy('SystemFaction', 'faction', rec, this);
+        pickx(rec, this,
+            ['StarSystem', 'name'],
+            ['StarPos', 'starpos', arr => arr.map((x) => {return Math.floor(x * 32)})],
+            ['SystemSecurity', 'security'],
+            ['SystemEconomy', 'economy'],
+            ['Population', 'population'],
+            ['SystemAllegiance', 'allegiance'],
+            ['SystemGovernment', 'government'],
+            ['SystemFaction', 'faction'],
+        );
 
         if (rec.Factions) {
             this.factions = [];
             for (let i in rec.Factions) {
-                dot.copy('Factions.' + i + '.Name', 'factions.' + i + '.name', rec, this);
-                dot.copy('Factions.' + i + '.FactionState', 'factions.' + i + '.state', rec, this);
-                dot.copy('Factions.' + i + '.Government', 'factions.' + i + '.government', rec, this);
-                dot.copy('Factions.' + i + '.Influence', 'factions.' + i + '.influence', rec, this);
-                dot.copy('Factions.' + i + '.Allegiance', 'factions.' + i + '.allegiance', rec, this);
-
-                if (rec.Factions[i].PendingStates) {
-                    for (let s in rec.Factions[i].PendingStates) {
-                        dot.set(
-                            `factions.${i}.pending.${rec.Factions[i].PendingStates[s].State}`,
-                            rec.Factions[i].PendingStates[s].Trend,
-                            this);
-                    }
-                }
+                let fa = {};
+                pickx(rec.Factions[i], fa,
+                    ['Name', 'name'],
+                    ['FactionState', 'state'],
+                    ['Government', 'gov'],
+                    ['Influence', 'influence'],
+                    ['Allegiance', 'allegiance'],
+                    ['PendingStates', 'state_pending'],
+                    ['RecoveringStates', 'state_recovering'],
+                );
+                this.factions.push(fa);
             }
         }
 
 
         if (!this.submited || this.submited > rec.timestamp) {
-            dot.copy('timestamp', 'submited', rec, this);
+            this.submited = rec.timestamp;
             this.submited_by = cmdr.name;
         }
         if (this.last_update < rec.timestamp)
@@ -508,7 +513,7 @@ class CMDR {
         this.last_rec = new Date(0);
         this.loc = {
             system: {name: null, starpos: [0, 0, 0], id: null},
-            body: {name: null, r: null, g: null},
+            body: {name: null, id: null, r: null, g: null},
         };
         this.metrics = {curr_ds: 0};
         this.status = {};
