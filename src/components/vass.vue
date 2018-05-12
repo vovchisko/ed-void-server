@@ -109,7 +109,7 @@
         data: () => {return {recent: Data.vass.recent, c_system: Data.vass.c_system}}
     }
 
-    Net.on('rec:Scan', (rec) => {
+    Net.on('pipe:Scan', (rec) => {
         for (let i = 0; i < Data.vass.recent.length; i++) {
             if (rec.BodyName === Data.vass.recent[i].BodyName) {
                 Data.vass.recent[i] = rec;

@@ -101,7 +101,7 @@
     const _cmdr = Data.cmdr;
     const _navi = Data.navi;
 
-    Net.on('rec:Status', (stat) => update_dest(stat));
+    Net.on('pipe:Status', (stat) => update_dest(stat));
 
     function update_dest(stat) {
 

@@ -93,7 +93,6 @@ class Clients {
 
             UNI.refill_user(user._id);
 
-
             user.online = true;
             user.save();
         });
@@ -143,8 +142,8 @@ class JCollector {
 
         this.wss_journals.on('message', async (client, c, dat) => {
             let user = await UNI.get_user({_id: client.id});
-            UNI.record(user, dat.rec, dat.cmdr_name, dat.gv, dat.lng);
-            if (PIPE_EVENTS.includes(dat.rec.event)) UNI.broadcast(user._id, 'rec:' + dat.rec.event, dat.rec)
+            UNI.upd_status(user, dat.rec, dat.cmdr_name, dat.gv, dat.lng);
+            if (PIPE_EVENTS.includes(dat.rec.event)) CLS.send_to(user._id, 'pipe:' + dat.rec.event, dat.rec);
         });
 
         this.wss_journals.init();
@@ -202,6 +201,11 @@ function init() {
     console.log('DATABSE: CONNECTED ' + cfg.database.host + ':' + cfg.database.port);
     console.log('  VOID_DB - ' + cfg.database.db_void);
     console.log('   JRN_DB - ' + cfg.database.db_journals);
+
+
+    UNI.on(EV_USRPIPE, (uid, rec_event, rec) => {
+        CLS.send_to(uid, 'pipe:' + rec_event, rec);
+    });
 
     CLS.init(cfg.main.ws_user);
     JCL.init(cfg.main.ws_journals);

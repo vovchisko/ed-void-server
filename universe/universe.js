@@ -9,9 +9,11 @@ const server = require('../server');
 const pick = server.tools.pick;
 const pickx = server.tools.pickx;
 const convert = server.tools.convert;
+const checksum = server.tools.checksum;
+const pre = require('./pre');
 
-const EV_USRUPD = 'uni-usr';
-const EV_USRPIPE = 'uni-pipe';
+global.EV_USRUPD = 'uni-usr';
+global.EV_USRPIPE = 'uni-pipe';
 
 class Universe extends EE3 {
     constructor() {
@@ -37,13 +39,14 @@ class Universe extends EE3 {
 
 
     refill_user(uid) {
-        return this.get_user({_by: id})
+        return this.get_user({_id: uid})
             .then((user) => {
 
+                if (!user) throw new Error();
 
                 if (user.journal()) {
-                    let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(4);
-                    scans.forEach((rec) => this.send_to(user._id, 'rec:' + 'Scan', rec));
+                    let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(5);
+                    scans.forEach((rec) => this.emit(EV_USRPIPE, user._id, rec.event, rec));
                 }
             })
             .catch((e) => {
@@ -51,19 +54,32 @@ class Universe extends EE3 {
             });
     }
 
+    upd_status(user, status, cmdr_name, gv, lng) {
+        this.emit(EV_USRPIPE, user._id, status.event, status)
+    }
 
-    /* ONLY FOR NEW RECORDS */
+
+    /* ONLY FOR NEW RECORDS!! */
     async record(user, rec, cmdr_name, gv, lng, records_left = 0) {
 
         if (cmdr_name !== user.cmdr_name) await user.set_cmdr(cmdr_name);
 
-        rec._id = rec.event + '/' + rec.timestamp;
         rec.timestamp = new Date(rec.timestamp);
+
+        if (typeof rec._jp !== 'undefined' && typeof rec._jl !== 'undefined') {
+            rec._id = rec.event + '/' + rec._jp + '+' + rec._jl;
+            delete rec._jp;
+            delete rec._jl;
+        } else {
+            rec._id = rec.event + '/' + (+ rec.timestamp / 1000) + '+!';
+            console.log(rec._id);
+        }
+
         rec._lng = lng;
         rec._gv = gv;
 
-        if (records_left < 5) UNI.emit(EV_USRPIPE, user._id, 'rec:' + rec.event, rec);
-        
+        if (records_left < 5) UNI.emit(EV_USRPIPE, user._id, rec.event, rec);
+
         await user.journal().save(rec);
 
         await UNI.process(user.cmdr, rec);
@@ -220,11 +236,6 @@ class Universe extends EE3 {
         let b = await DB.bodies.findOne({_id: body_id});
         if (b) return new BODY(b);
         return null;
-    }
-
-    broadcast(uid, c, dat) {
-        //todo: nice place to fire event
-        if (this.alive) server.CLS.send_to(uid, c, dat);
     }
 
     /**
