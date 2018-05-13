@@ -1,7 +1,7 @@
 'use strict';
 
 // @link: https://ed.miggy.org/fd-journal-docs/
-
+const dateformat = require('dateformat');
 const EE3 = require('eventemitter3');
 const extend = require('deep-extend');
 const DB = require('./database');
@@ -14,6 +14,7 @@ const pre = require('./pre');
 
 global.EV_USRUPD = 'uni-usr';
 global.EV_USRPIPE = 'uni-pipe';
+global.EV_DATA = 'uni-data';
 
 class Universe extends EE3 {
     constructor() {
@@ -40,14 +41,27 @@ class Universe extends EE3 {
 
     refill_user(uid) {
         return this.get_user({_id: uid})
-            .then((user) => {
+            .then(async (user) => {
 
                 if (!user) throw new Error();
+
+                if (!user.cmdr) return;
 
                 if (user.journal()) {
                     let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(5);
                     scans.forEach((rec) => this.emit(EV_USRPIPE, user._id, rec.event, rec));
                 }
+
+                if (user.cmdr.system_id) {
+                    let sys = await this.get_system(user.cmdr.system_id);
+                    this.emit(EV_DATA, uid, 'c_system', sys);
+                }
+
+                if (user.cmdr.body_id) {
+                    let body = await this.get_body(user.cmdr.body_id);
+                    this.emit(EV_DATA, uid, 'c_body', body);
+                }
+
             })
             .catch((e) => {
                 console.log(`UNI::refill_user(${uid}) - can't refill user;`);
@@ -58,32 +72,29 @@ class Universe extends EE3 {
         this.emit(EV_USRPIPE, user._id, status.event, status)
     }
 
-
     /* ONLY FOR NEW RECORDS!! */
     async record(user, rec, cmdr_name, gv, lng, records_left = 0) {
 
         if (cmdr_name !== user.cmdr_name) await user.set_cmdr(cmdr_name);
 
         rec.timestamp = new Date(rec.timestamp);
+        rec._lng = lng;
+        rec._gv = gv;
 
         if (typeof rec._jp !== 'undefined' && typeof rec._jl !== 'undefined') {
             rec._id = rec.event + '/' + rec._jp + '+' + rec._jl;
             delete rec._jp;
             delete rec._jl;
-        } else {
-            rec._id = rec.event + '/' + (+ rec.timestamp / 1000) + '+!';
-            console.log(rec._id);
+            if (records_left < 5) UNI.emit(EV_USRPIPE, user._id, rec.event, rec);
+            await user.journal().save(rec);
+        } else if (typeof rec._data !== 'undefined') {
+            if (['shipyard', 'market', 'outfitting'].includes(rec._data)) {
+                rec._id = [dateformat(rec.timestamp, 'yymmddHHMMss', true), rec.MarketID, rec.StationName].join('/');
+                DB[rec._data].save(rec);
+            }
         }
 
-        rec._lng = lng;
-        rec._gv = gv;
-
-        if (records_left < 5) UNI.emit(EV_USRPIPE, user._id, rec.event, rec);
-
-        await user.journal().save(rec);
-
-        await UNI.process(user.cmdr, rec);
-
+        await this.process(user.cmdr, rec);
         if (user.cmdr.last_rec < rec.timestamp) user.cmdr.last_rec = rec.timestamp;
     }
 
@@ -103,7 +114,7 @@ class Universe extends EE3 {
         cmdr.metrics.curr_ds += rec.Bodies;
         cmdr.touch();
 
-        await  UNI.get_system(cmdr.loc.system.id)
+        await  UNI.get_system(cmdr.system_id)
             .then((system) => {
                 if (!system) return;
                 if (cmdr.metrics.curr_ds > system.ds_count)
@@ -119,7 +130,7 @@ class Universe extends EE3 {
 
         cmdr.touch();
 
-        await UNI.get_system(cmdr.loc.system.id)
+        await UNI.get_system(cmdr.system_id)
             .then((system) => {
                 if (!system) return;
                 if (cmdr.metrics.curr_ds > system.ds_count)
@@ -131,40 +142,34 @@ class Universe extends EE3 {
 
     async proc_LeaveBody(cmdr, LeaveBody) {
         cmdr.touch({
-            loc: {
-                body: {
-                    name: null,
-                    r: null,
-                    g: null,
-                }
-            }
+            body_id: null,
         });
     }
 
     async proc_ApproachBody(cmdr, ApproachBody) {
-
-        let body = await DB.bodies.findOne({BodyName: ApproachBody.Body});
-
+        let body = await this.spawn_body(ApproachBody.Body, cmdr.system_id);
         cmdr.touch({
-            loc: {
-                body: {
-                    name: ApproachBody.Body,
-                    r: body ? body.Radius : null,
-                    g: body ? body.SurfaceGravity : null,
-                }
-            }
+            body_id: body._id
         });
+        this.emit(EV_DATA, cmdr.uid, 'c_body', body);
     }
 
     async proc_Location(cmdr, Location) {
         let sys = await this.spawn_system(Location.StarSystem, Location.StarPos);
         if (!sys) return;
         await sys.append(cmdr, Location);
-        cmdr.touch({
-            loc: {
-                system: {name: sys.name, starpos: sys.starpos, id: sys._id},
-            },
-        });
+
+        let td = {
+            system_id: sys._id,
+            starpos: sys.starpos,
+        };
+
+        if (Location.Body) {
+            let body = await this.spawn_body(Location.Body, sys._id);
+            td.body_id = body._id;
+        }
+        cmdr.touch(td);
+
     }
 
     async proc_FSDJump(cmdr, FSDJump) {
@@ -172,32 +177,25 @@ class Universe extends EE3 {
         if (!sys) return;
         sys.append(cmdr, FSDJump);
         cmdr.touch({
-            loc: {
-                system: {name: sys.name, starpos: sys.starpos, id: sys._id},
-                body: {name: null, r: null, g: null}
-            },
+            system_id: sys._id,
+            starpos: sys.starpos,
+            body_id: null,
             metrics: {curr_ds: 0}
         });
+
+        this.emit(EV_DATA, cmdr.uid, 'c_system', sys);
     }
 
     async proc_Scan(cmdr, Scan) {
 
-        let body = await this.spawn_body(Scan.BodyName, cmdr.loc.system.id);
+        let body = await this.spawn_body(Scan.BodyName, cmdr.system_id);
         if (!body) return;
         body.append(cmdr, Scan);
 
-        //update cmr scan data if we waiting for it
-        if (cmdr.uid && Scan.BodyName === cmdr.loc.body.name) {
-            cmdr.touch({
-                loc: {
-                    body: {
-                        name: Scan.BodyName,
-                        r: Scan.Radius,
-                        g: Scan.SurfaceGravity,
-                    }
-                }
-            });
-        }
+        //update cmdr scan data if we waiting for it
+        if (body._id === cmdr.body_id)
+            this.emit(EV_DATA, cmdr.uid, 'c_body', body);
+
     }
 
     /**
@@ -283,10 +281,6 @@ class Universe extends EE3 {
                     _id: cmdr_id,
                     uid: uid,
                     name: name,
-                    loc: {
-                        system: {name: null, starpos: [0, 0, 0]},
-                        body: {name: null, r: null, g: null},
-                    }
                 });
             }
         }
@@ -547,11 +541,9 @@ class CMDR {
         this.uid = null;
         this.name = null;
         this.last_rec = new Date(0);
-        this.loc = {
-            system_id: null,
-            starpos: [0, 0, 0],
-            body_id: null,
-        };
+        this.system_id = null;
+        this.body_id = null;
+        this.starpos = [0, 0, 0];
         this.metrics = {curr_ds: 0};
         this.status = {};
         extend(this, cmdr_data);

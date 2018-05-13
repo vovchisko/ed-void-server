@@ -60,6 +60,11 @@ class Database {
         this.users = this.db_void.collection('users');
         this.bodies = this.db_void.collection('bodies');
         this.systems = this.db_void.collection('systems');
+
+        //summary logs
+        this.market = this.db_void.collection('log_market');
+        this.outfitting = this.db_void.collection('log_outfitting');
+        this.shipyard = this.db_void.collection('log_shipyard');
     };
 
     hash(string) {

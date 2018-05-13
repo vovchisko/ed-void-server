@@ -207,6 +207,10 @@ function init() {
         CLS.send_to(uid, 'pipe:' + rec_event, rec);
     });
 
+    UNI.on(EV_DATA, (uid, uni_event, data) => {
+        CLS.send_to(uid, 'uni:' + uni_event, data);
+    });
+
     CLS.init(cfg.main.ws_user);
     JCL.init(cfg.main.ws_journals);
     UNI.init();

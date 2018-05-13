@@ -25,7 +25,7 @@ module.exports = function (req, res) {
 
                 for (let i = 0; i < records.length; i++) {
                     pre.process(records[i]);
-                    await UNI.record(user, records[i], head.cmdr, head.gv, head.lng);
+                    await UNI.record(user, records[i], head.cmdr, head.gv, head.lng, records.length - (i + 1));
                     if (records[i].event === 'Status') log = '';//don't log status
                 }
 
@@ -38,8 +38,6 @@ module.exports = function (req, res) {
                 res_text = 'invalid api-key';
                 log += res_text;
             }
-
-
         } catch (e) {
             res.statusCode = 500;
             res_text = 'fail';
