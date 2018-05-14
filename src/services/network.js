@@ -39,7 +39,7 @@ class Network extends EventEmitter3 {
             _net.stat.online = NS_OFFLINE;
             if (e.reason) return;
             _net.stat.error = true;
-            _net.timer = setTimeout(() => _net.init(_net.wtoken), 1000);
+            _net.timer = setTimeout(() => _net.init(_net.wtoken), 2000);
         };
 
         this.ws.onerror = function (err) {

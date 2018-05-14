@@ -18,6 +18,9 @@ module.exports = function (req, res) {
         if (!dat.pass || dat.pass.length < 3)
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'password is required (atleast 3 chars)'}));
 
+
+        dat.email = dat.email.toLowerCase();
+
         const exists_email = await DB.users.findOne({email: dat.email});
         if (exists_email !== null)
             return res.end(JSON.stringify({result: 0, type: 'warn', text: 'this email already used'}));

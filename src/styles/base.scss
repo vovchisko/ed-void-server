@@ -23,7 +23,15 @@ input, textarea, select {
 * { box-sizing: border-box; }
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none !important; }
-html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 16px; line-height: 18px }
+pre { margin: 0; padding: 0; overflow: visible; line-height: 0.7rem}
+html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 16px; line-height: 100%; }
+//
+h1 { @include hcaps(); font-size: 1.4rem}
+h2 { @include hcaps(); font-size: 1.3rem}
+h3 { @include hcaps(); font-size: 1.2rem}
+h4 { @include hcaps(); font-size: 1.1rem}
+h5 { @include hcaps(); font-size: 1rem}
+//
 #{$all-inputs} {
   @include basic-ui();
   &:active, &:focus {
@@ -33,6 +41,9 @@ html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 1
   }
   + label { margin: 0; font-size: 1rem; line-height: 1rem}
 }
+
+input, textarea {caret-color:$orange; }
+
 button {
   @include basic-ui();
   border: 1px solid $ui-fg;
@@ -45,21 +56,55 @@ button {
   &.active {
     color: $ui-act-fg;
     border-color: $ui-act-fg;
-    text-shadow: -1px -2px 0 rgba(0, 255, 240, .25), 1px 2px 0 rgba(255, 0, 230, .25);
-    box-shadow: -1px -2px 0 0 rgba(0, 255, 240, .25), 1px 2px 0 0 rgba(255, 0, 230, .25);
+    text-shadow: -2px -4px 0 rgba(0, 255, 240, .15), 2px 4px 0 rgba(255, 0, 230, .15);
+    box-shadow: -2px -4px 0 0 rgba(0, 255, 240, .15), 2px 4px 0 0 rgba(255, 0, 230, .15);
+  }
+  &.semi-active {
+    color: darken($ui-act-fg, 15%);
+    border-color: darken($ui-act-fg, 15%);
   }
 }
-button, label { @include hcaps();}
+//
+i { vertical-align: middle; display: inline-block; }
+button, label { @include hcaps(); }
 .wide { width: 100%; display: block; }
 //
 //
 // BASE DATA LISTS
 //
-em {font-style: normal;display: block; font-size: 0.9rem}
-em > b {font-weight: normal;text-transform: uppercase;color: #c56209; display: block;width: 50%;float: left;}
-em > span {font-style: normal;color: #ff8800;display: block;width: 50%;float: left;}
-em > span i {font-style: normal;color: #715029;}
-em > span.false {color: #5d5d5d;}
-em[justify] > b { text-align: right; padding-right: 5px; }
-em[justify] > span { text-align: left; padding-right: 5px;}
+em {font-style: normal;display: block; font-size: 0.9rem; color: $ui-text; }
+em > b {font-weight: normal;text-transform: uppercase; display: block;width: 50%;float: left;}
+em > span {font-style: normal; display: block;width: 50%;float: left;}
+em > span u {font-style: normal; text-decoration: none;}
+em > span.false { }
 em::after, .cls::after { content: ""; clear: both; display: table; }
+.justify {
+  em > b { text-align: right; padding-right: 5px; }
+  em > span { text-align: left; padding-right: 5px;}
+}
+.sub {
+  em { font-size: 0.8rem; }
+  em > b { }
+  em > span { text-transform: capitalize; }
+}
+//
+//
+// MESSAGE BOXES
+//
+.alert {
+  color: $ui-text; text-align: center; margin: 1rem;
+  & > i { font-size: 2rem; display: block; margin-bottom: 1rem }
+  & > div { font-size: 1rem; text-transform: uppercase; }
+  & > small { font-size: 0.8rem; text-transform: lowercase; }
+}
+header { margin: 0px 2rem 0.5rem 7rem;
+  padding: 0px 10px 2px 10px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 2.2rem;
+  font-size: 15px;
+  font-weight: bold;
+  color: lighten($ui-text, 15%)
+}

@@ -35,9 +35,9 @@
 
     Vue.config.productionTip = false;
 
-    Vue.filter('nn', function (num, frac = 3, min_frac = 0) {
+    Vue.filter('nn', function (num, frac = 3, min_frac = 0, err = 'ERR') {
         num = parseFloat(num);
-        if (isNaN(num) || typeof num !== "number") return 'ERR';
+        if (isNaN(num) || typeof num !== "number") return err;
         return (new Intl.NumberFormat('en-US', {
             maximumFractionDigits: frac,
             minimumFractionDigits: min_frac

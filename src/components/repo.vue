@@ -1,5 +1,8 @@
 <template>
-    <b>REPORTING MODULE</b>
+    <div>
+        <header>REPORTING MODULE</header>
+
+    </div>
 </template>
 
 <script>

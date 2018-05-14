@@ -1,28 +1,24 @@
 <template>
     <div id="navbar" class="container-fluid">
-        <div class="nav-left">
-            <button v-on:click="m_toggle()" class=" mode" v-bind:class=" toggle? 'active': ''">
-                MOD: {{nav.c_tab}}
-            </button>
-        </div>
-        <div class="nav-mid">
-            <nav v-if="toggle">
-                <button v-for="(tab, key) in nav.tabs" v-on:click="do_nav(key)">{{key}}</button>
-            </nav>
-
-            <div v-if="!toggle">
-                <div class="nav-header" v-if="!nav.tabs[nav.c_tab].inject">{{nav.tabs[nav.c_tab].base}}</div>
-                <div class="nav-header inject" v-if="nav.tabs[nav.c_tab].inject"
-                     v-html="nav.tabs[nav.c_tab].inject"></div>
-            </div>
-        </div>
         <div class="nav-right">
-            <span v-bind:class="['net', net.error ? 'err':'', net.online]">
+            <div v-bind:class="['net', net.error ? 'err':'', net.online]">
                 <i class="i i-wifi" v-if="net.online === 'online'"></i>
                 <i class="i i-wifi-alert" v-if="net.online === 'offline'"></i>
                 <i class="i i-wifi-low" v-if="net.online === 'connecting'"></i>
-            </span>
+            </div>
         </div>
+
+        <div class="nav-left">
+            <button v-on:click="m_toggle()" class=" mode" v-bind:class=" toggle? 'active': ''">
+                MOD: {{nav.c_tab}}<i class="caret i-chevron-right"></i>
+            </button>
+
+            <nav v-if="toggle">
+                <button v-for="tab in nav.tabs" v-bind:class="nav.c_tab === tab ? 'semi-active':''" v-on:click="do_nav(tab)">{{tab}}</button>
+            </nav>
+        </div>
+
+        <div id="nav-clickout" v-if="toggle" v-on:click="toggle=false"></div>
     </div>
 </template>
 
@@ -49,49 +45,49 @@
 
 <style lang="scss">
     @import "../styles/vars";
-
     #navbar {
-        //layout
-        display: flex;
-        .nav-left {flex: 1; white-space: nowrap; }
-        .nav-mid {flex: 3 100%; }
-        .nav-right {flex: 1; white-space: nowrap; }
+        line-height: 2.2rem;
+        margin-top: 0; margin-bottom: 0;
+        padding-top: 0; padding-bottom: 0;
 
-        line-height: 2rem;
+        //layout
+        .nav-left { margin: 5px 0 0 0; float: left; white-space: nowrap; position: relative; z-index: 2; width: 7rem; }
+        .nav-right { margin: 5px 0 0 0; float: right; width: 2rem; white-space: nowrap; }
 
         //styles
-        button.mode { white-space: nowrap;
-            .caret { }
+        button.mode {
+            white-space: nowrap; width: 100%;
+            .caret { font-size: 1.1rem; width: 0.7em; display: inline-block; }
             &.active .caret { }
         }
         nav {
-            padding: 0 5px;
-            button { margin: 0 5px 0 0;
+            padding: 10px 0;
+            position: absolute;
+            top: 100%;
+            left: 0; background: $ui-bg;
+            z-index: 2;
+            button {
+                margin: 0 5px 5px 0; display: block; width: 7rem;
                 span { display: inline}
             }
         }
         .net {
-            color: darken($ui-text, 25%);
-            padding: 1px .3rem;
-            font-size: 1rem;
-            text-transform: uppercase;
-            text-align: right;
-            white-space: nowrap;
+            color: darken($ui-text, 15%);
+            font-size: 1.3rem;
+            line-height: 2.1rem;
+            text-align: center;
+            &.online { color: lighten($ui-fg, 15%); }
+            &.offline { color: $purple; }
+            &.connecting { color: $purple; }
             &.err { color: darken($red, 15%); }
 
-            span {
-                text-align: left;
-                color: $ui-fg;
-                display: inline-block;
-                &.online:before {content: "ok"; color: $ui-fg; }
-                &.offline:before {content: "off"; color: $orange; }
-                &.connecting:before {content: "..."; color: $ui-fg; }
-            }
         }
         .nav-header {
             padding: 1px 5px; text-transform: uppercase; color: lighten($ui-text, 15%);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis; }
+
+        #nav-clickout { position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: $ui-bg; opacity: 0.5; z-index: 1}
     }
 </style>

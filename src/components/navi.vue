@@ -1,5 +1,8 @@
 <template>
     <div id="navi">
+
+        <header>{{env.system? env.system.name : 'NAVIGATION MODULE'}}</header>
+
         <div class="navi-surf" v-if="navi.pos.alt">
             <div class="compass">
                 <div class="ruler" v-bind:style="navi.style_ruler">
@@ -13,29 +16,29 @@
                 <div class="row">
                     <div class="col-6 cords">
                         <h5>CURR. POSITION</h5>
-                        <em><b>LAT</b><span>{{navi.pos.lat | nn(4,4)}} <i>°</i></span></em>
-                        <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <i>°</i></span></em>
-                        <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <i>KM</i></span></em>
+                        <em><b>LAT</b><span>{{navi.pos.lat | nn(4,4)}} <u>°</u></span></em>
+                        <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <u>°</u></span></em>
+                        <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <u>KM</u></span></em>
                     </div>
                     <div class="col-6 cords">
                         <h5>DESTINATION</h5>
 
                         <div v-if="navi.dest.enabled">
-                            <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0,'err')}} <i>°</i></span></em>
-                            <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3,'err')}} <i>KM</i></span></em>
+                            <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0,'err')}} <u>°</u></span></em>
+                            <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3,'err')}} <u>KM</u></span></em>
                             <em class="editable">
                                 <b>LAT</b>
                                 <span><input type="number"
                                              @focus="$event.target.select()"
                                              @change="recalc_dest()"
-                                             v-model="navi.dest.lat"><i>°</i></span>
+                                             v-model="navi.dest.lat"><u>°</u></span>
                             </em>
                             <em class="editable">
                                 <b>LON</b>
                                 <span><input type="number"
                                              @focus="$event.target.select()"
                                              @change="recalc_dest()"
-                                             v-model="navi.dest.lon"><i>°</i></span>
+                                             v-model="navi.dest.lon"><u>°</u></span>
                             </em>
                         </div>
 
@@ -49,18 +52,15 @@
         </div>
 
         <div class="container-fluid">
-            <h5>CURRENT LOCATION</h5>
-            <div v-if="!navi.pos.alt">
-                <div class="notification huge">
-                    <div>NAV-mode will turns on automatically on approach.</div>
-                </div>
-            </div>
-            <div v-if="navi.body.name">
-                <em><b>BODY</b> <span>{{navi.body.name}}</span></em>
-                <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 | nn(3,3, 'no data')}} <i>KM</i></span></em>
-                <em><b>GRAVITY</b> <span>{{navi.body.surf_gravity | nn(3,3, 'no data')}} <i>G</i></span></em>
-                <div class="notification warn" v-if="navi.pos.alt && !navi.body.radius">
-                    <div>No scan data in database!<br>Scan body to identify radius and gravity correctly</div>
+            <div>
+                <em><b>SYSTEM</b> <span>{{env.system? env.system.name : 'N/A'}}</span></em>
+                <em><b>BODY</b> <span>{{navi.body.name || 'N/A'}}</span></em>
+                <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 | nn(3,3, 'NO DATA')}} <u>KM</u></span></em>
+                <em><b>GRAVITY</b> <span>{{navi.body.surf_gravity | nn(3,3, '#')}} <u>G</u></span></em>
+                <div class="alert warn" v-if="navi.pos.alt && !navi.body.radius">
+                    <i class="i-ed-alert"></i>
+                    <div>No scan data in database</div>
+                    <small>Scan body to identify radius and gravity correctly</small>
                 </div>
             </div>
         </div>
@@ -74,7 +74,7 @@
     export default {
         name: "navi",
         data: () => {
-            return {navi: Data.navi}
+            return {navi: Data.navi, env: Data.env}
         },
         methods: {recalc_dest: () => recalc_dest()}
     }
@@ -142,10 +142,10 @@
 
     #navi {}
     #navi .compass {overflow: hidden; background: #111;height: 145px;margin: 0 -5px 10px -5px;}
-    #navi .compass .ruler { background: transparent url('../assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
+    #navi .compass .ruler { background: transparent url('../../public/assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
     #navi .compass .ruler .head {width: 50px;font-size: 14px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -30px 0 0 -25px;}
     #navi .compass .ruler .head:after { content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-top: 5px solid #ff8800;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;}
-    #navi .compass .dest { background: transparent url('../assets/nav-ruler-dest.gif') 0 0; width: 100%;height: 7px;position: relative;transition: all linear 1000ms;}
+    #navi .compass .dest { background: transparent url('../../public/assets/nav-ruler-dest.gif') 0 0; width: 100%;height: 7px;position: relative;transition: all linear 1000ms;}
     #navi .compass .dest .head {width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #555;color: #555;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
     #navi .compass .dest .head:after {content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-bottom: 5px solid #555;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;top: -14px;}
     #navi .compass .dest .head:before {content: "vector";color: #676767;display: block;position: absolute;left: 50%;margin: 5px 0 0 -100px;top: -42px;width: 200px;text-align: center;text-transform: uppercase;font-size: 13px;}

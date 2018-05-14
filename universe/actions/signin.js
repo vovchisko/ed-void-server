@@ -15,6 +15,8 @@ module.exports = function (req, res) {
         if (!dat.email) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'email is required'}));
         if (!dat.pass) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'password is required'}));
 
+        dat.email = dat.email.toLowerCase();
+
         const user = await UNI.get_user({email: dat.email});
 
         if (!user) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}));
