@@ -1,4 +1,4 @@
-const NULL = {
+const Null = {
     tabs: {
         tabs: {
             'cmdr': {base: 'CMDR Profile', inject: ''},
@@ -18,10 +18,9 @@ const NULL = {
 
     cmdr: {
         name: null,
-        loc: {
-            system: {name: null, starpos: [0, 0, 0], id: null},
-            body: {name: null, r: null, g: null},
-        },
+        system_id: null,
+        body_id: null,
+        starpos: [0, 0, 0],
         last_rec: null
     },
 
@@ -41,14 +40,18 @@ const NULL = {
             lat: 0, lon: 0, azi: 0, dist: 0,
             align: ''
         },
+        body: {name: null, radius: 0, gravity: 0}
     },
 
     vass: {
-        c_system: {
-            name: null,
-        },
         recent: []
     },
+
+    env: {
+        system: null,
+        body: null,
+        station: null,
+    }
 };
 
-export default NULL;
+export default Null;

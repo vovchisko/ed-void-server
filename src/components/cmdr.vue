@@ -1,15 +1,14 @@
 <template>
     <div id="cmdr">
-
         <div class="row">
             <div class="col-sm">
                 <h5>CMDR INFO</h5>
                 <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
-                <em><b>SYSTEM</b><span>{{cmdr.loc.system.name}}</span></em>
+                <em><b>SYSTEM</b><span>{{env.system ? env.name : 'n/a'}}</span></em>
                 <em><b>&nbsp;</b><span class="false">
-                    <span v-for="x in cmdr.loc.system.starpos"> {{x/32}}; </span>
+                    <span v-for="x in cmdr.starpos"> {{x/32}}; </span>
                 </span></em>
-                <em><b>LOC</b><span>{{cmdr.loc.body.name || 'Deep Space' }}</span></em>
+                <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>
             </div>
             <div class="col-sm">
                 <h5>ACCOUNT INFO</h5>
@@ -34,41 +33,29 @@
 
             </div>
         </div>
-
     </div>
 </template>
 
 <script>
     import Data from '../services/data';
     import Net from '../services/network';
-    import extend from 'deep-extend';
+
 
     export default {
         name: 'cmdr',
         mounted: function () { console.info('DATA:', this.cmdr, this.user)},
-        data: () => { return {cmdr: Data.cmdr, user: Data.user}},
+        data: () => { return {cmdr: Data.cmdr, user: Data.user, env: Data.env}},
         methods: {
             signout: function () {
                 Net.disconnect();
                 Data.auth.is_logged = false;
                 Data.auth.wtoken = '';
-                Data.user.email = null;
-                Data.user.api_key = null;
                 Data.save();
                 Data.nullify();
             }
         }
     }
 
-    Net.on('cmdr', (cmdr) => {
-        if (!cmdr) return false;
-        extend(Data.cmdr, cmdr);
-    });
-
-    Net.on('user', (user) => {
-        Data.user.email = user.email;
-        Data.user.api_key = user.api_key;
-    });
 
 </script>
 

@@ -1,6 +1,6 @@
 <template>
     <div id="navi">
-        <div class="navi-surf" v-if="!navi.pos.alt">
+        <div class="navi-surf" v-if="navi.pos.alt">
             <div class="compass">
                 <div class="ruler" v-bind:style="navi.style_ruler">
                     <b class="head">{{navi.pos.head}}</b>
@@ -37,11 +37,10 @@
                                              @change="recalc_dest()"
                                              v-model="navi.dest.lon"><i>°</i></span>
                             </em>
-
                         </div>
 
                         <button v-bind:class="navi.dest.enabled?'active':''"
-                                v-on:click="navi.dest.enabled = !navi.dest.enabled">
+                                v-on:click="navi.dest.enabled = !navi.dest.enabled; recalc_dest()">
                             {{ !navi.dest.enabled ? 'SET COURSE' : 'DISMISS' }}
                         </button>
                     </div>
@@ -52,28 +51,18 @@
         <div class="container-fluid">
             <h5>CURRENT LOCATION</h5>
             <div v-if="!navi.pos.alt">
-                <em><b>SYS</b><span>{{cmdr.loc.system.name}}</span></em>
-                <em><b></b><span>Seep Space</span></em>
                 <div class="notification huge">
                     <div>NAV-mode will turns on automatically on approach.</div>
                 </div>
             </div>
-            <div v-if="navi.pos.alt">
-                <em><b>BODY</b><span
-                    v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.name || 'FALSE'}}</span></em>
-                <em>
-                    <b>RADIUS</b>
-                    <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.r / 1000 | nn(3,3)}} <i>KM</i></span>
-                </em>
-                <em>
-                    <b>GRAVITY</b>
-                    <span v-bind:class="cmdr.loc.body.name?'':'false'">{{cmdr.loc.body.g / 9.80665 | nn(4)}} <i>G</i></span>
-                </em>
-                <div class="notification warn" v-if="navi.pos.alt && !cmdr.loc.body.r">
-                    <div>Scan body to identify radius and gravity correctly</div>
+            <div v-if="navi.body.name">
+                <em><b>BODY</b> <span>{{navi.body.name}}</span></em>
+                <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 | nn(3,3, 'no data')}} <i>KM</i></span></em>
+                <em><b>GRAVITY</b> <span>{{navi.body.surf_gravity | nn(3,3, 'no data')}} <i>G</i></span></em>
+                <div class="notification warn" v-if="navi.pos.alt && !navi.body.radius">
+                    <div>No scan data in database!<br>Scan body to identify radius and gravity correctly</div>
                 </div>
             </div>
-
         </div>
     </div>
 </template>
@@ -85,33 +74,30 @@
     export default {
         name: "navi",
         data: () => {
-            return {
-                cmdr: Data.cmdr,
-                navi: Data.navi
-            }
+            return {navi: Data.navi}
         },
-        methods: {
-            recalc_dest: () => {
-                console.log('hey!');
-                recalc_dest();
-            }
-        }
+        methods: {recalc_dest: () => recalc_dest()}
     }
 
-    const _cmdr = Data.cmdr;
     const _navi = Data.navi;
 
     Net.on('pipe:Status', (stat) => update_dest(stat));
+    Net.on('uni:c_body', (body) => {
+        console.log(body)
+        _navi.body.name = (body) ? body.name : null;
+        _navi.body.radius = (body && body.radius) ? body.radius : 0;
+        _navi.body.surf_gravity = (body) ? body.surf_gravity : null;
+    });
+
 
     function update_dest(stat) {
-
-        if (!_cmdr.loc.body.r) return;
 
         _navi.pos.alt = stat.Altitude;
         _navi.pos.head = stat.Heading;
         _navi.pos.lat = stat.Latitude;
         _navi.pos.lon = stat.Longitude;
 
+        if (!_navi.pos.alt) return;
         recalc_dest();
     }
 
@@ -125,12 +111,12 @@
             let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
             let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
             if (initialBearing < 0) initialBearing = 360 + initialBearing;
-            _navi.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * _cmdr.loc.body.r;
+            _navi.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (_navi.body.radius);
             _navi.dest.head = Math.floor(initialBearing);
             isNaN(_navi.dest.head) ? _navi.dest.head = 'ERR' : null;
         }
 
-        let rw = window.innerWidth; //$refs.ruler.clientWidth;
+        let rw = window.innerWidth;
         let offset = (rw / 2) - _navi.pos.head * 4;
         _navi.style_ruler['background-position-x'] = offset + 'px';
 
@@ -173,6 +159,7 @@
     #navi .compass .dest .head.alg2:after {border-bottom-color: red;top: -14px;}
     #navi .compass .dest .head.alg2:before {content: 'wrong course vector!'; color: red; }
     #navi .cords input[type=number] {border: 0 none;width: calc(100% - 20px);text-align: right;line-height: inherit;height: auto;padding: 0;}
+    #navi .cords button { margin-top: 15px}
 
 </style>
 

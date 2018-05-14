@@ -144,10 +144,12 @@ class Universe extends EE3 {
         cmdr.touch({
             body_id: null,
         });
+        this.emit(EV_DATA, cmdr.uid, 'c_body', null);
     }
 
     async proc_ApproachBody(cmdr, ApproachBody) {
         let body = await this.spawn_body(ApproachBody.Body, cmdr.system_id);
+
         cmdr.touch({
             body_id: body._id
         });

@@ -1,7 +1,9 @@
 //import Net from './network';
 //Net.on('net:any', (c, rec) => { console.log(c, rec)});
-import extend from 'deep-extend'
-import NULL from './null';
+import extend from 'deep-extend';
+import Net from './network';
+import Null from './null';
+import Vue from 'vue';
 
 class DataStorage {
     constructor() {
@@ -11,14 +13,14 @@ class DataStorage {
         this.user = {};
         this.navi = {};
         this.vass = {};
+        this.env = {};
 
         this.init();
     }
 
     nullify() {
-        for (let i in this) extend(this[i], NULL[i]);
+        for (let i in this) extend(this[i], Null[i]);
     }
-
 
     init() {
 
@@ -40,6 +42,21 @@ class DataStorage {
     }
 }
 
-
 const Data = new DataStorage();
 export default Data;
+
+
+Net.on('cmdr', (cmdr) => {
+    if (!cmdr) return false;
+    extend(Data.cmdr, cmdr);
+});
+
+Net.on('user', (user) => {
+    Data.user.email = user.email;
+    Data.user.api_key = user.api_key;
+});
+
+Net.on('uni:c_system', (system) => Vue.set(Data.env, 'system', system));
+Net.on('uni:c_body', (body) => Vue.set(Data.env, 'body', body));
+
+
