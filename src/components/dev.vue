@@ -1,13 +1,12 @@
 <template>
     <div id="dev">
         <header>
-            <button v-for="m in dev_mods"
-                    v-on:click="c_mod = m"
-                    v-bind:class="m === c_mod ? 'active':''">{{m}}
-            </button>
+            <button v-for="t in tabs" v-on:click="c_tab = t" v-bind:class="t === c_tab ? 'active':''">{{t}}</button>
         </header>
 
-        <pre v-if="c_mod === 'data'">{{data}}</pre>
+        <pre v-if="c_tab === 'data'">{{data}}</pre>
+        <pre v-if="c_tab === 'pipe'">no pipe data yet</pre>
+        <pre v-if="c_tab === 'uni'">no uni data yet</pre>
     </div>
 </template>
 
@@ -16,7 +15,13 @@
 
     export default {
         name: "dev",
-        data: () => {return {c_mod: 'data', dev_mods: ['data', 'pipe', 'uni'], data: Data} }
+        data: () => {
+            return {
+                c_tab: 'data',
+                tabs: ['data', 'pipe', 'uni'],
+                data: Data
+            }
+        }
     }
 </script>
 
@@ -26,6 +31,5 @@
             button { margin-right: 5px;}
         }
         pre { font-size: 0.7rem; line-height: 0.7rem}
-
     }
 </style>

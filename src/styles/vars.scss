@@ -39,13 +39,14 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
 @mixin hcaps { font-family: 'euro_capsregular', sans-serif }
 @mixin basic-ui {
   display: inline-block;
-  line-height: calc(2.2rem - 1px);
+  line-height: 2.2rem;
   white-space: nowrap;
   height: 2.2rem;
   padding: 0 0.5rem;
   background: $ui-bg;
   border: 1px solid darken($ui-fg, 25%);
   color: $ui-fg;
+  font-size: 0.9rem;
   &:hover { border-color: darken($ui-act-fg, 25%); color: darken($ui-act-fg, 25%);}
 }
 

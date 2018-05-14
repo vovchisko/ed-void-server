@@ -28,7 +28,7 @@
                     </div>
                     <div class="col-sm">
                         <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
-                            <b>{{ring.Name}}</b>
+                            <h5>{{ring.Name}}</h5>
                             <em><b>Class</b><span>{{ring.RingClass}}</span></em>
                             <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <u>MT</u></span></em>
                             <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <u>KM</u></span></em>
@@ -42,8 +42,7 @@
                             <em><b>Planet Class</b><span>{{s.PlanetClass}}</span></em>
                             <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
                             <em><b>Tidal Lock</b><span v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
-                            <em><b>Volcanism</b><span
-                                v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
+                            <em><b>Volcanism</b><span v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
                             <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
                             <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <u>KM</u></span></em>
                             <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <u>G</u></span></em>
@@ -52,12 +51,12 @@
                     </div>
                     <div class="col-sm">
                         <div class="sub composion">
-                            <b>Body Composition</b>
+                            <h5>Body Composition</h5>
                             <em v-for="(com ,val) in s.Composition"><b>{{val}}</b><span>{{com * 100 | nn(2)}} <u>%</u></span></em>
                         </div>
 
                         <div class="sub atmosphere" v-if="s.Atmosphere">
-                            <b>Atmosphere</b>
+                            <h5>Atmosphere</h5>
                             <em><b>Surf. Pressure</b><span>{{s.SurfacePressure / 101325 | nn(3)}} <u>ATM</u></span></em>
                             <em><b>Atmosphere</b><span>{{s.Atmosphere || 'n/a'}}</span></em>
                             <em><b>Type</b><span>{{s.AtmosphereType}}</span></em>
@@ -66,19 +65,17 @@
                         </div>
 
                         <div class="sub materials" v-if="s.Materials">
-                            <b>Materials</b>
+                            <h5>Materials</h5>
                             <em v-for="material in s.Materials">
                                 <b>{{material.Name}}</b><span>{{material.Percent | nn(2,2)}} <u>%</u></span>
                             </em>
                         </div>
 
                         <div class="sub orbit">
-                            <b>Orbit</b>
+                            <h5>Orbit</h5>
                             <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <u>AU</u></span></em>
-                            <em><b>Orbital
-                                   Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
-                            <em><b>Rotation
-                                   Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
+                            <em><b>Orbital Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
+                            <em><b>Rotation Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
                             <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
                             <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <u>°</u></span></em>
                             <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <u>°</u></span></em>
@@ -86,7 +83,7 @@
                         </div>
 
                         <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
-                            <b>Ring: {{ring.Name}}</b>
+                            <h5>Ring: {{ring.Name}}</h5>
                             <em><b>Class</b><span>{{ring.RingClass}}</span></em>
                             <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <u>MT</u></span></em>
                             <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <u>KM</u></span></em>
@@ -138,7 +135,7 @@
     @import "../styles/vars";
     #vass {
         h4 {
-            text-transform: uppercase;font-size: 1.1rem;margin: 10px 0 5px 0; padding: 5px; text-align: left;background: #100f0f;
+            text-transform: uppercase;font-size: 1.1rem;margin: 10px 0 5px 0; padding: 5px; text-align: left; background: #100f0f;
             b { font-size: 1rem; }
             div { text-align: right; font-size: 0.8rem;}
             span { display: inline-block; margin-left: 1rem }
@@ -149,10 +146,14 @@
             span.value {color: $orange;}
         }
 
+        h5 { margin: 0.6rem 0 0rem 0; padding: 0; font-weight: normal; color: darken($ui-text, 15%)}
+
+        .main em { color: lighten($ui-text, 30%)}
+        .sub em { font-size: 0.8em; line-height: 100%}
+
         .scan:last-child { display: none; }
         .scan:first-child { display: block !important; }
         .scan.empty { text-align: center; color: $orange; padding: 100px 0; }
-
 
     }
 </style>

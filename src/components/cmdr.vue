@@ -3,10 +3,10 @@
         <header>PILOT PROFILE</header>
         <div class="row">
             <div class="col-sm props listed">
-                <h3>CMDR INFO</h3>
                 <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
-                <em><b>SYSTEM</b><span>{{env.system ? env.system.name : 'n/a'}}<br>
-                                <small v-for="x in cmdr.starpos"> {{x/32}}; </small>
+                <em><b>SYSTEM</b>
+                    <span>{{env.system ? env.system.name : 'n/a'}}<br>
+                    <small v-for="x in cmdr.starpos"> {{x/32}}; </small>
                 </span></em>
                 <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>
             </div>
@@ -22,9 +22,9 @@
         <div class="row">
             <div class="col-sm-6">
                 <p class="help">
-                    - Download Client <a href="download/ed-void-client.zip">ed-void.zip [ 8.16 Mb ]</a>
+                    - Download Jouranl Client<br/><a href="download/ed-void-journal.zip">ed-void-journal.zip [8.36Mb]</a>
                     on your PC.<br>
-                    - Run and follow the instructions
+                    - Run and follow the instructions.
                 </p>
                 <p class="help">If you need help - visit our
                     <a href="https://discord.gg/s7qchpj" target="_blank">Discord Server</a></p>

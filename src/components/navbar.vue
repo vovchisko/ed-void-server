@@ -10,11 +10,11 @@
 
         <div class="nav-left">
             <button v-on:click="m_toggle()" class=" mode" v-bind:class=" toggle? 'active': ''">
-                MOD: {{nav.c_tab}}<i class="caret i-chevron-right"></i>
+                MOD: {{nav.c_mode}}<i class="caret i-chevron-right"></i>
             </button>
 
             <nav v-if="toggle">
-                <button v-for="tab in nav.tabs" v-bind:class="nav.c_tab === tab ? 'semi-active':''" v-on:click="do_nav(tab)">{{tab}}</button>
+                <button v-for="mode in nav.modes" v-bind:class="nav.c_mode === mode ? 'semi-active':''" v-on:click="do_nav(mode)">{{mode}}</button>
             </nav>
         </div>
 
@@ -28,10 +28,10 @@
 
     export default {
         name: 'navbar',
-        data: () => {return {nav: Data.tabs, net: Net.stat, toggle: false} },
+        data: () => {return {nav: Data.modes, net: Net.stat, toggle: false} },
         methods: {
             do_nav: function (t) {
-                this.nav.c_tab = t;
+                this.nav.c_mode = t;
                 this.m_toggle(false);
                 Data.save();
             },

@@ -3,6 +3,12 @@
 
         <header>{{env.system? env.system.name : 'NAVIGATION MODULE'}}</header>
 
+        <div class="alert info" v-if="!navi.pos.alt">
+            <i class="i-ed-alert"></i>
+            <div>Approach to the body<br/>NAV-Module will engage automatically</div>
+            <small>Before approaching Scan body to identify radius and gravity correctly</small>
+        </div>
+
         <div class="navi-surf" v-if="navi.pos.alt">
             <div class="compass">
                 <div class="ruler" v-bind:style="navi.style_ruler">
@@ -52,7 +58,7 @@
         </div>
 
         <div class="container-fluid">
-            <div>
+            <div class="justify">
                 <em><b>SYSTEM</b> <span>{{env.system? env.system.name : 'N/A'}}</span></em>
                 <em><b>BODY</b> <span>{{navi.body.name || 'N/A'}}</span></em>
                 <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 | nn(3,3, 'NO DATA')}} <u>KM</u></span></em>
@@ -83,7 +89,6 @@
 
     Net.on('pipe:Status', (stat) => update_dest(stat));
     Net.on('uni:c_body', (body) => {
-        console.log(body)
         _navi.body.name = (body) ? body.name : null;
         _navi.body.radius = (body && body.radius) ? body.radius : 0;
         _navi.body.surf_gravity = (body) ? body.surf_gravity : null;

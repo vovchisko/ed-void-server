@@ -3,11 +3,11 @@
         <auth v-if="!data.auth.is_logged"></auth>
         <navbar v-if="data.auth.is_logged"/>
         <div class="container-fluid" v-if="data.auth.is_logged">
-            <cmdr v-if=" data.tabs.c_tab === 'cmdr'"></cmdr>
-            <vass v-if="data.tabs.c_tab === 'vass'"></vass>
-            <navi v-if="data.tabs.c_tab === 'navi'"></navi>
-            <repo v-if="data.tabs.c_tab === 'repo'"></repo>
-            <dev v-if="data.tabs.c_tab === 'dev'"></dev>
+            <cmdr v-if=" data.modes.c_mode === 'cmdr'"></cmdr>
+            <vass v-if="data.modes.c_mode === 'vass'"></vass>
+            <navi v-if="data.modes.c_mode === 'navi'"></navi>
+            <repo v-if="data.modes.c_mode === 'repo'"></repo>
+            <dev v-if="data.modes.c_mode === 'dev'"></dev>
         </div>
     </div>
 </template>

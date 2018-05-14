@@ -7,10 +7,37 @@ import Vue from 'vue';
 class DataStorage {
     constructor() {
         this._null = {};
-        this.tabs = {
-            tabs: ['cmdr', 'navi', 'vass', 'repo', 'dev'],
-            c_tab: 'cmdr'
+
+        this.modes = {
+            modes: ['cmdr', 'navi', 'vass', 'repo', 'dev'],
+            c_mode: 'cmdr'
         };
+
+        this.poi = {
+            current: {
+                _id: null,
+                type: null,
+                subject: '',
+                description: '',
+                links: [],
+                system_name: '',
+                system_id: null,
+                body_name: '',
+                body_id: null,
+                starpos: [0, 0, 0],
+                lat: 0,
+                lon: 0,
+            },
+            recents: [],
+            search: {
+                request: {
+                    type: null,
+                    text: {}
+                },
+                results: []
+            }
+        };
+
         this.auth = {
             is_logged: false,
             email: '',
@@ -81,18 +108,19 @@ class DataStorage {
         if (wtoken) this.auth.wtoken = wtoken;
 
         //read wtoken
-        let c_tab = localStorage.getItem('c_tab');
-        if (c_tab) this.tabs.c_tab = c_tab;
+        let c_mode = localStorage.getItem('c_mode');
+        if (c_mode) this.modes.c_mode = c_mode;
     }
 
     save() {
         //save some data to locastorage
         localStorage.setItem('wtoken', this.auth.wtoken);
-        localStorage.setItem('c_tab', this.tabs.c_tab);
+        localStorage.setItem('c_mode', this.modes.c_mode);
     }
 }
 
-const Data = new DataStorage();
+const
+    Data = new DataStorage();
 export default Data;
 
 
@@ -108,5 +136,4 @@ Net.on('user', (user) => {
 
 Net.on('uni:c_system', (system) => Vue.set(Data.env, 'system', system));
 Net.on('uni:c_body', (body) => Vue.set(Data.env, 'body', body));
-
 

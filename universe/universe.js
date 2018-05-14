@@ -69,7 +69,21 @@ class Universe extends EE3 {
     }
 
     upd_status(user, status, cmdr_name, gv, lng) {
-        this.emit(EV_USRPIPE, user._id, status.event, status)
+        this.emit(EV_USRPIPE, user._id, status.event, status);
+
+        //todo: deal with shi data;
+        let example = {
+            "timestamp": "2017-12-07T12:03:14Z",
+            "event": "Status",
+            "Flags": 18874376,
+            "Pips": [4, 8, 0],
+            "FireGroup": 0,
+            "GuiFocus": 0,
+            "Latitude": -28.584963,
+            "Longitude": 6.826313,
+            "Heading": 109,
+            "Altitude": 404
+        }
     }
 
     /* ONLY FOR NEW RECORDS!! */
