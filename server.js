@@ -79,18 +79,8 @@ class Clients {
         this.wss_clients.on('connected', async (client) => {
 
             let user = await UNI.get_user({_id: client.id});
-
             if (!user) return client.close();
-
-            this.send_to(user._id, 'user', {
-                email: user.email,
-                api_key: user.api_key
-            });
-
-            this.send_to(user._id, 'cmdr', user.cmdr);
-
             console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] joined`);
-
             UNI.refill_user(user._id);
 
             user.online = true;

@@ -35,17 +35,22 @@ class Universe extends EE3 {
             for (let c in this.cmdrs) this.cmdrs[c].save();
             for (let u in this.users) this.users[u].save();
         }, 5000);
-
     }
-
 
     refill_user(uid) {
         return this.get_user({_id: uid})
             .then(async (user) => {
-
                 if (!user) throw new Error();
 
+                this.emit(EV_DATA, user._id, 'user', {
+                    email: user.email,
+                    api_key: user.api_key
+                });
+
                 if (!user.cmdr) return;
+
+                this.emit(EV_DATA, user._id, 'cmdr', user.cmdr);
+                this.emit(EV_DATA, user._id, 'status', user.cmdr.status);
 
                 if (user.journal()) {
                     let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(5);
@@ -68,22 +73,25 @@ class Universe extends EE3 {
             });
     }
 
-    upd_status(user, status, cmdr_name, gv, lng) {
-        this.emit(EV_USRPIPE, user._id, status.event, status);
+    async upd_status(user, Status, cmdr_name, gv, lng) {
+        this.emit(EV_USRPIPE, user._id, Status.event, Status);
 
-        //todo: deal with shi data;
-        let example = {
-            "timestamp": "2017-12-07T12:03:14Z",
-            "event": "Status",
-            "Flags": 18874376,
-            "Pips": [4, 8, 0],
-            "FireGroup": 0,
-            "GuiFocus": 0,
-            "Latitude": -28.584963,
-            "Longitude": 6.826313,
-            "Heading": 109,
-            "Altitude": 404
-        }
+        if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
+
+        // user.cmdr.touch({ status: ...don't cause unnecessary update.
+        // send only status
+        extend(user.cmdr.status, {
+            flags: Status.flags,
+            pips: Status.Pips,
+            fgroup: Status.FireGroup || 0,
+            lat: Status.Latitude || null,
+            lon: Status.Longitude || null,
+            alt: Status.Altitude || null,
+            head: Status.Heading || null,
+            _upd: new Date(Status.timestamp)
+        });
+        user.cmdr._ch = true; // but mark as changed
+        this.emit(EV_USRUPD, user._id, 'status', user.cmdr.status);
     }
 
     /* ONLY FOR NEW RECORDS!! */

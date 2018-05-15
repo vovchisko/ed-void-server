@@ -49,10 +49,7 @@
     export default {
         name: "auth",
         data: () => { return {auth: Data.auth, pass_c: '', sign_: 'in', msg: {type: '', text: WELCOME_IN}}},
-        created: function () {
-            console.log(this.auth.wtoken);
-            if (this.auth.wtoken) this.connect()
-        },
+        created: function () { if (this.auth.wtoken) this.connect() },
         methods: {
             sign: function (to = 'in') {
                 this.sign_ = to;
@@ -96,14 +93,22 @@
                 Net.init(this.auth.wtoken);
                 Data.save();
             }
-
         }
     }
+
+    Net.on('_close', (code, reason) => {
+        if (reason === 'unauthorized') {
+            Data.auth.wtoken = '';
+            Data.auth.is_logged = false;
+            Data.save();
+        }
+
+    });
+
 </script>
 
 <style lang="scss">
     @import "../styles/vars";
-
     #auth {
         h2 { @include hcaps(); font-size: 2rem; margin-bottom: 2rem}
         form {

@@ -50,7 +50,8 @@ class DataStorage {
             system_id: null,
             body_id: null,
             starpos: [0, 0, 0],
-            last_rec: null
+            last_rec: null,
+            status: {}
         };
 
         this.user = {
@@ -100,9 +101,6 @@ class DataStorage {
             }
         }
 
-        console.log(this);
-
-
         //read wtoken
         let wtoken = localStorage.getItem('wtoken');
         if (wtoken) this.auth.wtoken = wtoken;
@@ -119,14 +117,17 @@ class DataStorage {
     }
 }
 
-const
-    Data = new DataStorage();
+const Data = new DataStorage();
 export default Data;
-
 
 Net.on('cmdr', (cmdr) => {
     if (!cmdr) return false;
     extend(Data.cmdr, cmdr);
+});
+
+Net.on('status', (status) => {
+    if (!status) return false;
+    extend(Data.cmdr.status, status);
 });
 
 Net.on('user', (user) => {

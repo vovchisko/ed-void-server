@@ -26,10 +26,5 @@
 </script>
 
 <style lang="scss">
-    #dev {
-        header {
-            button { margin-right: 5px;}
-        }
-        pre { font-size: 0.7rem; line-height: 0.7rem}
-    }
+
 </style>

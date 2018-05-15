@@ -51,8 +51,8 @@
         padding-top: 0; padding-bottom: 0;
 
         //layout
-        .nav-left { margin: 5px 0 0 0; float: left; white-space: nowrap; position: relative; z-index: 2; width: 7rem; }
-        .nav-right { margin: 5px 0 0 0; float: right; width: 2rem; white-space: nowrap; }
+        .nav-left {  float: left; white-space: nowrap; position: relative; z-index: 2; width: 7rem; }
+        .nav-right {  float: right; width: 2rem; white-space: nowrap; }
 
         //styles
         button.mode {
@@ -72,6 +72,7 @@
             }
         }
         .net {
+            padding: 1px 0;
             color: darken($ui-text, 15%);
             font-size: 1.3rem;
             line-height: 2.1rem;

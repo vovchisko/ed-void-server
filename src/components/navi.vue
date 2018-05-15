@@ -3,13 +3,13 @@
 
         <header>{{env.system? env.system.name : 'NAVIGATION MODULE'}}</header>
 
-        <div class="alert info" v-if="!navi.pos.alt">
+        <div class="alert info" v-if="navi.pos.alt===null">
             <i class="i-ed-alert"></i>
             <div>Approach to the body<br/>NAV-Module will engage automatically</div>
             <small>Before approaching Scan body to identify radius and gravity correctly</small>
         </div>
 
-        <div class="navi-surf" v-if="navi.pos.alt">
+        <div class="navi-surf" v-if="navi.pos.alt!==null">
             <div class="compass">
                 <div class="ruler" v-bind:style="navi.style_ruler">
                     <b class="head">{{navi.pos.head}}</b>
@@ -30,8 +30,8 @@
                         <h5>DESTINATION</h5>
 
                         <div v-if="navi.dest.enabled">
-                            <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0,'err')}} <u>°</u></span></em>
-                            <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3,'err')}} <u>KM</u></span></em>
+                            <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0)}} <u>°</u></span></em>
+                            <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3)}} <u>KM</u></span></em>
                             <em class="editable">
                                 <b>LAT</b>
                                 <span><input type="number"
@@ -63,13 +63,15 @@
                 <em><b>BODY</b> <span>{{navi.body.name || 'N/A'}}</span></em>
                 <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 | nn(3,3, 'NO DATA')}} <u>KM</u></span></em>
                 <em><b>GRAVITY</b> <span>{{navi.body.surf_gravity | nn(3,3, '#')}} <u>G</u></span></em>
-                <div class="alert warn" v-if="navi.pos.alt && !navi.body.radius">
+                <div class="alert warn" v-if="navi.pos.alt !== null && !navi.body.radius">
                     <i class="i-ed-alert"></i>
                     <div>No scan data in database</div>
                     <small>Scan body to identify radius and gravity correctly</small>
                 </div>
             </div>
         </div>
+
+        <!-- <pre>{{navi}}</pre> -->
     </div>
 </template>
 
@@ -87,7 +89,8 @@
 
     const _navi = Data.navi;
 
-    Net.on('pipe:Status', (stat) => update_dest(stat));
+    Net.on('uni:status', (stat) => update_dest(stat));
+
     Net.on('uni:c_body', (body) => {
         _navi.body.name = (body) ? body.name : null;
         _navi.body.radius = (body && body.radius) ? body.radius : 0;
@@ -97,12 +100,12 @@
 
     function update_dest(stat) {
 
-        _navi.pos.alt = stat.Altitude;
-        _navi.pos.head = stat.Heading;
-        _navi.pos.lat = stat.Latitude;
-        _navi.pos.lon = stat.Longitude;
+        _navi.pos.alt = stat.alt;
+        _navi.pos.head = stat.head;
+        _navi.pos.lat = stat.lat;
+        _navi.pos.lon = stat.lon;
 
-        if (!_navi.pos.alt) return;
+        if (_navi.pos.alt === null) return;
         recalc_dest();
     }
 
