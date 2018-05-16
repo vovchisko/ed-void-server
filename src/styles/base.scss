@@ -71,15 +71,20 @@ button, label { @include hcaps(); }
 // BASE DATA LISTS
 //
 em {font-style: normal;display: block; font-size: 0.9rem; color: $ui-text; }
-em > b {font-weight: normal;text-transform: uppercase; display: block;width: 50%;float: left;}
-em > span {font-style: normal; display: block;width: 50%;float: left;}
+em > b {font-weight: normal;text-transform: uppercase; display: block;width: 50%;float: left; padding-right: 5px;}
+em > span {font-style: normal; display: block;width: 50%;float: left; padding-left: 5px}
 em > span u {font-style: normal; text-decoration: none;}
 em > span.false { }
 em > span > small { display: block; }
 em::after, .cls::after { content: ""; clear: both; display: table; }
-.justify {
-  em > b { text-align: right; padding-right: 15px; }
-  em > span { text-align: left; padding-left: 15px;}
+.centered {
+  h4, h5 { text-align: center; }
+  em > b { text-align: right; }
+  em > span { text-align: left; }
+}
+.justified {
+  em > b { text-align: left; }
+  em > span { text-align: right; }
 }
 .sub {
   em { font-size: 0.8rem; }
@@ -112,8 +117,9 @@ header { margin: 5px 2rem 0.5rem 7rem;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 2.2rem;
-  font-size: 15px;
+  font-size: 0.9rem;
   font-weight: bold;
   color: lighten($ui-text, 15%);
   button { margin-right: 5px;}
+  letter-spacing: -0.02rem;
 }

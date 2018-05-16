@@ -12,7 +12,6 @@ const convert = server.tools.convert;
 const checksum = server.tools.checksum;
 const pre = require('./pre');
 
-global.EV_USRUPD = 'uni-usr';
 global.EV_USRPIPE = 'uni-pipe';
 global.EV_DATA = 'uni-data';
 
@@ -91,7 +90,7 @@ class Universe extends EE3 {
             _upd: new Date(Status.timestamp)
         });
         user.cmdr._ch = true; // but mark as changed
-        this.emit(EV_USRUPD, user._id, 'status', user.cmdr.status);
+        this.emit(EV_DATA, user._id, 'status', user.cmdr.status);
     }
 
     /* ONLY FOR NEW RECORDS!! */
@@ -171,7 +170,8 @@ class Universe extends EE3 {
 
     async proc_ApproachBody(cmdr, ApproachBody) {
         let body = await this.spawn_body(ApproachBody.Body, cmdr.system_id);
-
+        console.log(ApproachBody)
+        console.log('>>>', body)
         cmdr.touch({
             body_id: body._id
         });
@@ -235,7 +235,7 @@ class Universe extends EE3 {
         if (!sys) return null;
 
         let body_id = Universe.body_id(system_id, body_name);
-        let b = await DB.systems.findOne({_id: body_id});
+        let b = await this.get_body(body_id);
 
         //todo: shoudl we do socme cache like with cmdrs or users?
         if (b) return new BODY(b);
@@ -538,8 +538,8 @@ class USER {
         this.cmdr_name = name;
         if (!this.cmdrs.includes(name)) this.cmdrs.push(name);
         this._ch = true;
-        UNI.emit(EV_USRUPD, this._id, 'user', this);
-        UNI.emit(EV_USRUPD, this._id, 'cmdr', this);
+        UNI.emit(EV_DATA, this._id, 'user', this);
+        UNI.emit(EV_DATA, this._id, 'cmdr', this);
     }
 
     async save() {
@@ -576,7 +576,7 @@ class CMDR {
     touch(data = null) {
         if (data) extend(this, data);
         this._ch = true;
-        if (this.uid) UNI.emit(EV_USRUPD, this.uid, 'cmdr', this);
+        if (this.uid) UNI.emit(EV_DATA, this.uid, 'cmdr', this);
     }
 
     async save() {

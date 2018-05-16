@@ -5,9 +5,11 @@
             <div class="col-sm props listed">
                 <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
                 <em><b>SYSTEM</b>
-                    <span>{{env.system ? env.system.name : 'n/a'}}<br>
-                    <small v-for="x in cmdr.starpos"> {{x/32}}; </small>
-                </span></em>
+                    <span>
+                        {{env.system ? env.system.name : 'n/a'}}
+                        <small><u v-for="x in env.system.starpos">{{x/32}}; </u></small>
+                    </span>
+                </em>
                 <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>
             </div>
             <div class="col-sm props listed">

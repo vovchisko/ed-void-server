@@ -35,7 +35,7 @@
 
     Vue.config.productionTip = false;
 
-    Vue.filter('nn', function (num, frac = 3, min_frac = 0, err = 'ERR') {
+    Vue.filter('nn', function (num, frac = 3, min_frac = 0, err = 'ERR!') {
         num = parseFloat(num);
         if (isNaN(num) || typeof num !== "number") return err;
         return (new Intl.NumberFormat('en-US', {
