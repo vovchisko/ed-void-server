@@ -42,7 +42,6 @@ class Universe extends EE3 {
                 if (!user) throw new Error();
 
 
-                console.log('>>> OVERLOAD ::: ', user._overload)
                 if (user._overload) {
                     user.track_overload();
                     UNI.emitf(EV_NET, user._id, 'overload', true);

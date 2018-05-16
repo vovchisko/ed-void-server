@@ -18,30 +18,29 @@ class DataStorage {
             c_mode: 'cmdr'
         };
 
-        this.poi = {
-            current: {
+        this.repo = {
+            curr: {
                 _id: null,
+
+                //user can edit
                 type: null,
                 subject: '',
                 description: '',
                 links: [],
-                system_name: '',
+                pub: false, //other peopl can find it
+                locked: false, //report confirmed nad locked
+
+                //user can't edit
+                parent_id: null, //for a few reports in the same place
                 system_id: null,
-                body_name: '',
                 body_id: null,
-                starpos: [0, 0, 0],
                 lat: 0,
                 lon: 0,
                 reporter: null
+
             },
-            recents: [],
-            search: {
-                request: {
-                    type: null,
-                    text: {}
-                },
-                results: []
-            }
+            recent: [],
+
         };
 
         this.auth = {

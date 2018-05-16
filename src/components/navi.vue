@@ -90,7 +90,7 @@
     Net.on('uni:status', (stat) => update_dest(stat));
 
     Net.on('uni:c_body', (body) => {
-        _navi.body.name = (body) ? (body.name.replace(Data.env.system.name, '')) : null;
+        _navi.body.name = (body) ? (body.name.replace(Data.env.system.name, '').trim()) : null;
         _navi.body.radius = (body && body.radius) ? body.radius : 0;
         _navi.body.gravity = (body) ? body.surf_gravity : null;
     });
