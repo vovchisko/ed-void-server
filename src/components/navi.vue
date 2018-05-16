@@ -61,7 +61,7 @@
                 </div>
 
                 <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
-                <div class="starpos"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
+                <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
 
                 <em><b>BODY</b> <span>{{navi.body.name || 'N/A'}}</span></em>
                 <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 || null | nn(3,3, 'N/A') }} <u>KM</u></span></em>

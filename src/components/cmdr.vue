@@ -7,7 +7,7 @@
                 <em><b>SYSTEM</b>
                     <span>
                         {{env.system ? env.system.name : 'n/a'}}
-                        <small><u v-for="x in env.system.starpos">{{x/32}}; </u></small>
+                        <small v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></small>
                     </span>
                 </em>
                 <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>

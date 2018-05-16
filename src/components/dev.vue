@@ -7,22 +7,29 @@
         <pre v-if="c_tab === 'data'">{{data}}</pre>
         <pre v-if="c_tab === 'pipe'">no pipe data yet</pre>
         <pre v-if="c_tab === 'uni'">no uni data yet</pre>
+        <pre v-if="c_tab === 'net'">{{network}}</pre>
     </div>
 </template>
 
 <script>
     import Data from '../services/data'
+    import Net from '../services/network'
+
+    const network = [];
 
     export default {
         name: "dev",
         data: () => {
             return {
-                c_tab: 'data',
-                tabs: ['data', 'pipe', 'uni'],
-                data: Data
+                c_tab: 'net',
+                tabs: ['net','data', 'pipe', 'uni'],
+                data: Data,
+                network: network
             }
         }
     }
+
+
 </script>
 
 <style lang="scss">

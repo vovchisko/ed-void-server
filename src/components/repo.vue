@@ -6,36 +6,32 @@
 
         <div id="repo-new" v-if="c_tab==='+report'">
             <div class="row">
-
                 <div class="col-6">
+                    {{}}
+
                     <input type="text" v-model="current.system_name" placeholder="system">
                     {{current.system_id}}
 
-                    <input type="text" v-model="current.body_name">
+                    <label><input type="text" v-model="current.body_name"></label>
                     <input type="text" v-model="current.body_id">
                     <input type="text" v-model="current.lon">
                     <input type="text" v-model="current.lat">
                     <input type="text" v-model="current.reporter">
-
 
                     <button type="button" v-on:click="use_current_location()">Use Current</button>
                 </div>
 
                 <div class="col-6">
 
-
                 </div>
-
             </div>
-
-
         </div>
 
-        <div id="repo-new" v-if="c_tab==='recent'">
+        <div id="repo-recent" v-if="c_tab==='recent'">
             recent reports
         </div>
 
-        <div id="repo-new" v-if="c_tab==='search'">
+        <div id="repo-search" v-if="c_tab==='search'">
             search for reports
         </div>
     </div>

@@ -41,11 +41,11 @@ module.exports = function (req, res) {
         } catch (e) {
             res.statusCode = 500;
             res_text = 'fail';
-            console.log(e);
+            console.log(log, res_text, e);
         }
 
         res.end(res_text);
-        if (log) console.log(log + res_text);
+        if (log && server.cfg.rec_log) console.log(log + res_text);
     });
 };
 

@@ -8,6 +8,11 @@ class DataStorage {
     constructor() {
         this._null = {};
 
+
+        this.app = {
+            overload: false
+        };
+
         this.modes = {
             modes: ['cmdr', 'navi', 'vass', 'repo', 'dev'],
             c_mode: 'cmdr'

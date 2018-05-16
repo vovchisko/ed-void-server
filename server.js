@@ -71,7 +71,7 @@ class Clients {
 
         this.wss_clients.on('disconnected', async (client) => {
             let user = await UNI.get_user({_id: client.id});
-            console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] leave`);
+            console.log(`USR: ${user._id} [CMDR ${user.cmdr_name}] leave`);
             user.online = false;
             user.save();
         });
@@ -80,7 +80,7 @@ class Clients {
 
             let user = await UNI.get_user({_id: client.id});
             if (!user) return client.close();
-            console.log(`USR:${user._id} [ CMDR ${user.cmdr_name} ] joined`);
+            console.log(`USR: ${user._id} [CMDR ${user.cmdr_name}] joined`);
             UNI.refill_user(user._id);
 
             user.online = true;
@@ -120,14 +120,14 @@ class JCollector {
 
         this.wss_journals.on('disconnected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
-            console.log(`JCL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - journal disconnected`);
+            console.log(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] - journal disconnected`);
         });
 
         this.wss_journals.on('connected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
             if (!juser) return client.close();
 
-            console.log(`JCL: ${juser._id} [ CMDR ${juser.cmdr_name} ] - journal connected`);
+            console.log(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] - journal connected`);
         });
 
         this.wss_journals.on('message', async (client, c, dat) => {
@@ -193,11 +193,11 @@ function init() {
     console.log('   JRN_DB - ' + cfg.database.db_journals);
 
 
-    UNI.on(EV_USRPIPE, (uid, rec_event, rec) => {
+    UNI.on(EV_PIPE, (uid, rec_event, rec) => {
         CLS.send_to(uid, 'pipe:' + rec_event, rec);
     });
 
-    UNI.on(EV_DATA, (uid, uni_event, data) => {
+    UNI.on(EV_NET, (uid, uni_event, data) => {
         CLS.send_to(uid, 'uni:' + uni_event, data);
     });
 

@@ -9,6 +9,12 @@
             <repo v-if="data.modes.c_mode === 'repo'"></repo>
             <dev v-if="data.modes.c_mode === 'dev'"></dev>
         </div>
+
+        <div class="alert info modal" v-show="data.app.overload">
+            <i class="i-ed-alert"></i>
+            <div>recieving new data</div>
+            <small>please wait</small>
+        </div>
     </div>
 </template>
 <script>
@@ -16,6 +22,7 @@
     import Auth from './components/auth.vue'
     import Navbar from './components/navbar.vue'
     import Data from './services/data'
+    import Net from './services/network';
     import Vue from 'vue'
 
     import Cmdr from './components/cmdr.vue'
@@ -31,7 +38,6 @@
             Navbar, Auth, Cmdr, Navi, Vass, Dev, Repo
         },
     }
-
 
     Vue.config.productionTip = false;
 
@@ -52,6 +58,10 @@
     Vue.filter('isval', function (value) {
         return value ? value : 'FALSE';
     });
+
+    Net.on('uni:overload', (is_overload) => {
+        Data.app.overload = is_overload;
+    })
 
 </script>
 

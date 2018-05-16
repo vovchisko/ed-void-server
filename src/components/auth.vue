@@ -102,7 +102,6 @@
             Data.auth.is_logged = false;
             Data.save();
         }
-
     });
 
 </script>

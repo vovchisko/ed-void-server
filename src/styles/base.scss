@@ -41,6 +41,21 @@ h5 { @include hcaps(); font-size: 1rem}
   }
   + label { margin: 0; font-size: 1rem; line-height: 1rem}
 }
+@keyframes glitched_text {
+  0% { text-shadow: none; }
+  20% { text-shadow: none; }
+  21% { text-shadow: -1px -4px 0 rgba(0, 255, 240, .35), 1px 4px 0 rgba(255, 0, 230, .35); }
+  25% { text-shadow: -1px -4px 0 rgba(0, 255, 240, .35), 1px 4px 0 rgba(255, 0, 230, .35); }
+  26% { text-shadow: none; }
+  48% { text-shadow: none; }
+  50% { text-shadow: -1px -4px 0 rgba(0, 255, 240, .35), 1px 4px 0 rgba(255, 0, 230, .35); }
+  67% { text-shadow: none; }
+  79% { text-shadow: none; }
+  80% { text-shadow: -2px -5px 0 rgba(0, 255, 240, .35), 2px 5px 0 rgba(255, 0, 230, .35);}
+  89% { text-shadow: -2px -5px 0 rgba(0, 255, 240, .35), 2px 5px 0 rgba(255, 0, 230, .35); }
+  95% { text-shadow: none; }
+  100% { text-shadow: none; }
+}
 input, textarea {caret-color: $orange; }
 button {
   @include basic-ui();
@@ -96,10 +111,10 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
 // MESSAGE BOXES
 //
 .alert {
-  color: $ui-text; text-align: center; margin: 1rem;
-  & > i { font-size: 2rem; display: block; margin-bottom: 1rem; }
-  & > div { @include hcaps(); font-size: 1rem; text-transform: uppercase; }
-  & > small { font-size: 0.8rem; text-transform: lowercase; }
+  color: $ui-text; text-align: center; margin: 1rem; font-size: 1rem; line-height: 100%;
+  & > i { font-size: 2em; display: block; margin-bottom: 1em; }
+  & > div { @include hcaps(); font-size: 1em; text-transform: uppercase; }
+  & > small { font-size: 0.8em; text-transform: lowercase; }
   &.info { color: $info;
     & > small { color: darken($info, 10%) }
   }
@@ -109,9 +124,18 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
   &.error { color: $red;
     & > small {color: darken($red, 10%)}
   }
+  &.modal {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, .7);
+    margin: 0; padding: 20vh 0;
+    font-size: 1.5rem;
+    animation: glitched_text 2s infinite;
+  }
 }
-header { margin: 5px 2rem 0.5rem 7rem;
-  padding: 0px 10px 2px 10px;
+header { margin: -2.2rem 2rem 5px 7rem;
+  padding: 5px 5px 0 10px;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;

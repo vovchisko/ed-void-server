@@ -46,7 +46,7 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
   background: $ui-bg;
   border: 1px solid darken($ui-fg, 25%);
   color: $ui-fg;
-  font-size: 0.9rem;
+  font-size: 1rem;
   &:hover { border-color: darken($ui-act-fg, 25%); color: darken($ui-act-fg, 25%);}
 }
 

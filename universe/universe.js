@@ -12,8 +12,8 @@ const convert = server.tools.convert;
 const checksum = server.tools.checksum;
 const pre = require('./pre');
 
-global.EV_USRPIPE = 'uni-pipe';
-global.EV_DATA = 'uni-data';
+global.EV_PIPE = 'uni-pipe';
+global.EV_NET = 'uni-data';
 
 class Universe extends EE3 {
     constructor() {
@@ -41,29 +41,36 @@ class Universe extends EE3 {
             .then(async (user) => {
                 if (!user) throw new Error();
 
-                this.emit(EV_DATA, user._id, 'user', {
+
+                console.log('>>> OVERLOAD ::: ', user._overload)
+                if (user._overload) {
+                    user.track_overload();
+                    UNI.emitf(EV_NET, user._id, 'overload', true);
+                }
+
+                this.emit(EV_NET, user._id, 'user', {
                     email: user.email,
                     api_key: user.api_key
                 });
 
                 if (!user.cmdr) return;
 
-                this.emit(EV_DATA, user._id, 'cmdr', user.cmdr);
-                this.emit(EV_DATA, user._id, 'status', user.cmdr.status);
+                this.emit(EV_NET, user._id, 'cmdr', user.cmdr);
+                this.emit(EV_NET, user._id, 'status', user.cmdr.status);
 
                 if (user.journal()) {
                     let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(5);
-                    scans.forEach((rec) => this.emit(EV_USRPIPE, user._id, rec.event, rec));
+                    scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
                 }
 
                 if (user.cmdr.system_id) {
                     let sys = await this.get_system(user.cmdr.system_id);
-                    this.emit(EV_DATA, uid, 'c_system', sys);
+                    this.emit(EV_NET, uid, 'c_system', sys);
                 }
 
                 if (user.cmdr.body_id) {
                     let body = await this.get_body(user.cmdr.body_id);
-                    this.emit(EV_DATA, uid, 'c_body', body);
+                    this.emit(EV_NET, uid, 'c_body', body);
                 }
 
             })
@@ -73,7 +80,10 @@ class Universe extends EE3 {
     }
 
     async upd_status(user, Status, cmdr_name, gv, lng) {
-        this.emit(EV_USRPIPE, user._id, Status.event, Status);
+
+        user.track_overload(0);
+
+        this.emit(EV_PIPE, user._id, Status.event, Status);
 
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
@@ -90,7 +100,7 @@ class Universe extends EE3 {
             _upd: new Date(Status.timestamp)
         });
         user.cmdr._ch = true; // but mark as changed
-        this.emit(EV_DATA, user._id, 'status', user.cmdr.status);
+        this.emit(EV_NET, user._id, 'status', user.cmdr.status);
     }
 
     /* ONLY FOR NEW RECORDS!! */
@@ -106,7 +116,13 @@ class Universe extends EE3 {
             rec._id = rec.event + '/' + rec._jp + '+' + rec._jl;
             delete rec._jp;
             delete rec._jl;
-            if (records_left < 5) UNI.emit(EV_USRPIPE, user._id, rec.event, rec);
+
+            user.track_overload(records_left);
+
+
+            this.emit(EV_PIPE, user._id, rec.event, rec);
+
+
             await user.journal().save(rec);
         } else if (typeof rec._data !== 'undefined') {
             if (['shipyard', 'market', 'outfitting'].includes(rec._data)) {
@@ -117,6 +133,22 @@ class Universe extends EE3 {
 
         await this.process(user.cmdr, rec);
         if (user.cmdr.last_rec < rec.timestamp) user.cmdr.last_rec = rec.timestamp;
+    }
+
+
+    emitf(ev, uid) {  //force emit
+        super.emit(...arguments);
+    }
+
+    emit(ev, uid) { // ignore some event when overloaded
+        if (ev === EV_PIPE || ev === EV_NET) {
+            this.get_user({_id: uid})
+                .then(user => {
+                    if (!user._overload) super.emit(...arguments);
+                });
+        } else {
+            super.emit(...arguments);
+        }
     }
 
     // for any records but careful with others cmdrs
@@ -165,17 +197,15 @@ class Universe extends EE3 {
         cmdr.touch({
             body_id: null,
         });
-        this.emit(EV_DATA, cmdr.uid, 'c_body', null);
+        this.emit(EV_NET, cmdr.uid, 'c_body', null);
     }
 
     async proc_ApproachBody(cmdr, ApproachBody) {
         let body = await this.spawn_body(ApproachBody.Body, cmdr.system_id);
-        console.log(ApproachBody)
-        console.log('>>>', body)
         cmdr.touch({
             body_id: body._id
         });
-        this.emit(EV_DATA, cmdr.uid, 'c_body', body);
+        this.emit(EV_NET, cmdr.uid, 'c_body', body);
     }
 
     async proc_Location(cmdr, Location) {
@@ -207,7 +237,7 @@ class Universe extends EE3 {
             metrics: {curr_ds: 0}
         });
 
-        this.emit(EV_DATA, cmdr.uid, 'c_system', sys);
+        this.emit(EV_NET, cmdr.uid, 'c_system', sys);
     }
 
     async proc_Scan(cmdr, Scan) {
@@ -218,7 +248,7 @@ class Universe extends EE3 {
 
         //update cmdr scan data if we waiting for it
         if (body._id === cmdr.body_id)
-            this.emit(EV_DATA, cmdr.uid, 'c_body', body);
+            this.emit(EV_NET, cmdr.uid, 'c_body', body);
 
     }
 
@@ -524,8 +554,44 @@ class USER {
         this.cmdrs = [];
         this.online = false;
         this.dev = false;
-
+        this._rec_left = 0;
+        this._overload = false;
+        this._overtimeout = null
         extend(this, data);
+    }
+
+    track_overload(records_left = null) {
+
+        if (records_left === null) {
+            records_left = this._rec_left;
+        }
+
+        if (records_left && !this._overload) {
+            UNI.emitf(EV_NET, this._id, 'overload', true);
+            this._overload = true;
+        }
+
+        if (records_left === 0) {
+            if (this._overtimeout) {
+                clearTimeout(this._overtimeout);
+                this._overtimeout = null;
+            }
+            //re-fill timeout
+            this._overtimeout = setTimeout(() => {
+                if (this._rec_left && this._overload) return;
+                if (this._overload && !this._rec_left) {
+                    this._overload = false;
+                    UNI.emit(EV_NET, this._id, 'overload', false);
+                    UNI.refill_user(this._id);
+
+                    clearTimeout(this._overtimeout);
+                    this._overtimeout = null;
+                }
+            }, 500);
+        }
+
+        this._rec_left = records_left;
+
     }
 
     async init() {
@@ -538,8 +604,8 @@ class USER {
         this.cmdr_name = name;
         if (!this.cmdrs.includes(name)) this.cmdrs.push(name);
         this._ch = true;
-        UNI.emit(EV_DATA, this._id, 'user', this);
-        UNI.emit(EV_DATA, this._id, 'cmdr', this);
+        UNI.emit(EV_NET, this._id, 'user', this);
+        UNI.emit(EV_NET, this._id, 'cmdr', this);
     }
 
     async save() {
@@ -547,7 +613,9 @@ class USER {
         let snapshot = {};
         extend(snapshot, this);
         delete snapshot.cmdr; //remove temporary field from snapshot
-        delete snapshot._ch; //remove temporary field from snapshot
+        delete snapshot._ch;
+        delete snapshot._rec_left;
+        delete snapshot._overload;
         await DB.users.save(snapshot);
         this._ch = false;
     }
@@ -576,7 +644,7 @@ class CMDR {
     touch(data = null) {
         if (data) extend(this, data);
         this._ch = true;
-        if (this.uid) UNI.emit(EV_DATA, this.uid, 'cmdr', this);
+        if (this.uid) UNI.emit(EV_NET, this.uid, 'cmdr', this);
     }
 
     async save() {

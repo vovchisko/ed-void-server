@@ -46,13 +46,14 @@
 <style lang="scss">
     @import "../styles/vars";
     #navbar {
+        height: 2.2rem;
         line-height: 2.2rem;
         margin-top: 0; margin-bottom: 0;
         padding-top: 0; padding-bottom: 0;
 
         //layout
-        .nav-left {  float: left; white-space: nowrap; position: relative; z-index: 2; width: 7rem; }
-        .nav-right {  float: right; width: 2rem; white-space: nowrap; }
+        .nav-left { margin-top: 5px; float: left; white-space: nowrap; position: relative; z-index: 2; width: 7rem; }
+        .nav-right { margin-top: 5px; float: right; width: 2rem; white-space: nowrap; }
 
         //styles
         button.mode {
