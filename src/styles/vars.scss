@@ -34,7 +34,7 @@ $ui-text: $gray;
 $ui-err: $red;
 $ui-act-fg: $orange;
 
-$all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=button]";
+$all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=button], textarea, select";
 
 @mixin hcaps { font-family: 'euro_capsregular', sans-serif }
 @mixin basic-ui {

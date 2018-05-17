@@ -148,7 +148,7 @@
 
     #navi {
         .justified em { }
-        .justified em > b {  width: 30%}
+        .justified em > b { width: 30%}
         .justified em > span { width: 70% }
         .compass {overflow: hidden; height: 145px;margin: 0 -5px 10px -5px;
             .ruler { background: transparent url('../../public/assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
@@ -181,7 +181,7 @@
             margin-top: 3rem;
             h4 { margin-bottom: 0; }
             .starpos { text-align: center; margin-bottom: 0.5rem }
-            .starpos u { font-size: 0.8rem; color: darken($ui-text, 25%); text-decoration: none;}
+            .starpos u { font-size: 0.8rem; color: darken($ui-text, 25%); }
         }
         small { color: darken($ui-text, 25%);}
         .alert.info { margin-top: 2rem}

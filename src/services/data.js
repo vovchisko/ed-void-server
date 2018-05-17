@@ -23,7 +23,7 @@ class DataStorage {
                 _id: null,
 
                 //user can edit
-                type: null,
+                type: '',
                 subject: '',
                 description: '',
                 links: [],

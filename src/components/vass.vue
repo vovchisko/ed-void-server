@@ -146,7 +146,7 @@
             span.value {color: $orange;}
         }
 
-        h5 { margin: 0.6rem 0 0rem 0; padding: 0; font-weight: normal; color: darken($ui-text, 15%)}
+        h5 { font-weight: normal; color: darken($ui-text, 15%)}
 
         .main em { color: lighten($ui-text, 30%)}
         .sub em { font-size: 0.8em; line-height: 100%}

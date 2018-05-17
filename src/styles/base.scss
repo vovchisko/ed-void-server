@@ -13,6 +13,7 @@
   AUTOFILL STYLES IN CHROME
 */
 input, textarea, select {
+
   &:-webkit-autofill {
     border: 1px solid darken($ui-fg, 25%);
     -webkit-text-fill-color: darken($ui-act-fg, 25%);
@@ -29,8 +30,10 @@ html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 1
 h1 { @include hcaps(); font-size: 1.4rem}
 h2 { @include hcaps(); font-size: 1.3rem}
 h3 { @include hcaps(); font-size: 1.2rem}
-h4 { @include hcaps(); font-size: 1.1rem}
-h5 { @include hcaps(); font-size: 1rem}
+h4 { @include hcaps(); font-size: 1.1rem; margin: 0.6rem 0 0 0; padding: 0; }
+h5 { @include hcaps(); font-size: 1rem; margin: 0.6rem 0 0 0; padding: 0; }
+//
+u { text-decoration: none;}
 //
 #{$all-inputs} {
   @include basic-ui();
@@ -88,7 +91,7 @@ button, label { @include hcaps(); }
 em {font-style: normal;display: block; font-size: 0.9rem; color: $ui-text; }
 em > b {font-weight: normal;text-transform: uppercase; display: block;width: 50%;float: left; padding-right: 5px;}
 em > span {font-style: normal; display: block;width: 50%;float: left; padding-left: 5px}
-em > span u {font-style: normal; text-decoration: none;}
+em > span u {font-style: normal; }
 em > span.false { }
 em > span > small { display: block; }
 em::after, .cls::after { content: ""; clear: both; display: table; }
