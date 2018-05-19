@@ -215,7 +215,7 @@ class Universe extends EE3 {
             }
         } else {
             r._id = DB.gen_id();
-            r.uid = user.id;
+            r.uid = user._id;
             r.submited = new Date(Date.now());
         }
 

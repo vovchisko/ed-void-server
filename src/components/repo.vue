@@ -69,7 +69,7 @@
                         <label>reported by</label><br>
                     </div>
 
-                    <div v-if="curr._id">
+                    <div v-if="curr._id" class="props listed">
                         <em><b>REPORTED: </b><span>{{curr.submited}}</span></em>
                         <em><b>BY: </b><span>{{curr.reporter}}</span></em>
                         <em v-if="curr.updated !== curr.submited"><b>UPDATED: </b><span>{{curr.updated}}</span></em>
@@ -118,7 +118,7 @@
         <div id="repo-recent" v-if="c_tab==='recent'">
             <button type="button" v-on:click="get_reports()">View Recent Reports</button>
 
-            <div class="repo-item" v-for="r in recent" v-on:click="edit_report(r)">
+            <div class="repo-item" v-for="r in recent" v-on:click="edit_report(r)" >
                 <h3>REPORT: {{r.type}}-{{r._id}}</h3>
                 <em><b>type</b><span>{{report_types[r.type]}}</span></em>
                 <em><b>subject</b><span>{{r.subject}}</span></em>

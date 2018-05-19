@@ -112,6 +112,12 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
   em > b { }
   em > span { text-transform: capitalize; }
 }
+.listed {
+  em { margin-bottom: 0.8rem }
+  em > b { text-transform: uppercase; font-size: 0.8rem; width: 100%; padding: 0;}
+  em > span { font-size: 1.0rem; color: lighten($ui-fg, 20%); width: 100%; padding: 0;}
+  em > span > small { color: darken($ui-fg, 20%) }
+}
 //
 //
 // MESSAGE BOXES
@@ -156,4 +162,6 @@ header { margin: -2.8rem 2rem 5px 7rem;
   button { margin-right: 5px; }
   letter-spacing: -0.02rem;
 }
-.ui { padding-bottom: 0.5rem; position: relative; button { margin-right: 5px; }   }
+.ui { padding-bottom: 0.5rem; position: relative;
+  button { margin-right: 5px; }
+}

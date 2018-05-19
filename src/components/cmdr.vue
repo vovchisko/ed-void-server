@@ -82,9 +82,5 @@
     @import '../styles/vars';
     #cmdr {
         h3 { margin-top: 1rem}
-        em { margin-bottom: 0.8rem }
-        em > b { text-transform: uppercase; font-size: 0.8rem; width: 100%; }
-        em > span { font-size: 1.0rem; color: lighten($ui-fg, 20%) }
-        em > span > small { color: darken($ui-fg, 20%) }
     }
 </style>
