@@ -8,12 +8,16 @@ const DB = require('./database');
 const server = require('../server');
 const pick = server.tools.pick;
 const pickx = server.tools.pickx;
-const convert = server.tools.convert;
+const con = server.tools.convert;
 const checksum = server.tools.checksum;
 const pre = require('./pre');
 
 global.EV_PIPE = 'uni-pipe';
 global.EV_NET = 'uni-data';
+global.SEP_SYSTEM = '@';
+global.SEP_BODY = '/';
+global.SEP_COORD = ':';
+global.FIRST_SYS_OBJ = '*';
 
 class Universe extends EE3 {
     constructor() {
@@ -52,29 +56,29 @@ class Universe extends EE3 {
                     api_key: user.api_key
                 });
 
-                if (!user.cmdr) return;
+                if (!user._cmdr) return;
 
-                this.emit(EV_NET, user._id, 'cmdr', user.cmdr);
-                this.emit(EV_NET, user._id, 'status', user.cmdr.status);
+                this.emit(EV_NET, user._id, 'cmdr', user._cmdr);
+                this.emit(EV_NET, user._id, 'status', user._cmdr.status);
 
                 if (user.journal()) {
                     let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(5);
                     scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
                 }
 
-                if (user.cmdr.system_id) {
-                    let sys = await this.get_system(user.cmdr.system_id);
+                if (user._cmdr.system_id) {
+                    let sys = await this.get_system(user._cmdr.system_id);
                     this.emit(EV_NET, uid, 'c_system', sys);
                 }
 
-                if (user.cmdr.body_id) {
-                    let body = await this.get_body(user.cmdr.body_id);
+                if (user._cmdr.body_id) {
+                    let body = await this.get_body(user._cmdr.body_id);
                     this.emit(EV_NET, uid, 'c_body', body);
                 }
 
             })
             .catch((e) => {
-                console.log(`UNI::refill_user(${uid}) - can't refill user;`);
+                console.log(`UNI::refill_user(${uid}) - can't refill user;`, e);
             });
     }
 
@@ -82,14 +86,14 @@ class Universe extends EE3 {
 
         user.track_overload(0);
 
-        this.emit(EV_PIPE, user._id, Status.event, Status);
+        //this.emit(EV_PIPE, user._id, Status.event, Status);
 
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
-        // user.cmdr.touch({ status: ...don't cause unnecessary update.
+        // user._cmdr.touch({ status: ...don't cause unnecessary update.
         // send only status
-        extend(user.cmdr.status, {
-            flags: Status.flags,
+        extend(user._cmdr.status, {
+            flags: Status.Flags,
             pips: Status.Pips,
             fgroup: Status.FireGroup || 0,
             lat: Status.Latitude || null,
@@ -98,8 +102,8 @@ class Universe extends EE3 {
             head: Status.Heading || null,
             _upd: new Date(Status.timestamp)
         });
-        user.cmdr._ch = true; // but mark as changed
-        this.emit(EV_NET, user._id, 'status', user.cmdr.status);
+        user._cmdr._ch = true; // but mark as changed
+        this.emit(EV_NET, user._id, 'status', user._cmdr.status);
     }
 
     /* ONLY FOR NEW RECORDS!! */
@@ -130,8 +134,8 @@ class Universe extends EE3 {
             }
         }
 
-        await this.process(user.cmdr, rec);
-        if (user.cmdr.last_rec < rec.timestamp) user.cmdr.last_rec = rec.timestamp;
+        await this.process(user._cmdr, rec);
+        if (user._cmdr.last_rec < rec.timestamp) user._cmdr.last_rec = rec.timestamp;
     }
 
 
@@ -152,13 +156,117 @@ class Universe extends EE3 {
 
     // for any records but careful with others cmdrs
     process(cmdr, rec) {
-        if (rec.event === 'Scan') return this.proc_Scan(cmdr, rec);
-        if (rec.event === 'FSDJump') return this.proc_FSDJump(cmdr, rec);
-        if (rec.event === 'Location') return this.proc_Location(cmdr, rec);
-        if (rec.event === 'ApproachBody') return this.proc_ApproachBody(cmdr, rec);
-        if (rec.event === 'LeaveBody') return this.proc_LeaveBody(cmdr, rec);
-        if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec); //todo: << this is probably useless
-        if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
+        try {
+            if (rec.event === 'Scan') return this.proc_Scan(cmdr, rec);
+            if (rec.event === 'FSDJump') return this.proc_FSDJump(cmdr, rec);
+            if (rec.event === 'Location') return this.proc_Location(cmdr, rec);
+            if (rec.event === 'ApproachBody') return this.proc_ApproachBody(cmdr, rec);
+            if (rec.event === 'LeaveBody') return this.proc_LeaveBody(cmdr, rec);
+            if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec); //todo: << this is probably useless
+            if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
+        } catch (e) {
+            console.log(rec.event, e);
+        }
+        return null;
+    }
+
+    async repo_search(user, query) {
+        DB.reports
+            .find({uid: user.id})
+            .sort({submited: -1})
+            .toArray()
+            .then(list => this.emit(EV_NET, user._id, 'repo-search', list));
+    }
+
+    async repo_submit(user, report) {
+        //Buffer.from('hello world', 'utf8').toString('hex');
+
+        let r = {
+            _id: null,
+            type: 'NA',
+            system: '',
+            body: '',
+            subject: '',
+            description: '',
+            links: [],
+            pub: false, //other peopl can find it
+            locked: false, //report confirmed nad locked
+            lat: '',
+            lon: '',
+            reporter: null,
+
+            //user can't edit
+            parent_id: null, //for a few reports in the same place
+            starpos: [0, 0, 0], // get automatically from the system
+            system_id: null, // get automatically from
+            body_id: null,
+        };
+
+
+        if (report._id) {
+            r = await DB.reports.findOne({_id: report._id});
+            if (r.locked || user._id !== r.uid) {
+                //you can't edit locked reports or reports from other players
+                return this.emit(EV_NET, user._id, 'repo-submition', {
+                    result: 0,
+                    type: 'warn',
+                    msg: 'report has been locked'
+                })
+            }
+        } else {
+            r._id = DB.gen_id();
+            r.uid = user.id;
+            r.submited = new Date(Date.now());
+        }
+
+        if (!report.subject) {
+            return this.emit(EV_NET, user._id, 'repo-submition', {
+                result: 0,
+                type: 'warn',
+                msg: 'Report Subject not specified!'
+            })
+        }
+
+        //todo: a lot of validation job!
+        if (!report.system) {
+            return this.emit(EV_NET, user._id, 'repo-submition', {
+                result: 0,
+                type: 'error',
+                msg: 'System not specified!'
+            })
+        }
+
+        r.type = report.type;
+        r.subject = report.subject;
+        r.system = report.system;
+        r.body = report.body;
+        r.description = report.description;
+        r.links = report.links;
+        r.pub = report.pub;
+        r.lat = report.lat;
+        r.lon = report.lon;
+        r.reporter = report.reporter;
+
+        //user can't edit
+        r.starpos = report.starpos;
+        r.system_id = report.system_id;
+        r.body_id = report.body_id;
+        r.updated = new Date(Date.now());
+
+        await DB.reports.save(r);
+
+        this.emit(EV_NET, user._id, 'repo-submition', {
+            result: 1,
+            type: '',
+            msg: 'report submited'
+        });
+
+        this.emit(EV_NET, user._id, 'repo-current', r);
+    }
+
+    user_data(user, c, data) {
+        if (c === 'repo-submit') return this.repo_submit(user, data);
+        if (c === 'repo-search') return this.repo_search(user, data);
     }
 
     async proc_DiscoveryScan(cmdr, rec) {
@@ -217,7 +325,7 @@ class Universe extends EE3 {
             starpos: sys.starpos,
         };
 
-        if (Location.Body) {
+        if (Location.Body && Location.BodyType === 'Planet') {
             let body = await this.spawn_body(Location.Body, sys._id);
             td.body_id = body._id;
         }
@@ -273,7 +381,8 @@ class Universe extends EE3 {
             sys_id: sys._id, // or by sys id
             sys_name: sys.name, // to make search by system easy
             starpos: sys.starpos.slice(), // to make search by pos easy
-            name: body_name,
+            name: con.ED_CAPS(body_name),
+            short_name: con.ED_CAPS(body_name).replace(sys.name, '').trim() || FIRST_SYS_OBJ,
             type: null,
         });
     }
@@ -374,12 +483,12 @@ class Universe extends EE3 {
      * @returns {string} Cool System ID
      */
     static system_id(name, starpos) {
-        return name + '@' + starpos.map(x => Math.round(x * 32)).join(':');
+        return con.ED_CAPS(name) + SEP_SYSTEM + starpos.map(x => Math.round(x * 32)).join(SEP_COORD);
     }
 
     static body_id(system_id, body_name) {
-        let n = body_name.replace(system_id.split('@')[0], '').trim();
-        return system_id + '/' + (n ? n : '*');
+        let n = con.ED_CAPS(body_name).replace(system_id.split(SEP_SYSTEM)[0], '').trim();
+        return system_id + SEP_BODY + (n ? n : FIRST_SYS_OBJ);
     }
 
 }
@@ -393,18 +502,18 @@ class BODY {
         this.submited = null;
         this.last_update = null;
         this.type = null;
-        extend(this, body)
+        extend(this, body);
     }
 
     append(cmdr, rec) {
 
-        this.type = 'cluster'
+        this.type = 'cluster';
 
         if (rec.StarType) this.type = 'star';
         if (rec.PlanetClass) this.type = 'planet';
 
         pickx(rec, this,
-            ['BodyName', 'name'],
+            ['BodyName', 'name', con.ED_CAPS],
             ['BodyID', 'body_id'],
             ['DistanceFromArrivalLS', 'arrival'],
             ['Radius', 'radius'],
@@ -414,13 +523,13 @@ class BODY {
             ['StarType', 'class'],
             ['AbsoluteMagnitude', 'star_absm'],
             ['Age_MY', 'age'],
-            ['StellarMass', 'mass', convert.Sol2GT],
+            ['StellarMass', 'mass', con.Sol2GT],
 
             //planets
-            ['Landable', 'landable', convert.toBool, true],
+            ['Landable', 'landable', con.toBool, true],
             ['PlanetClass', 'class'],
-            ['MassEM', 'mass', convert.Earth2GT],
-            ['SurfaceGravity', 'surf_gravity', convert.GF2Gravity],
+            ['MassEM', 'mass', con.Earth2GT],
+            ['SurfaceGravity', 'surf_gravity', con.GF2Gravity],
             ['SurfacePressure', 'surf_presure'],
             ['SurfaceTemperature', 'surf_temperature'],
             ['TerraformState', 'terraform_state'],
@@ -497,7 +606,7 @@ class SYSTEM {
 
     append(cmdr, rec) {
         pickx(rec, this,
-            ['StarSystem', 'name'],
+            ['StarSystem', 'name', con.ED_CAPS],
             ['StarPos', 'starpos', arr => arr.map((x) => {return Math.floor(x * 32)})],
             ['SystemSecurity', 'security'],
             ['SystemEconomy', 'economy'],
@@ -547,7 +656,6 @@ class USER {
     constructor(data) {
         this._id = null;
         this._ch = true;
-        this.cmdr = null;
         this.cmdr_name = null;
         this.last_rec = new Date(0);
         this.cmdrs = [];
@@ -555,7 +663,8 @@ class USER {
         this.dev = false;
         this._rec_left = 0;
         this._overload = false;
-        this._overtimeout = null
+        this._overtimeout = null;
+        this._cmdr = null;
         extend(this, data);
     }
 
@@ -588,18 +697,16 @@ class USER {
                 }
             }, 500);
         }
-
         this._rec_left = records_left;
-
     }
 
     async init() {
-        if (this.cmdr_name) this.cmdr = await UNI.get_cmdr(this._id, this.cmdr_name);
+        if (this.cmdr_name) this._cmdr = await UNI.get_cmdr(this._id, this.cmdr_name);
     }
 
     async set_cmdr(name) {
         if (!name) return;
-        this.cmdr = await UNI.get_cmdr(this._id, name);
+        this._cmdr = await UNI.get_cmdr(this._id, name);
         this.cmdr_name = name;
         if (!this.cmdrs.includes(name)) this.cmdrs.push(name);
         this._ch = true;
@@ -609,19 +716,19 @@ class USER {
 
     async save() {
         if (!this._ch) return;
+
         let snapshot = {};
-        extend(snapshot, this);
-        delete snapshot.cmdr; //remove temporary field from snapshot
-        delete snapshot._ch;
-        delete snapshot._rec_left;
-        delete snapshot._overload;
+
+        for (let p in this)
+            if (p[0] !== '_' || p === '_id') snapshot[p] = this[p];
+
         await DB.users.save(snapshot);
         this._ch = false;
     }
 
     journal() {
-        if (this.cmdr)
-            return DB.journal(`[${this._id}] ${this.cmdr.name}`);
+        if (this._cmdr)
+            return DB.journal(`[${this._id}] ${this._cmdr.name}`);
     }
 }
 
@@ -650,8 +757,8 @@ class CMDR {
         if (!this._ch) return;
         if (!this._id || !this.uid) return;
         let snapshot = {};
-        extend(snapshot, this);
-        delete snapshot._ch;
+        for (let p in this)
+            if (p[0] !== '_' || p === '_id') snapshot[p] = this[p];
         await DB.cmdrs.save(snapshot);
         this._ch = false;
     }

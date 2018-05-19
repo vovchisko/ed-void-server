@@ -7,12 +7,19 @@ const AU = 149597870700; //m?
 
 const convert = {
 
+    ED_CAPS(x) {
+        return x.toUpperCase();
+    },
+    ED_ID(x) {
+        return x.toLowerCase().replace(/ /g, '_');
+    },
+
     toBool(x) {
         return !!x;
     },
 
     Pascal2ATM: function (p) {
-        return p / 101325
+        return p / 101325;
     },
 
     meter2SolRadius(m) {

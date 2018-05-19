@@ -5,6 +5,9 @@ const shortid = require('shortid');
 const crypto = require('crypto');
 const extend = require('deep-extend');
 
+console.log(shortid.generate());
+
+
 class Database {
     constructor() {
         //databases links
@@ -28,10 +31,10 @@ class Database {
         extend(this.cfg, cfg);
         MongoClient
             .connect('mongodb://' + this.cfg.host + ':' + this.cfg.port)
-            .then((client) => {
+            .then(async (client) => {
                 this.db_void = client.db(this.cfg.db_void);
                 this.db_journals = client.db(this.cfg.db_journals);
-                this.bind_collections();
+                await this.bind_collections();
                 this.db_void.once('close', () => { throw new Error('DB:: CONNECTION_CLOSED: db_void') });
                 this.db_journals.once('close', () => { throw new Error('DB:: CONNECTION_CLOSED: db_journals'); });
                 callback();
@@ -54,17 +57,20 @@ class Database {
         return 'T' + shortid.generate() + shortid.generate();
     };
 
-    bind_collections() {
-        this.reports = this.db_void.collection('reports');
+    async bind_collections() {
+        //await this.wipe_data();
+
+        this.users = this.db_void.collection('users'); // don't drop!
         this.cmdrs = this.db_void.collection('cmdrs');
-        this.users = this.db_void.collection('users');
+
+        this.reports = this.db_void.collection('reports');
         this.bodies = this.db_void.collection('bodies');
         this.systems = this.db_void.collection('systems');
 
         //summary logs
-        this.market = this.db_void.collection('log_market');
-        this.outfitting = this.db_void.collection('log_outfitting');
-        this.shipyard = this.db_void.collection('log_shipyard');
+        this.market = this.db_journals.collection('_log_market');
+        this.outfitting = this.db_journals.collection('_log_outfitting');
+        this.shipyard = this.db_journals.collection('_log_shipyard');
     };
 
     hash(string) {
@@ -76,6 +82,15 @@ class Database {
             this.journals[journal_id] = this.db_journals.collection(journal_id);
         }
         return this.journals[journal_id];
+    }
+
+    async wipe_data() {
+        await this.db_void.collection('cmdrs').deleteMany({});
+
+        await this.db_void.collection('reports').deleteMany({});
+        await this.db_void.collection('bodies').deleteMany({});
+        await this.db_void.collection('systems').deleteMany({});
+
     }
 }
 

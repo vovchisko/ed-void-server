@@ -76,6 +76,11 @@ class Clients {
             user.save();
         });
 
+        this.wss_clients.on('message', async (client, c, dat) => {
+            let user = await UNI.get_user({_id: client.id});
+            UNI.user_data(user, c, dat);
+        });
+
         this.wss_clients.on('connected', async (client) => {
 
             let user = await UNI.get_user({_id: client.id});
@@ -133,7 +138,6 @@ class JCollector {
         this.wss_journals.on('message', async (client, c, dat) => {
             let user = await UNI.get_user({_id: client.id});
             UNI.upd_status(user, dat.rec, dat.cmdr_name, dat.gv, dat.lng);
-            if (PIPE_EVENTS.includes(dat.rec.event)) CLS.send_to(user._id, 'pipe:' + dat.rec.event, dat.rec);
         });
 
         this.wss_journals.init();
@@ -184,7 +188,10 @@ console.log('API-SERVER ON PORT: ' + cfg.main.api_port);
 
 DB.connect(cfg.database, init);
 
-process.on('unhandledRejection', (error) => console.log('ERROR: unhandledRejection', error));
+process.on('unhandledRejection', (error) => {
+    console.log('ERROR: unhandledRejection', error);
+    process.exit(-1);
+});
 
 function init() {
 

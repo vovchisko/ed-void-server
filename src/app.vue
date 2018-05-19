@@ -10,7 +10,7 @@
             <dev v-if="data.modes.c_mode === 'dev'"></dev>
         </div>
 
-        <div class="alert info modal" v-show="data.app.overload">
+        <div class="alert info modal progress" v-show="data.app.overload">
             <i class="i-ed-alert"></i>
             <div>recieving new data</div>
             <small>please wait</small>

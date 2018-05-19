@@ -63,9 +63,9 @@
                 <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
                 <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
 
-                <em><b>BODY</b> <span>{{navi.body.name || 'N/A'}}</span></em>
-                <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 || null | nn(3,3, 'N/A') }} <u>KM</u></span></em>
-                <em><b>GRAVITY</b> <span>{{navi.body.gravity | nn(3,3, 'N/A')}} <u>G</u></span></em>
+                <em><b>BODY</b> <span>{{navi.body.name || 'N / A'}}</span></em>
+                <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 || null | nn(3,3, 'N / A') }} <u>KM</u></span></em>
+                <em><b>GRAVITY</b> <span>{{navi.body.gravity | nn(3,3, 'N / A')}} <u>G</u></span></em>
 
             </div>
         </div>
@@ -90,7 +90,7 @@
     Net.on('uni:status', (stat) => update_dest(stat));
 
     Net.on('uni:c_body', (body) => {
-        _navi.body.name = (body) ? (body.name.replace(Data.env.system.name, '').trim()) : null;
+        _navi.body.name = (body) ? body.short_name : null;
         _navi.body.radius = (body && body.radius) ? body.radius : 0;
         _navi.body.gravity = (body) ? body.surf_gravity : null;
     });

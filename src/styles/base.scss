@@ -7,7 +7,8 @@
 .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-md-auto,
 .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-lg-auto,
 .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl, .col-xl-auto,
-.container-fluid { padding: 0 5px;}
+.container-fluid { padding: 0 5px; }
+.container-fluid .container-fluid { padding: 0; }
 .row { margin: 0 -5px}
 /*
   AUTOFILL STYLES IN CHROME
@@ -36,14 +37,16 @@ h5 { @include hcaps(); font-size: 1rem; margin: 0.6rem 0 0 0; padding: 0; }
 u { text-decoration: none;}
 //
 #{$all-inputs} {
-  @include basic-ui();
-  &:active, &:focus {
-    color: $ui-act-fg;
-    border-color: $ui-act-fg;
-    + label { color: $ui-act-fg}
-  }
-  + label { margin: 0; font-size: 1rem; line-height: 1rem}
+  @include hcaps();
+  @include ui-basic();
+  @include ui-input();
 }
+textarea {
+  @include ui-basic();
+  @include ui-input();
+  max-width: 100%; resize: vertical; max-height: 50vh; line-height: 100%; min-height: 8rem; padding-top: 0.7rem;padding-bottom: 0.7rem;
+}
+select { -webkit-appearance: none; }
 @keyframes glitched_text {
   0% { text-shadow: none; }
   20% { text-shadow: none; }
@@ -61,7 +64,8 @@ u { text-decoration: none;}
 }
 input, textarea {caret-color: $orange; }
 button {
-  @include basic-ui();
+  @include hcaps();
+  @include ui-basic();
   border: 1px solid $ui-fg;
   transition: all ease-out 50ms;
   &:active {
@@ -82,7 +86,6 @@ button {
 }
 //
 i { vertical-align: middle; display: inline-block; }
-button, label { @include hcaps(); }
 .wide { width: 100%; display: block; }
 //
 //
@@ -134,10 +137,13 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
     background: rgba(0, 0, 0, .7);
     margin: 0; padding: 20vh 0;
     font-size: 1.5rem;
-    animation: glitched_text 2s infinite;
+  }
+  &.progress { animation: glitched_text 2s infinite;}
+  .ui { margin-top: 2rem;
+    button { width: 15rem; line-height: 3rem; height: 3rem; font-size: 1.2rem}
   }
 }
-header { margin: -2.2rem 2rem 5px 7rem;
+header { margin: -2.8rem 2rem 5px 7rem;
   padding: 5px 5px 0 10px;
   text-transform: uppercase;
   white-space: nowrap;
@@ -147,6 +153,7 @@ header { margin: -2.2rem 2rem 5px 7rem;
   font-size: 0.9rem;
   font-weight: bold;
   color: lighten($ui-text, 15%);
-  button { margin-right: 5px;}
+  button { margin-right: 5px; }
   letter-spacing: -0.02rem;
 }
+.ui { padding-bottom: 0.5rem; position: relative; button { margin-right: 5px; }   }

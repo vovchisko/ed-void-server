@@ -46,7 +46,7 @@
 <style lang="scss">
     @import "../styles/vars";
     #navbar {
-        height: 2.2rem;
+        height: 2.8rem;
         line-height: 2.2rem;
         margin-top: 0; margin-bottom: 0;
         padding-top: 0; padding-bottom: 0;

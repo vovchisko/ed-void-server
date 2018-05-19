@@ -6,7 +6,7 @@
                 <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
                 <em><b>SYSTEM</b>
                     <span>
-                        {{env.system ? env.system.name : 'n/a'}}
+                        {{env.system ? env.system.name : 'N / A'}}
                         <small v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></small>
                     </span>
                 </em>
@@ -39,7 +39,8 @@
 <script>
     import Data from '../services/data';
     import Net from '../services/network';
-
+    import Vue from 'vue';
+    import extend from 'deep-extend';
 
     export default {
         name: 'cmdr',
@@ -55,6 +56,25 @@
             }
         }
     }
+
+
+    Net.on('uni:status', (status) => {
+        if (!status) return false;
+        extend(Data.cmdr.status, status);
+    });
+
+    Net.on('uni:cmdr', (cmdr) => {
+        if (!cmdr) return false;
+        extend(Data.cmdr, cmdr);
+    });
+
+    Net.on('uni:user', (user) => {
+        Data.user.email = user.email;
+        Data.user.api_key = user.api_key;
+    });
+
+    Net.on('uni:c_system', (system) => Vue.set(Data.env, 'system', system));
+    Net.on('uni:c_body', (body) => Vue.set(Data.env, 'body', body));
 
 </script>
 

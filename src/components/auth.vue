@@ -6,11 +6,15 @@
 
             <div v-bind:class="['msg',msg.type]">{{msg.text}}</div>
 
-            <input type="email" v-model="auth.email"/>
-            <label>Email</label>
+            <div class="ui">
+                <input type="email" v-model="auth.email"/>
+                <label>Email</label>
+            </div>
 
-            <input type="password" v-model="auth.pass"/>
-            <label>Password</label>
+            <div class="ui">
+                <input type="password" v-model="auth.pass"/>
+                <label>Password</label>
+            </div>
 
             <button type="button" v-on:click="signin()">Signin</button>
             <button type="button" v-on:click="sign('up')">Register Pilot</button>
@@ -23,18 +27,25 @@
 
             <div v-bind:class="['msg',msg.type]">{{msg.text}}</div>
 
-            <input type="email" v-model="auth.email"/>
-            <label>Email</label>
+            <div class="ui">
+                <input type="email" v-model="auth.email"/>
+                <label>Email</label>
+            </div>
 
-            <input type="password" v-model="auth.pass"/>
-            <label>Password</label>
+            <div class="ui">
+                <input type="password" v-model="auth.pass"/>
+                <label>Password</label>
+            </div>
 
-            <input type="password" v-model="pass_c"/>
-            <label>Confirm password</label>
+            <div class="ui">
+                <input type="password" v-model="pass_c"/>
+                <label>Confirm password</label>
+            </div>
 
-            <button type="button" v-on:click="signup()">Register</button>
-            <button type="button" v-on:click="sign('in')">Cancel</button>
-
+            <div class="ui">
+                <button type="button" v-on:click="signup()">Register</button>
+                <button type="button" v-on:click="sign('in')">Cancel</button>
+            </div>
         </form>
     </div>
 </template>

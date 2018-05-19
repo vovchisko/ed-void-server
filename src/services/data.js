@@ -8,6 +8,18 @@ class DataStorage {
     constructor() {
         this._null = {};
 
+        this.REPORT_TYPES = {
+            'NA': 'Not Identified',
+            'SF': 'Stellar Features',
+            'PF': 'Planetary Features',
+            'GF': 'Geological Features',
+            'VF': 'Volcanic Features',
+            'OF': 'Organic Features',
+            'SW': 'Shipwreck',
+            'TS': 'Thargoid Structures',
+            'GS': 'Guardian Structures',
+            'ME': 'Automated Mining Extractor',
+        };
 
         this.app = {
             overload: false
@@ -23,20 +35,26 @@ class DataStorage {
                 _id: null,
 
                 //user can edit
-                type: '',
+                type: 'NA',
                 subject: '',
                 description: '',
                 links: [],
+
+                system: null,
+                body: null,
+                lat: null,
+                lon: null,
+                reporter: null,
                 pub: false, //other peopl can find it
                 locked: false, //report confirmed nad locked
 
                 //user can't edit
                 parent_id: null, //for a few reports in the same place
+                starpos: [0, 0, 0],
                 system_id: null,
                 body_id: null,
-                lat: 0,
-                lon: 0,
-                reporter: null
+                reported: null,
+                updated: null,
 
             },
             recent: [],
@@ -91,10 +109,13 @@ class DataStorage {
         this.init();
     }
 
-    nullify() {
-        for (let i in this) {
-            extend(this[i], this._null[i]);
+    nullify(only = null) {
+        if (only !== null) {
+            extend(this[only], this._null[only]);
+        } else {
+            for (let i in this) extend(this[i], this._null[i]);
         }
+
     }
 
     init() {
@@ -125,21 +146,7 @@ class DataStorage {
 const Data = new DataStorage();
 export default Data;
 
-Net.on('cmdr', (cmdr) => {
-    if (!cmdr) return false;
-    extend(Data.cmdr, cmdr);
-});
 
-Net.on('status', (status) => {
-    if (!status) return false;
-    extend(Data.cmdr.status, status);
-});
 
-Net.on('user', (user) => {
-    Data.user.email = user.email;
-    Data.user.api_key = user.api_key;
-});
 
-Net.on('uni:c_system', (system) => Vue.set(Data.env, 'system', system));
-Net.on('uni:c_body', (body) => Vue.set(Data.env, 'body', body));
 
