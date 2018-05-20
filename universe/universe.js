@@ -172,7 +172,7 @@ class Universe extends EE3 {
 
     async repo_search(user, query) {
         DB.reports
-            .find({uid: user.id})
+            .find({uid: user._id})
             .sort({submited: -1})
             .toArray()
             .then(list => this.emit(EV_NET, user._id, 'repo-search', list));

@@ -8,19 +8,6 @@ class DataStorage {
     constructor() {
         this._null = {};
 
-        this.REPORT_TYPES = {
-            'NA': 'Not Identified',
-            'SF': 'Stellar Features',
-            'PF': 'Planetary Features',
-            'GF': 'Geological Features',
-            'VF': 'Volcanic Features',
-            'OF': 'Organic Features',
-            'SW': 'Shipwreck',
-            'TS': 'Thargoid Structures',
-            'GS': 'Guardian Structures',
-            'ME': 'Automated Mining Extractor',
-        };
-
         this.app = {
             overload: false
         };
@@ -36,6 +23,7 @@ class DataStorage {
 
                 //user can edit
                 type: 'NA',
+                sub_type: null,
                 subject: '',
                 description: '',
                 links: [],

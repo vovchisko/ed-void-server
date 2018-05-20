@@ -61,7 +61,7 @@
 
     Net.on('uni:overload', (is_overload) => {
         Data.app.overload = is_overload;
-    })
+    });
 
 </script>
 
