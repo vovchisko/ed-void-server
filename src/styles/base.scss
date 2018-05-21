@@ -25,28 +25,34 @@ input, textarea, select {
 * { box-sizing: border-box; }
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none !important; }
-pre { margin: 0; padding: 0; overflow: visible; line-height: 100%; font-size: 0.7rem}
+pre { margin: 0; padding: 0; overflow: visible; line-height: 100%; font-size: 0.7em}
 html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 16px; line-height: 100%; }
 //
-h1 { @include hcaps(); font-size: 1.4rem}
-h2 { @include hcaps(); font-size: 1.3rem}
-h3 { @include hcaps(); font-size: 1.2rem}
-h4 { @include hcaps(); font-size: 1.1rem; margin: 0.6rem 0 0 0; padding: 0; }
-h5 { @include hcaps(); font-size: 1rem; margin: 0.6rem 0 0 0; padding: 0; }
+h1 { @include hcaps(); font-size: 1.4em; padding: 1rem 0 0.5em 0; margin: 0;}
+h2 { @include hcaps(); font-size: 1.3em; padding: 0.8rem 0 0.4em 0; margin: 0;}
+h3 { @include hcaps(); font-size: 1.2em; padding: 0.7rem 0 0.4em 0; margin: 0;}
+h4 { @include hcaps(); font-size: 1.1em; padding: 0.6rem 0 0.3em 0; margin: 0; }
+h5 { @include hcaps(); font-size: 1em; padding: 0.6rem 0 0.3em 0; margin: 0; }
 //
 u { text-decoration: none;}
 //
 #{$all-inputs} {
-  @include hcaps();
   @include ui-basic();
   @include ui-input();
 }
 textarea {
   @include ui-basic();
   @include ui-input();
-  max-width: 100%; resize: vertical; max-height: 50vh; line-height: 100%; min-height: 8rem; padding-top: 0.7rem;padding-bottom: 0.7rem;
+  max-width: 100%; resize: vertical; max-height: 50vh; line-height: 100%; min-height: 8rem;
+  padding-top: 0.7rem; padding-bottom: 0.7rem;
+  overflow: auto;
+  white-space: initial;
 }
 select { -webkit-appearance: none; }
+select, button { @include hcaps(); }
+button.link { border-color: transparent !important;
+  i { font-size: 1.4rem }
+}
 @keyframes glitched_text {
   0% { text-shadow: none; }
   20% { text-shadow: none; }
@@ -145,8 +151,8 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
     font-size: 1.5rem;
   }
   &.progress { animation: glitched_text 2s infinite;}
-  .ui { margin-top: 2rem;
-    button { width: 15rem; line-height: 3rem; height: 3rem; font-size: 1.2rem}
+  .ui { margin-top: 1rem; text-align: center;
+    button { margin: 1rem}
   }
 }
 header { margin: -2.8rem 2rem 5px 7rem;
@@ -164,4 +170,5 @@ header { margin: -2.8rem 2rem 5px 7rem;
 }
 .ui { padding-bottom: 0.5rem; position: relative;
   button { margin-right: 5px; }
+  select { @include ui-has-caret(); }
 }

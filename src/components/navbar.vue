@@ -10,7 +10,7 @@
 
         <div class="nav-left">
             <button v-on:click="m_toggle()" class=" mode" v-bind:class=" toggle? 'active': ''">
-                MOD: {{nav.c_mode}}<i class="caret i-chevron-right"></i>
+                <i class="i-menu"></i> {{nav.c_mode}}<i class="caret i-chevron-down"></i>
             </button>
 
             <nav v-if="toggle">

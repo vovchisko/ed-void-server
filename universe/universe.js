@@ -237,6 +237,7 @@ class Universe extends EE3 {
         }
 
         r.type = report.type;
+        r.sub_type = report.sub_type;
         r.subject = report.subject;
         r.system = report.system;
         r.body = report.body;

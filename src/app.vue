@@ -23,7 +23,8 @@
     import Navbar from './components/navbar.vue'
     import Data from './services/data'
     import Net from './services/network';
-    import Vue from 'vue'
+    import Vue from 'vue';
+    import moment from 'moment';
 
     import Cmdr from './components/cmdr.vue'
     import Navi from './components/navi.vue'
@@ -61,6 +62,12 @@
 
     Net.on('uni:overload', (is_overload) => {
         Data.app.overload = is_overload;
+    });
+
+    Vue.filter('date', function(value) {
+        if (value) {
+            return moment(String(value)).format('MM/DD/YYYY hh:mm')
+        }
     });
 
 </script>

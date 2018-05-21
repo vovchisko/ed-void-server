@@ -45,7 +45,8 @@ class DataStorage {
                 updated: null,
 
             },
-            recent: [],
+            reports_count: null,
+            reports: [],
 
         };
 
@@ -95,15 +96,6 @@ class DataStorage {
         };
 
         this.init();
-    }
-
-    nullify(only = null) {
-        if (only !== null) {
-            extend(this[only], this._null[only]);
-        } else {
-            for (let i in this) extend(this[i], this._null[i]);
-        }
-
     }
 
     init() {
