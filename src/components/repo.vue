@@ -353,7 +353,7 @@
         .id { font-family: 'Titillium Web', sans-serif; text-transform: none; }
         .curr-entry {}
         .curr-location h2 { }
-        .curr-location h2 button { float: right; }
+        .curr-location h2 button { margin-left: 1rem }
 
         #repo-reports {
             .alert { font-size: 1.2rem; margin-top: 20vh }
@@ -361,7 +361,7 @@
         #repo-view {
             h1 { color: lighten($ui-text, 25%)}
             h2 { color: lighten($ui-text, 25%); }
-            h2 small { @include hcaps(); color:  lighten($ui-text, 15%); }
+            h2 small { @include hcaps(); color: lighten($ui-text, 15%); }
         }
         #repo-edit {
             h4 { margin-top: 5px; }
@@ -373,7 +373,9 @@
             display: block; margin: 0; padding: 1rem 0 2rem 0;
             border-bottom: 1px solid $dark;
             border-top: 1px solid $dark;
-            .actions { button { margin: 0.5rem 2rem 0.9rem 0;}}
+            .actions {
+                button { margin: 0.5rem 2rem 0.9rem 0;}
+            }
 
             h2 { color: lighten($ui-text, 25%); }
             h2 small { @include hcaps(); color: lighten($ui-text, 5%); }
