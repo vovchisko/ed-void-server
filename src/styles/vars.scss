@@ -36,12 +36,12 @@ $ui-act-fg: $orange;
 
 $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=button], input:not([type]), select";
 
-@mixin hcaps { font-family: 'euro_capsregular', sans-serif }
+@mixin hcaps { font-family: 'euro_capsregular', sans-serif; }
 @mixin ui-basic {
   display: inline-block;
   line-height: 2.2rem;
   white-space: nowrap;
-  height: 2.2rem;
+  //height: 2.2rem;
   padding: 0 0.5rem;
   background: transparent;
   border: 1px solid darken($ui-fg, 25%);
@@ -49,7 +49,7 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
   font-size: 1rem;
   border-radius: 0;
   &:hover { border-color: darken($ui-act-fg, 25%); color: darken($ui-act-fg, 25%);}
-  &:active, &:focus {
+  &.active {
     color: $ui-act-fg;
     border-color: $ui-act-fg;
     + label { color: $ui-act-fg }
@@ -59,7 +59,6 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
 @mixin ui-input {
   width: 100%; display: block;
 }
-
 @mixin ui-has-caret {
   background-image: url("../public/assets/caret.svg");
   background-position: calc(100% - 8px) 50%;

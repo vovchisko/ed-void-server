@@ -49,10 +49,8 @@ textarea {
   white-space: initial;
 }
 select { -webkit-appearance: none; }
-select, button { @include hcaps(); }
-button.link { border-color: transparent !important;
-  i { font-size: 1.4rem }
-}
+select, button { @include hcaps(); option { text-transform: none !important}}
+button.link { border-color: transparent !important; line-height: inherit; display: inline-block; padding: 0; }
 @keyframes glitched_text {
   0% { text-shadow: none; }
   20% { text-shadow: none; }
@@ -73,7 +71,6 @@ button {
   @include hcaps();
   @include ui-basic();
   border: 1px solid $ui-fg;
-  transition: all ease-out 50ms;
   &:active {
     border: 1px solid $ui-act-fg;
     text-shadow: -2px -4px 0 rgba(0, 255, 240, .35), 2px 4px 0 rgba(255, 0, 230, .35);
@@ -131,8 +128,8 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
 .alert {
   color: $ui-text; text-align: center; margin: 1rem; font-size: 1rem; line-height: 100%;
   & > i { font-size: 2em; display: block; margin-bottom: 1em; }
-  & > div { @include hcaps(); font-size: 1em; text-transform: uppercase; }
-  & > small { font-size: 0.8em; text-transform: lowercase; }
+  & > div { @include hcaps(); font-size: 1em; }
+  & > small { font-size: 0.8em; margin-top: 0.3rem; display: block; text-transform: lowercase; }
   &.info { color: $info;
     & > small { color: darken($info, 10%) }
   }
@@ -148,11 +145,11 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
     z-index: 9999;
     background: rgba(0, 0, 0, .7);
     margin: 0; padding: 20vh 0;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
   &.progress { animation: glitched_text 2s infinite;}
   .ui { margin-top: 1rem; text-align: center;
-    button { margin: 1rem}
+    button { margin: 1rem; padding: 0rem 3rem; line-height: 2.5rem; font-size: 1.2rem }
   }
 }
 header { margin: -2.8rem 2rem 5px 7rem;
@@ -165,8 +162,9 @@ header { margin: -2.8rem 2rem 5px 7rem;
   font-size: 0.9rem;
   font-weight: bold;
   color: lighten($ui-text, 15%);
-  button { margin-right: 5px; }
-  letter-spacing: -0.02rem;
+  button { margin: 0 0.5rem 0 0; padding: 0 1rem }
+  button.link { padding: 0 0.3rem }
+  button.link i { font-size: 1.2rem; margin-left: 0.2rem; margin-right: 0.2rem}
 }
 .ui { padding-bottom: 0.5rem; position: relative;
   button { margin-right: 5px; }

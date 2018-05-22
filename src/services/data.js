@@ -121,6 +121,10 @@ class DataStorage {
         localStorage.setItem('wtoken', this.auth.wtoken);
         localStorage.setItem('c_mode', this.modes.c_mode);
     }
+
+    nullify(section) {
+        if (section === 'repo.curr') extend(this.repo.curr, this._null.repo.curr);
+    }
 }
 
 const Data = new DataStorage();

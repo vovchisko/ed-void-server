@@ -50,7 +50,7 @@
                         </div>
                     </div>
                     <div class="col-sm">
-                        <div class="sub composion">
+                        <div class="sub composion" v-if="s.Composition">
                             <h5>Body Composition</h5>
                             <em v-for="(com ,val) in s.Composition"><b>{{val}}</b><span>{{com * 100 | nn(2)}} <u>%</u></span></em>
                         </div>
@@ -139,7 +139,7 @@
             b { font-size: 1rem; }
             div { text-align: right; font-size: 0.8rem;}
             span { display: inline-block; margin-left: 1rem }
-            span.arrival {color: #d1d2a3;text-align: right;}
+            span.arrival {color: #d1d2a3; text-align: right;}
             span.star {color: $purple}
             span.planet {color: $green;}
             span.landable {color: $blue;}
@@ -148,7 +148,7 @@
 
         h5 { font-weight: normal; color: darken($ui-text, 15%)}
 
-        .main em { color: lighten($ui-text, 30%)}
+        .main em { color: lighten($ui-text, 15%); font-size: 1.05rem; line-height: 1.1rem}
         .sub em { font-size: 0.8em; line-height: 100%}
 
         .scan:last-child { display: none; }

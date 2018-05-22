@@ -210,7 +210,8 @@ class Universe extends EE3 {
                 return this.emit(EV_NET, user._id, 'repo-submition', {
                     result: 0,
                     type: 'warn',
-                    msg: 'report has been locked'
+                    msg: 'Report has been locked!',
+                    desc: 'This has been verified and locked, and can`t be edited.'
                 })
             }
         } else {
@@ -223,7 +224,8 @@ class Universe extends EE3 {
             return this.emit(EV_NET, user._id, 'repo-submition', {
                 result: 0,
                 type: 'warn',
-                msg: 'Report Subject not specified!'
+                msg: 'Report Subject not specified!',
+                desc: 'This field is required for htis type or reports'
             })
         }
 
@@ -232,7 +234,8 @@ class Universe extends EE3 {
             return this.emit(EV_NET, user._id, 'repo-submition', {
                 result: 0,
                 type: 'error',
-                msg: 'System not specified!'
+                msg: 'System not specified!',
+                desc: 'Location section should contain valid system name'
             })
         }
 

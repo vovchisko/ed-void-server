@@ -52,7 +52,7 @@
                 Data.auth.is_logged = false;
                 Data.auth.wtoken = '';
                 Data.save();
-                Data.nullify();
+                Data.nullify('auth');
             }
         }
     }
