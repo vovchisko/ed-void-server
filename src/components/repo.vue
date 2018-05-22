@@ -197,8 +197,9 @@
                         <div class="col-sm">
                             <h3>Location</h3>
 
-                            <em><b>system</b><span>{{r.system}} <small class="starpos"><u v-for="x in r.starpos">{{x/32}}</u></small></span></em>
-                            <em><b>body</b><span>{{r.body}}</span></em>
+                            <em><b>system</b><span>{{r.system}}</span></em>
+                            <em v-if="r.body"><b>body</b><span>{{r.body.replace(r.system,'')}}</span></em>
+                            <em><b>&nbsp;</b><span><small class="starpos"><u v-for="x in r.starpos">{{x/32}}</u></small></span></em>
                             <em v-if="r.lat"><b>LAT</b><span>{{r.lat | nn(4,4)}} <u>°</u></span></em>
                             <em v-if="r.lon"><b>LON</b><span>{{r.lon | nn(4,4)}} <u>°</u></span></em>
 
