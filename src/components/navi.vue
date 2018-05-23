@@ -6,7 +6,7 @@
         <div class="alert info" v-if="navi.pos.alt===null">
             <i class="i-ed-alert"></i>
             <div>Approach to the body<br/>NAV-Module will engage automatically</div>
-            <small>Before approaching Scan body to identify radius and gravity correctly</small>
+            <small>Scan body Before approaching to identify radius and gravity correctly</small>
         </div>
 
         <div class="navi-surf" v-if="navi.pos.alt!==null">
@@ -42,9 +42,15 @@
                                 <b>LON</b>
                                 <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lon"><u>°</u></span>
                             </em>
+                            <em class="editable" v-if="!env.body">
+                                <b>RADIUS</b>
+                                <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.body.c_radius_km"><u>km</u></span>
+                            </em>
                         </div>
-                        <button v-bind:class="navi.dest.enabled?'active':''"
+                        <button v-bind:class="navi.dest.enabled?'semi-active':''"
                                 v-on:click="navi.dest.enabled = !navi.dest.enabled; recalc_dest()">
+                            <i v-if="!navi.dest.enabled " class="i-aim"></i>
+                            <i v-if="navi.dest.enabled " class="i-chevron-up"></i>
                             {{ !navi.dest.enabled ? 'SET COURSE' : 'DISMISS' }}
                         </button>
                     </div>
@@ -108,6 +114,11 @@
     }
 
     function recalc_dest() {
+
+        if (!Data.env.body) {
+            _navi.body.radius = _navi.body.c_radius_km * 1000;
+        }
+
         if (_navi.dest.enabled) {
             let latStart = _navi.pos.lat * Math.PI / 180;
             let lonStart = _navi.pos.lon * Math.PI / 180;
@@ -147,9 +158,10 @@
     // NAV MODULE
 
     #navi {
+        header { font-size: 1rem}
         .justified em { }
         .justified em > b { width: 30%}
-        .justified em > span { width: 70% }
+        .justified em > span { width: 70%; text-align: left }
         .compass {overflow: hidden; height: 145px;margin: 0 -5px 10px -5px;
             .ruler { background: transparent url('../../public/assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
             .ruler .head {width: 50px;font-size: 14px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -30px 0 0 -25px;}
@@ -174,7 +186,14 @@
 
         }
         .cords {
-            input[type=number] { width: calc(100% - 1rem);text-align: right; margin-top: -0.2rem; height: 1.5rem; line-height: 1.5rem; font-size: 1rem; margin-bottom: 0.3rem}
+            .editable {
+                line-height: 2.4rem;
+                b { font-size: 1.1rem }
+                span { font-size: 1.4rem }
+                span input { border-width: 0 0 1px 0}
+                span u { font-size: 1.4rem }
+            }
+            input[type=number] { width: calc(100% - 1rem); display: inline-block; text-align: right; line-height: 1.8rem; font-size: 1.4rem; max-width: 10rem }
             button { margin-top: 15px}
         }
         .location-data {

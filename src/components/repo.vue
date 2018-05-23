@@ -24,7 +24,7 @@
             <small>{{state.alert.desc}}</small>
             <div class="ui" v-if="!state.loading">
                 <button type="button" v-on:click="state.alert.show = false" v-if="!state.complete">roger that</button>
-                <button type="button" v-on:click="go_home()" v-if="state.complete">ok</button>
+                <button type="button" v-on:click="state.alert.show = false; go_view()" v-if="state.complete">ok</button>
             </div>
         </div>
 
@@ -52,12 +52,12 @@
 
                     <div class="ui">
                         <input type="text" v-model="repo.curr.subject" placeholder="report subject">
-                        <label>subject / title</label><br>
+                        <label>subject / title</label>
                     </div>
 
                     <div class="ui">
                         <textarea v-model="repo.curr.description" placeholder="optional description"></textarea>
-                        <label>report description ({{repo.curr.description.length}} / 255)</label>
+                        <label>report description ({{repo.curr.description.length}} / 1000)</label>
                     </div>
 
                     <div class="alert warn" v-if="navi.body.name !== null && !navi.body.radius">
@@ -101,14 +101,14 @@
 
                     <div class="ui">
                         <input type="text" v-model="repo.curr.reporter" placeholder="cmdr name">
-                        <label>reported by</label><br>
+                        <label>reported by</label>
                     </div>
                 </div>
 
             </div>
 
             <div class="ui">
-                <button type="button" v-on:click="curr_submit()">{{repo.curr._id ? 'save shanges' : 'submit report'}}</button>
+                <button type="button" v-on:click="curr_submit()">{{repo.curr._id ? 'save changes' : 'submit report'}}</button>
                 <button type="button" v-on:click="curr_reset()">cancel</button>
             </div>
         </div>
@@ -175,20 +175,16 @@
 
             <ul class="search-results">
                 <li class="repo-item" v-for="r in repo.reports">
-                    <div class="row">
-                        <div class="col-sm">
-                            <h2>REP: {{r.submited | date}} <br>
-                                <small>{{report_types[r.type]}}</small>
-                            </h2>
-                        </div>
-                        <div class="col-sm actions">
-                            <button class="link" v-on:click="select_report(r)"><i class="i-file"></i> report details</button>
-                            <span v-if="r.locked" class="rep-locked"><i class="i-bookmark"></i> protected</span>
-                        </div>
-                    </div>
+
                     <div class="row">
                         <div class="col-sm listed">
-
+                            <h2>REP: {{r.submited | date}}
+                                <small>{{report_types[r.type]}}</small>
+                            </h2>
+                            <div class="actions">
+                                <button class="link" v-on:click="select_report(r)"><i class="i-file"></i> report details</button>
+                                <span v-if="r.locked" class="rep-locked"><i class="i-bookmark"></i> protected</span>
+                            </div>
                             <em v-if="r.sub_type"><b>classified as:</b><span>{{report_sub_types[r.type][r.sub_type]}}</span></em>
                             <em><b>subject</b><span>{{r.subject}}</span></em>
                             <em><b>cmdr</b><span>{{r.reporter}}</span></em>
@@ -226,7 +222,6 @@
             type: '',
             msg: 'nothing happened',
             desc: '',
-
         },
         complete: false,
     };
@@ -252,14 +247,17 @@
                 this.state.alert.show = false;
                 Data.nullify('repo.curr');
                 this.c_tab = 'home';
+                this.get_recent();
             },
             go_create() {
                 Data.nullify('repo.curr');
-                //this.curr_location();
                 this.c_tab = 'edit';
             },
             go_edit() {
                 this.c_tab = 'edit';
+            },
+            go_view() {
+                this.c_tab = 'view';
             },
             get_recent: function () {
                 this.state.loading = true;
@@ -270,8 +268,7 @@
                 this.repo.reports.splice(0, this.repo.reports.length);
                 setTimeout(() => {
                     Net.send('repo-search', {});
-                }, 750);
-
+                }, 500);
             },
             curr_location: function () {
                 if (this.repo.curr._id) return;
@@ -302,7 +299,7 @@
                 this.state.complete = false;
                 setTimeout(() => {
                     Net.send('repo-submit', this.repo.curr);
-                }, 1750);
+                }, 500);
             },
             curr_reset: function () {
                 Data.nullify('repo.curr');
@@ -350,7 +347,11 @@
     #repo {
 
         header i.active { font-size: 1.4rem}
-        .id { font-family: 'Titillium Web', sans-serif; text-transform: none; }
+        .id {
+            font-family: 'Titillium Web', sans-serif;
+            text-transform: none;
+            line-height: 0.8rem;
+            font-size: 1.1rem; }
         .curr-entry {}
         .curr-location h2 { }
         .curr-location h2 button { margin-left: 1rem }
@@ -360,11 +361,13 @@
         }
         #repo-view {
             h1 { color: lighten($ui-text, 25%)}
-            h2 { color: lighten($ui-text, 25%); }
+            h2 { color: lighten($ui-text, 25%);
+                small { display: block }
+            }
             h2 small { @include hcaps(); color: lighten($ui-text, 15%); }
         }
         #repo-edit {
-            h4 { margin-top: 5px; }
+            h2 { }
             small { display: block; margin-bottom: 0.4rem; }
         }
 
@@ -374,7 +377,8 @@
             border-bottom: 1px solid $dark;
             border-top: 1px solid $dark;
             .actions {
-                button { margin: 0.5rem 2rem 0.9rem 0;}
+                margin: 0.5rem 0 0.9rem 0; line-height: 1.5rem;
+                button { padding-right: 1rem; color: darken($ui-act-fg, 25%); }
             }
 
             h2 { color: lighten($ui-text, 25%); }
@@ -382,7 +386,7 @@
             .starpos { color: darken($ui-text, 25%)}
         }
 
-        .user-text { white-space: pre-wrap}
+        .user-text { white-space: pre-wrap; word-wrap: break-word;}
         .rep-locked { @include hcaps(); font-size: 1rem; color: $purple}
     }
 

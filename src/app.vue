@@ -2,6 +2,7 @@
     <div id="app">
         <auth v-if="!data.auth.is_logged"></auth>
         <navbar v-if="data.auth.is_logged"/>
+
         <div class="container-fluid" v-if="data.auth.is_logged">
             <cmdr v-if=" data.modes.c_mode === 'cmdr'"></cmdr>
             <vass v-if="data.modes.c_mode === 'vass'"></vass>

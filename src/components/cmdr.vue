@@ -1,8 +1,11 @@
 <template>
     <div id="cmdr">
-        <header>PILOT PROFILE</header>
+        <header>
+            <button class="logout link" v-on:click="signout()">logout <i class="i-chevron-right"></i></button>
+        </header>
         <div class="row">
             <div class="col-sm props listed">
+                <h1>pilot profile</h1>
                 <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
                 <em><b>SYSTEM</b>
                     <span>
@@ -13,10 +16,9 @@
                 <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>
             </div>
             <div class="col-sm props listed">
-                <h3>ACCOUNT INFO</h3>
+                <h1>account info</h1>
                 <em><b>EMAIL</b><span>{{user.email}}</span></em>
                 <em><b>API_KEY</b><span>{{user.api_key}}</span></em>
-                <button v-on:click="signout()">signout</button>
             </div>
         </div>
 
@@ -24,13 +26,13 @@
         <div class="row">
             <div class="col-sm-6">
                 <p class="help">
-                    - Download Jouranl Client<br/><a href="download/ed-void-journal.zip">ed-void-journal.zip [8.36Mb]</a>
-                    on your PC.<br>
-                    - Run and follow the instructions.
+                    - Download <a href="download/ed-void-journal.zip">Jouranl Client [8.6Mb]</a><br>
+                    - Run and follow the instructions.<br>
+                    - Come back to ED-VOID
                 </p>
                 <p class="help">If you need help - visit our
-                    <a href="https://discord.gg/s7qchpj" target="_blank">Discord Server</a></p>
-
+                    <a href="https://discord.gg/s7qchpj" target="_blank">Discord Server</a>
+                </p>
             </div>
         </div>
     </div>
@@ -82,5 +84,6 @@
     @import '../styles/vars';
     #cmdr {
         h3 { margin-top: 1rem}
+        button.logout { float: right; margin: 0 }
     }
 </style>

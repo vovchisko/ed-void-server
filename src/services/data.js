@@ -13,7 +13,13 @@ class DataStorage {
         };
 
         this.modes = {
-            modes: ['cmdr', 'navi', 'vass', 'repo', 'dev'],
+            modes: {
+                'cmdr': 'cmdr',
+                'navi': 'nav',
+                'vass': 'scan',
+                'repo': 'poi',
+                'dev': 'dev'
+            },
             c_mode: 'cmdr'
         };
 
@@ -82,7 +88,7 @@ class DataStorage {
                 lat: 0, lon: 0, azi: 0, dist: 0,
                 align: ''
             },
-            body: {name: null, radius: 0, gravity: 0}
+            body: {name: null, radius: 0, gravity: 0, c_radius_km: 0}
         };
 
         this.vass = {

@@ -1,5 +1,5 @@
 <template>
-    <div id="navbar" class="container-fluid">
+    <div id="navbar" class="container-fluid clearfix">
         <div class="nav-right">
             <div v-bind:class="['net', net.error ? 'err':'', net.online]">
                 <i class="i i-wifi" v-if="net.online === 'online'"></i>
@@ -10,11 +10,11 @@
 
         <div class="nav-left">
             <button v-on:click="m_toggle()" class=" mode" v-bind:class=" toggle? 'active': ''">
-                <i class="i-menu"></i> {{nav.c_mode}}<i class="caret i-chevron-down"></i>
+                <i class="i-menu"></i> {{nav.modes[nav.c_mode]}}<i class="caret i-chevron-down"></i>
             </button>
 
             <nav v-if="toggle">
-                <button v-for="mode in nav.modes" v-bind:class="nav.c_mode === mode ? 'semi-active':''" v-on:click="do_nav(mode)">{{mode}}</button>
+                <button v-for="(name, mode) in nav.modes" v-bind:class="nav.c_mode === mode ? 'semi-active':''" v-on:click="do_nav(mode)">{{name}}</button>
             </nav>
         </div>
 
@@ -46,14 +46,14 @@
 <style lang="scss">
     @import "../styles/vars";
     #navbar {
-        height: 2.8rem;
+        height: calc(2.2rem + 2px + 5px);
         line-height: 2.2rem;
-        margin-top: 0; margin-bottom: 0;
-        padding-top: 0; padding-bottom: 0;
+        margin-top: 0px; margin-bottom: 0;
+        padding-top: 5px; padding-bottom: 0;
 
         //layout
-        .nav-left { margin-top: 5px; float: left; white-space: nowrap; position: relative; z-index: 2; width: 7rem; }
-        .nav-right { margin-top: 5px; float: right; width: 2rem; white-space: nowrap; }
+        .nav-left { float: left; white-space: nowrap; position: relative; z-index: 2; width: 6rem; }
+        .nav-right { float: right; width: 2rem; white-space: nowrap; }
 
         //styles
         button.mode {
@@ -73,15 +73,15 @@
             }
         }
         .net {
-            padding: 1px 0;
+            padding: 0;
             color: darken($ui-text, 15%);
             font-size: 1.3rem;
-            line-height: 2.1rem;
             text-align: center;
             &.online { color: lighten($ui-fg, 15%); }
             &.offline { color: $purple; }
             &.connecting { color: $purple; }
             &.err { color: darken($red, 15%); }
+            i { margin-top: -2px }
 
         }
         .nav-header {
@@ -91,5 +91,20 @@
             text-overflow: ellipsis; }
 
         #nav-clickout { position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: $ui-bg; opacity: 0.5; z-index: 1}
+    }
+    header {
+        @include hcaps();
+        margin: calc(-2.2rem - 2px) 1.5rem 5px 6rem;
+        padding: 0 0 0 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 2.2rem;
+        height: calc(2.2rem + 2px);
+        font-size: 1rem;
+        color: lighten($ui-text, 15%);
+        button { margin: 0 0.4rem 0 0; }
+        button.link { padding: 0 0.3rem }
+        button.link i { font-size: 1.1rem; margin-right: 0.2rem}
     }
 </style>

@@ -27,12 +27,14 @@ input, textarea, select {
 *:focus, *:active { outline: none !important; }
 pre { margin: 0; padding: 0; overflow: visible; line-height: 100%; font-size: 0.7em}
 html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 16px; line-height: 100%; }
+body { padding-top: 1px; }
 //
 h1 { @include hcaps(); font-size: 1.4em; padding: 1rem 0 0.5em 0; margin: 0;}
 h2 { @include hcaps(); font-size: 1.3em; padding: 0.8rem 0 0.4em 0; margin: 0;}
 h3 { @include hcaps(); font-size: 1.2em; padding: 0.7rem 0 0.4em 0; margin: 0;}
 h4 { @include hcaps(); font-size: 1.1em; padding: 0.6rem 0 0.3em 0; margin: 0; }
 h5 { @include hcaps(); font-size: 1em; padding: 0.6rem 0 0.3em 0; margin: 0; }
+.caps { @include hcaps(); }
 //
 u { text-decoration: none;}
 //
@@ -49,8 +51,29 @@ textarea {
   white-space: initial;
 }
 select { -webkit-appearance: none; }
-select, button { @include hcaps(); option { text-transform: none !important}}
+select, button { @include hcaps();
+  option { text-transform: none !important}
+}
+button {
+  @include hcaps();
+  @include ui-basic();
+  border: 1px solid $ui-fg;
+  &:active {
+    border: 1px solid $ui-act-fg;
+    @include glitch();
+  }
+  &.active {
+    @include redshift();
+    color: $ui-act-fg;
+    border-color: $ui-act-fg;
+  }
+  &.semi-active {
+    color: darken($ui-act-fg, 15%);
+    border-color: darken($ui-act-fg, 15%);
+  }
+}
 button.link { border-color: transparent !important; line-height: inherit; display: inline-block; padding: 0; }
+.clearfix { @include clearfix()}
 @keyframes glitched_text {
   0% { text-shadow: none; }
   20% { text-shadow: none; }
@@ -66,27 +89,10 @@ button.link { border-color: transparent !important; line-height: inherit; displa
   95% { text-shadow: none; }
   100% { text-shadow: none; }
 }
+input { height: auto; }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { appearance: none; }
 input, textarea {caret-color: $orange; }
-button {
-  @include hcaps();
-  @include ui-basic();
-  border: 1px solid $ui-fg;
-  &:active {
-    border: 1px solid $ui-act-fg;
-    text-shadow: -2px -4px 0 rgba(0, 255, 240, .35), 2px 4px 0 rgba(255, 0, 230, .35);
-    box-shadow: -2px -4px 0 0 rgba(0, 255, 240, .35), 2px 4px 0 0 rgba(255, 0, 230, .35);
-  }
-  &.active {
-    color: $ui-act-fg;
-    border-color: $ui-act-fg;
-    text-shadow: -2px -4px 0 rgba(0, 255, 240, .15), 2px 4px 0 rgba(255, 0, 230, .15);
-    box-shadow: -2px -4px 0 0 rgba(0, 255, 240, .15), 2px 4px 0 0 rgba(255, 0, 230, .15);
-  }
-  &.semi-active {
-    color: darken($ui-act-fg, 15%);
-    border-color: darken($ui-act-fg, 15%);
-  }
-}
 //
 i { vertical-align: middle; display: inline-block; }
 .wide { width: 100%; display: block; }
@@ -152,21 +158,9 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
     button { margin: 1rem; padding: 0rem 3rem; line-height: 2.5rem; font-size: 1.2rem }
   }
 }
-header { margin: -2.8rem 2rem 5px 7rem;
-  padding: 5px 5px 0 10px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 2.2rem;
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: lighten($ui-text, 15%);
-  button { margin: 0 0.5rem 0 0; padding: 0 1rem }
-  button.link { padding: 0 0.3rem }
-  button.link i { font-size: 1.2rem; margin-left: 0.2rem; margin-right: 0.2rem}
-}
-.ui { padding-bottom: 0.5rem; position: relative;
+.ui { padding-bottom: 1rem; position: relative; padding-top: 1rem;
+  label { position: absolute; top: 0; left: 0; right: 0; line-height: 1rem}
   button { margin-right: 5px; }
   select { @include ui-has-caret(); }
+  *:focus + label { color: $ui-act-fg }
 }
