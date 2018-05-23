@@ -3,14 +3,13 @@
         <header>
             <div v-if="c_tab==='home'">
                 <button type="button" class="link" v-on:click="go_create()"><i class="i-file-add"></i> create</button>
-                <button type="button" class="link" v-if="repo.reports.length" v-on:click="get_recent()"><i class="i-sync"></i> sync</button>
+                <button type="button" class="link" v-if="repo.reports_count !== null" v-on:click="get_recent()"><i class="i-sync"></i> sync</button>
             </div>
 
             <div v-if="c_tab==='view'">
                 <button v-if="c_tab!=='home'" class="link" v-on:click="go_home()" type="button"><i class="i-angle-left"></i> back</button>
                 <button type="button" class="link" v-if="!repo.curr.locked" v-on:click="go_edit()"><i class="i-edit"></i> edit report</button>
                 <span v-if="repo.curr.locked" class="rep-locked"><i class="i-bookmark"></i> protected</span>
-
             </div>
 
             <div v-if="c_tab==='edit'">
@@ -109,7 +108,7 @@
             </div>
 
             <div class="ui">
-                <button type="button" v-on:click="curr_submit()">submit report</button>
+                <button type="button" v-on:click="curr_submit()">{{repo.curr._id ? 'save shanges' : 'submit report'}}</button>
                 <button type="button" v-on:click="curr_reset()">cancel</button>
             </div>
         </div>
@@ -168,7 +167,7 @@
                 </div>
             </div>
 
-            <div class="alert info" v-if="repo.reports_count === 0">
+            <div class="alert info" v-if="repo.reports_count === 0 && !state.loading">
                 <i class="i-ed-alert"></i>
                 <div>No reports found</div>
                 <small>there is no reports mathing your request</small>

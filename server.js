@@ -161,7 +161,6 @@ const JCL = server.JCL = new JCollector();
 require('http').createServer(function (request, response) {
 
     // API
-
     if (request.url === '/api/record')
         return action_record(request, response);
 
@@ -171,9 +170,7 @@ require('http').createServer(function (request, response) {
     if (request.url === '/api/signin')
         return action_signin(request, response);
 
-
     // STATIC
-
     request.addListener('end', function () {
         app.serve(request, response, function (e, res) {
             if (e && (e.status === 404)) { // If the file wasn't found
@@ -183,8 +180,8 @@ require('http').createServer(function (request, response) {
 
     }).resume();
 
-}).listen(cfg.main.api_port);
-console.log('API-SERVER ON PORT: ' + cfg.main.api_port);
+}).listen(cfg.main.port);
+console.log('WEB & API-SERVER ON PORT: ' + cfg.main.port);
 
 DB.connect(cfg.database, init);
 
@@ -212,7 +209,7 @@ function init() {
     JCL.init(cfg.main.ws_journals);
     UNI.init();
 
-    console.log('http://localhost:' + cfg.main.api_port);
+    console.log('http://localhost:' + cfg.main.port);
 }
 
 

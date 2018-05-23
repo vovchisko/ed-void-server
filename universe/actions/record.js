@@ -26,7 +26,7 @@ module.exports = function (req, res) {
                 for (let i = 0; i < records.length; i++) {
                     pre.process(records[i]);
                     await UNI.record(user, records[i], head.cmdr, head.gv, head.lng, records.length - (i + 1));
-                    if (records[i].event === 'Status') log = '';//don't log status
+                    if (records[i].event === 'Status') log = ''; //don't log status
                 }
 
                 res.statusCode = 200;

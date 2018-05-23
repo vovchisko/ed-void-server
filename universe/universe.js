@@ -165,7 +165,7 @@ class Universe extends EE3 {
             if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec); //todo: << this is probably useless
             if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
         } catch (e) {
-            console.log(rec.event, e);
+            console.log('UNI.process()',rec.event, e);
         }
         return null;
     }
@@ -223,7 +223,7 @@ class Universe extends EE3 {
         if (!report.subject) {
             return this.emit(EV_NET, user._id, 'repo-submition', {
                 result: 0,
-                type: 'warn',
+                type: 'error',
                 msg: 'Report Subject not specified!',
                 desc: 'This field is required for htis type or reports'
             })
@@ -236,6 +236,15 @@ class Universe extends EE3 {
                 type: 'error',
                 msg: 'System not specified!',
                 desc: 'Location section should contain valid system name'
+            })
+        }
+
+        if (!report.reporter) {
+            return this.emit(EV_NET, user._id, 'repo-submition', {
+                result: 0,
+                type: 'error',
+                msg: 'Reporter CMDR name is requierd',
+                desc: 'You can\'t submit report anonymously'
             })
         }
 
