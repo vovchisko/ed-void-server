@@ -1,5 +1,5 @@
 //import Net from './network';
-//Net.on('net:any', (c, rec) => { console.log(c, rec)});
+
 import extend from 'deep-extend';
 import Net from './network';
 import Vue from 'vue';

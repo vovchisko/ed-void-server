@@ -199,8 +199,7 @@
         .location-data {
             margin-top: 3rem;
             h4 { margin-bottom: 0; }
-            .starpos { text-align: center; margin-bottom: 0.5rem }
-            .starpos u { font-size: 0.8rem; color: darken($ui-text, 25%); }
+            .starpos { text-align: center; }
         }
         small { color: darken($ui-text, 25%);}
         .alert.info { margin-top: 2rem}

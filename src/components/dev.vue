@@ -29,6 +29,11 @@
         }
     }
 
+    Net.on('net:any', (c, dat)=>{
+        console.log(c,dat)
+    });
+
+
 
 </script>
 

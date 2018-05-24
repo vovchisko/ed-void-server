@@ -345,7 +345,6 @@
 <style lang="scss">
     @import "../styles/vars";
     #repo {
-
         header i.active { font-size: 1.4rem}
         .id {
             font-family: 'Titillium Web', sans-serif;
@@ -359,17 +358,6 @@
         #repo-reports {
             .alert { font-size: 1.2rem; margin-top: 20vh }
         }
-        #repo-view {
-            h1 { color: lighten($ui-text, 25%)}
-            h2 { color: lighten($ui-text, 25%);
-                small { display: block }
-            }
-            h2 small { @include hcaps(); color: lighten($ui-text, 15%); }
-        }
-        #repo-edit {
-            h2 { }
-            small { display: block; margin-bottom: 0.4rem; }
-        }
 
         ul.search-results { display: block; margin: 0; padding: 0; }
         ul.search-results li {
@@ -381,10 +369,11 @@
                 button { padding-right: 1rem; color: darken($ui-act-fg, 25%); }
             }
 
-            h2 { color: lighten($ui-text, 25%); }
-            h2 small { @include hcaps(); color: lighten($ui-text, 5%); }
-            .starpos { color: darken($ui-text, 25%)}
         }
+
+        h1 { color: lighten($ui-text, 25%)}
+        h2 { color: lighten($ui-text, 25%); }
+        h2 small { @include hcaps(); display: block; color: lighten($ui-text, 15%); margin-bottom: 0.4rem; }
 
         .user-text { white-space: pre-wrap; word-wrap: break-word;}
         .rep-locked { @include hcaps(); font-size: 1rem; color: $purple}

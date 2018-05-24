@@ -14,7 +14,6 @@
   AUTOFILL STYLES IN CHROME
 */
 input, textarea, select {
-
   &:-webkit-autofill {
     border: 1px solid darken($ui-fg, 25%);
     -webkit-text-fill-color: darken($ui-act-fg, 25%);
@@ -45,7 +44,7 @@ u { text-decoration: none;}
 textarea {
   @include ui-basic();
   @include ui-input();
-  max-width: 100%; resize: vertical; max-height: 50vh; line-height: 100%; min-height: 8rem;
+  max-width: 100%; resize: vertical; max-height: 50vh; line-height: 100%; min-height: 6.8rem; height: 6.8rem;
   padding-top: 0.7rem; padding-bottom: 0.7rem;
   overflow: auto;
   white-space: initial;
@@ -84,7 +83,7 @@ button.link { border-color: transparent !important; line-height: inherit; displa
   50% { text-shadow: -1px -4px 0 rgba(0, 255, 240, .35), 1px 4px 0 rgba(255, 0, 230, .35); }
   67% { text-shadow: none; }
   79% { text-shadow: none; }
-  80% { text-shadow: -2px -5px 0 rgba(0, 255, 240, .35), 2px 5px 0 rgba(255, 0, 230, .35);}
+  80% { text-shadow: -2px -5px 0 rgba(0, 255, 240, .35), 2px 5px 0 rgba(255, 0, 230, .35); }
   89% { text-shadow: -2px -5px 0 rgba(0, 255, 240, .35), 2px 5px 0 rgba(255, 0, 230, .35); }
   95% { text-shadow: none; }
   100% { text-shadow: none; }
@@ -164,3 +163,5 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
   select { @include ui-has-caret(); }
   *:focus + label { color: $ui-act-fg }
 }
+.starpos { color: darken($ui-text, 25%); margin-bottom: 0.5rem }
+.starpos u { font-size: 0.8rem; color: darken($ui-text, 25%); }

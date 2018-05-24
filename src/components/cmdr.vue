@@ -46,7 +46,6 @@
 
     export default {
         name: 'cmdr',
-        mounted: function () { console.info('DATA:', this.cmdr, this.user)},
         data: () => { return {cmdr: Data.cmdr, user: Data.user, env: Data.env}},
         methods: {
             signout: function () {
