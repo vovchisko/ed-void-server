@@ -15,24 +15,28 @@
     import Data from '../services/data'
     import Net from '../services/network'
 
-    const network = [];
+    const network = {
+        uni: [],
+        pipe: [],
+        status: []
+    };
 
     export default {
         name: "dev",
         data: () => {
             return {
-                c_tab: 'net',
-                tabs: ['net','data', 'pipe', 'uni'],
+                c_tab: 'stat',
+                tabs: ['stat', 'uni', 'pipe'],
                 data: Data,
                 network: network
             }
         }
     }
 
-    Net.on('net:any', (c, dat)=>{
-        console.log(c,dat)
-    });
+    Net.on('net:any', (c, dat) => {
 
+        console.log(c, dat);
+    });
 
 
 </script>

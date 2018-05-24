@@ -20,18 +20,18 @@
 </template>
 <script>
 
-    import Auth from './components/auth.vue'
-    import Navbar from './components/navbar.vue'
+    import Auth from './mods/auth.vue'
+    import Navbar from './mods/navbar.vue'
     import Data from './services/data'
     import Net from './services/network';
     import Vue from 'vue';
     import moment from 'moment';
 
-    import Cmdr from './components/cmdr.vue'
-    import Navi from './components/navi.vue'
-    import Vass from './components/vass.vue'
-    import Repo from './components/repo.vue'
-    import Dev from './components/dev.vue'
+    import Cmdr from './mods/cmdr.vue'
+    import Navi from './mods/navi.vue'
+    import Vass from './mods/vass.vue'
+    import Repo from './mods/repo.vue'
+    import Dev from './mods/dev.vue'
 
     export default {
         name: 'app',
@@ -40,8 +40,6 @@
             Navbar, Auth, Cmdr, Navi, Vass, Dev, Repo
         },
     }
-
-    Vue.config.productionTip = false;
 
     Vue.filter('nn', function (num, frac = 3, min_frac = 0, err = 'ERR!') {
         num = parseFloat(num);

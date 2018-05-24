@@ -37,7 +37,7 @@ class Universe extends EE3 {
         this.autosave = setInterval(() => {
             for (let c in this.cmdrs) this.cmdrs[c].save();
             for (let u in this.users) this.users[u].save();
-        }, 5000);
+        }, 60000);
     }
 
     refill_user(uid) {
@@ -527,6 +527,7 @@ class BODY {
 
         pickx(rec, this,
             ['BodyName', 'name', con.ED_CAPS],
+            ['BodyName', 'name_raw'],
             ['BodyID', 'body_id'],
             ['DistanceFromArrivalLS', 'arrival'],
             ['Radius', 'radius'],
@@ -620,6 +621,7 @@ class SYSTEM {
     append(cmdr, rec) {
         pickx(rec, this,
             ['StarSystem', 'name', con.ED_CAPS],
+            ['StarSystem', 'name_raw'],
             ['StarPos', 'starpos', arr => arr.map((x) => {return Math.floor(x * 32)})],
             ['SystemSecurity', 'security'],
             ['SystemEconomy', 'economy'],
