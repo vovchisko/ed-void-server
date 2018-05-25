@@ -14,7 +14,8 @@ class DataStorage {
 
 
         this.cfg = {
-            font_size: '14',
+            font_size: '100%',
+            font_sizes_list: new Array(17).fill(0).map((x,i)=>{return i * 10 + 40 + '%'})
         };
 
         this.modes = {
@@ -134,7 +135,7 @@ class DataStorage {
 
         //read wtoken
         let font_size = localStorage.getItem('font_size');
-        if (font_size) this.cfg.font_size = parseInt(font_size);
+        if (font_size) this.cfg.font_size = font_size;
     }
 
     save() {

@@ -120,16 +120,16 @@
 <style lang="scss">
     @import "../styles/vars";
     #auth {
-        h2 { @include hcaps(); font-size: 2rem; margin-bottom: 2rem}
+        h2 { @include hcaps(); font-size: 2em; margin-bottom: 2em}
         form {
-            width: 18rem;
+            width: 18em;
             margin: 0 auto;
-            padding: calc(50vh - 300px + 1rem) 0;
+            padding: calc(50vh - 300px + 1em) 0;
             border: $ui-bg;
             input, button {
-                display: block; clear: both; margin-top: 0.3rem; width: 100%;
+                display: block; clear: both; margin-top: 0.3em; width: 100%;
             }
-            button { margin-top: 1.2rem}
+            button { margin-top: 1.2em}
             .msg {
                 text-transform: uppercase; margin: 10px 0 10px 0;
                 &.warn { color: $ui-err;}

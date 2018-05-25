@@ -135,10 +135,10 @@
     @import "../styles/vars";
     #vass {
         h4 {
-            text-transform: uppercase;font-size: 1.1rem;margin: 10px 0 5px 0; padding: 5px; text-align: left; background: #100f0f;
-            b { font-size: 1rem; }
-            div { text-align: right; font-size: 0.8rem;}
-            span { display: inline-block; margin-left: 1rem }
+            text-transform: uppercase;font-size: 1.1em;margin: 10px 0 5px 0; padding: 5px; text-align: left; background: #100f0f;
+            b { font-size: 1em; }
+            div { text-align: right; font-size: 0.8em;}
+            span { display: inline-block; margin-left: 1em }
             span.arrival {color: #d1d2a3; text-align: right;}
             span.star {color: $purple}
             span.planet {color: $green;}
@@ -148,8 +148,8 @@
 
         h5 { font-weight: normal; color: darken($ui-text, 15%)}
 
-        .main em { color: lighten($ui-text, 15%); font-size: 1.05rem; line-height: 1.1rem}
-        .sub em { font-size: 0.8rem; }
+        .main em { color: lighten($ui-text, 15%); font-size: 1.05em; line-height: 1.1em}
+        .sub em { font-size: 0.8em; }
 
         .scan:last-child { display: none; }
         .scan:first-child { display: block !important; }

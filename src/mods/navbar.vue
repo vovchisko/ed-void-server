@@ -46,19 +46,19 @@
 <style lang="scss">
     @import "../styles/vars";
     #navbar {
-        height: calc(2.2rem + 2px + 5px);
-        line-height: 2.2rem;
+        height: calc(2.2em + 2px + 5px);
+        line-height: 2.2em;
         margin-top: 0px; margin-bottom: 0;
         padding-top: 5px; padding-bottom: 0;
 
         //layout
-        .nav-left { float: left; white-space: nowrap; position: relative; z-index: 2; width: 6rem; }
-        .nav-right { float: right; width: 2rem; white-space: nowrap; }
+        .nav-left { float: left; white-space: nowrap; position: relative; z-index: 2; width: 6em; }
+        .nav-right { float: right; width: 2em; white-space: nowrap; }
 
         //styles
         button.mode {
             white-space: nowrap; width: 100%;
-            .caret { font-size: 1.1rem; width: 0.7em; display: inline-block; }
+            .caret { font-size: 1.1em; width: 0.7em; display: inline-block; }
             &.active .caret { }
         }
         nav {
@@ -68,14 +68,14 @@
             left: 0; background: $ui-bg;
             z-index: 2;
             button {
-                margin: 0 5px 5px 0; display: block; width: 7rem;
+                margin: 0 5px 5px 0; display: block; width: 7em;
                 span { display: inline}
             }
         }
         .net {
             padding: 0;
             color: darken($ui-text, 15%);
-            font-size: 1.3rem;
+            font-size: 1.3em;
             text-align: center;
             &.online { color: lighten($ui-fg, 15%); }
             &.offline { color: $purple; }
@@ -94,17 +94,17 @@
     }
     header {
         @include hcaps();
-        margin: calc(-2.2rem - 2px) 1.5rem 5px 6rem;
+        margin: calc(-2.2em - 2px) 1.5em 5px 6em;
         padding: 0 0 0 10px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        line-height: 2.2rem;
-        height: calc(2.2rem + 2px);
-        font-size: 1rem;
+        line-height: 2.2em;
+        height: calc(2.2em + 2px);
+        font-size: 1em;
         color: lighten($ui-text, 15%);
-        button { margin: 0 0.4rem 0 0; }
-        button.link { padding: 0 0.3rem }
-        button.link i { font-size: 1.1rem; margin-right: 0.2rem}
+        button { margin: 0 0.4em 0 0; }
+        button.link { padding: 0 0.3em }
+        button.link i { font-size: 1.1em; margin-right: 0.2em}
     }
 </style>

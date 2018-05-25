@@ -158,7 +158,7 @@
     // NAV MODULE
 
     #navi {
-        header { font-size: 1rem}
+        header { font-size: 1em}
         .justified em { }
         .justified em > b { width: 30%}
         .justified em > span { width: 70%; text-align: left }
@@ -187,22 +187,22 @@
         }
         .cords {
             .editable {
-                line-height: 2.4rem;
-                b { font-size: 1.1rem }
-                span { font-size: 1.4rem }
+                line-height: 2.4em;
+                b { font-size: 1.1em }
+                span { font-size: 1.4em }
                 span input { border-width: 0 0 1px 0}
-                span u { font-size: 1.4rem }
+                span u { font-size: 1.4em }
             }
-            input[type=number] { width: calc(100% - 1rem); display: inline-block; text-align: right; line-height: 1.8rem; font-size: 1.4rem; max-width: 10rem }
+            input[type=number] { width: calc(100% - 1em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.4em; max-width: 10em }
             button { margin-top: 15px}
         }
         .location-data {
-            margin-top: 3rem;
+            margin-top: 3em;
             h4 { margin-bottom: 0; }
             .starpos { text-align: center; }
         }
         small { color: darken($ui-text, 25%);}
-        .alert.info { margin-top: 2rem}
+        .alert.info { margin-top: 2em}
     }
 </style>
 

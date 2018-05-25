@@ -13,20 +13,7 @@
                     </span>
         </em>
         <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>
-        <br>
-        <h3>ED-VOID CLIENT INSTALLATION</h3>
-        <div class="row">
-            <div class="col-sm-6">
-                <p class="help">
-                    - Download <a href="download/ed-void-journal.zip">Jouranl Client [8.6Mb]</a><br>
-                    - Run and follow the instructions.<br>
-                    - Come back to ED-VOID
-                </p>
-                <p class="help">If you need help - visit our
-                    <a href="https://discord.gg/s7qchpj" target="_blank">Discord Server</a>
-                </p>
-            </div>
-        </div>
+
     </div>
 </template>
 
@@ -71,7 +58,7 @@
 <style lang="scss">
     @import '../styles/vars';
     #cmdr {
-        h3 { margin-top: 1rem}
+        h3 { margin-top: 1em}
         button.logout { float: right; margin: 0 }
     }
 </style>

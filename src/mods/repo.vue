@@ -405,48 +405,48 @@
 <style lang="scss">
     @import "../styles/vars";
     #repo {
-        header i.active { font-size: 1.4rem}
+        header i.active { font-size: 1.4em}
         .id {
             white-space: nowrap;
             font-family: 'Titillium Web', sans-serif;
             text-transform: none;
-            font-size: 1.2rem;
+            font-size: 1.2em;
             color: $cyan;
             &:before {
                 content: 'ID: '; font-family: 'Titillium Web', sans-serif;
                 text-transform: none;
-                font-size: 1.0rem;
+                font-size: 1.0em;
                 color: darken($cyan,15%);
             }
         }
-        h2 button { margin-left: 1rem; vertical-align: bottom }
+        h2 button { margin-left: 1em; vertical-align: bottom }
 
         #repo-reports {
-            .alert { font-size: 1.2rem; margin-top: 20vh }
+            .alert { font-size: 1.2em; margin-top: 20vh }
         }
 
         ul.search-results { display: block; margin: 0; padding: 0; }
         ul.search-results li {
-            display: block; margin: 0; padding: 1rem 0 2rem 0;
+            display: block; margin: 0; padding: 1em 0 2em 0;
             border-bottom: 1px solid $dark;
             border-top: 1px solid $dark;
             .actions {
-                margin: 0.5rem 0 0.9rem 0; line-height: 1.5rem;
-                button { padding-right: 1rem; color: darken($ui-act-fg, 25%); }
+                margin: 0.5em 0 0.9em 0; line-height: 1.5em;
+                button { padding-right: 1em; color: darken($ui-act-fg, 25%); }
             }
 
         }
 
         h1 { color: lighten($ui-text, 25%)}
         h2 { color: lighten($ui-text, 25%); }
-        h2 small { @include hcaps(); display: block; color: lighten($ui-text, 15%); margin-bottom: 0.4rem; }
+        h2 small { @include hcaps(); display: block; color: lighten($ui-text, 15%); margin-bottom: 0.4em; }
 
         .repo-link {
-            i {margin-right: 0.5rem}
-            a { padding: 0.3rem; display: inline-block }
+            i {margin-right: 0.5em}
+            a { padding: 0.3em; display: inline-block }
         }
         .user-text { white-space: pre-wrap; word-wrap: break-word;}
-        .rep-locked { @include hcaps(); font-size: 1rem; color: $purple}
+        .rep-locked { @include hcaps(); font-size: 1em; color: $purple}
     }
 
 </style>

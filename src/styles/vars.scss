@@ -39,14 +39,14 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
 @mixin hcaps { font-family: 'euro_capsregular', sans-serif; }
 @mixin ui-basic {
   display: inline-block;
-  line-height: 2.2rem;
+  line-height: 2.2em;
   white-space: nowrap;
-  //height: 2.2rem;
-  padding: 0 0.5rem;
+  //height: 2.2em;
+  padding: 0 0.5em;
   background: transparent;
   border: 1px solid darken($ui-fg, 25%);
   color: $ui-fg;
-  font-size: 1rem;
+  font-size: 1em;
   border-radius: 0;
   &:hover { border-color: darken($ui-act-fg, 25%); color: darken($ui-act-fg, 25%);}
   &.active {
@@ -54,7 +54,7 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
     border-color: $ui-act-fg;
     + label { color: $ui-act-fg }
   }
-  + label { @include hcaps(); margin: 0; font-size: 1rem; line-height: 1rem }
+  + label { @include hcaps(); margin: 0; font-size: 1em; line-height: 1em }
 }
 @mixin ui-input {
   width: 100%; display: block;
@@ -72,9 +72,9 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
   text-shadow: -2px -4px 0 rgba(0, 255, 240, .35), 2px 4px 0 rgba(255, 0, 230, .35);
   box-shadow: -2px -4px 0 0 rgba(0, 255, 240, .35), 2px 4px 0 0 rgba(255, 0, 230, .35);
 }
-@mixin redshift ($intense:0.25) {
+@mixin redshift($intense:0.25) {
   text-shadow: -3px 0 1px rgba(255, 0, 0, $intense), 3px 0 1px rgba(255, 0, 0, $intense);
-  box-shadow: -3px 0 1px rgba(255, 0, 0, $intense), 3px 0 1px rgba(255, 0, 0, $intense)//, -3px 0 1px rgba(255, 0, 0, 0.25) inset, 3px 0 1px rgba(255, 0, 0, 0.25) inset;
+  box-shadow: -3px 0 1px rgba(255, 0, 0, $intense), 3px 0 1px rgba(255, 0, 0, $intense) //, -3px 0 1px rgba(255, 0, 0, 0.25) inset, 3px 0 1px rgba(255, 0, 0, 0.25) inset;
 }
 @mixin clearfix() {
   &::after {
