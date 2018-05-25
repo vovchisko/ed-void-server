@@ -98,10 +98,10 @@ class Universe extends EE3 {
             flags: Status.Flags,
             pips: Status.Pips,
             fgroup: Status.FireGroup || 0,
-            lat: Status.Latitude || null,
-            lon: Status.Longitude || null,
-            alt: Status.Altitude || null,
-            head: Status.Heading || null,
+            lat: typeof Status.Latitude !== 'undefined' ? Status.Latitude : null,
+            lon: typeof Status.Longitude !== 'undefined' ? Status.Longitude : null,
+            alt: typeof Status.Altitude !== 'undefined' ? Status.Altitude : null,
+            head: typeof Status.Heading !== 'undefined' ? Status.Heading : null,
             _upd: new Date(Status.timestamp)
         });
         user._cmdr._ch = true; // but mark as changed

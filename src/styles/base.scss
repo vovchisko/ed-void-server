@@ -25,8 +25,8 @@ input, textarea, select {
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none !important; }
 pre { margin: 0; padding: 0; overflow: visible; font-size: 0.7em}
-html, body { height: 100%; background: $dark-deep; color: $ui-text;  }
-body { padding-top: 1px; font-size: 16px;  }
+html, body { height: 100%; background: $dark-deep; color: $ui-text; }
+body { padding-top: 1px; font-size: 16px; }
 //
 h1 { @include hcaps(); font-size: 1.4em; line-height: 1.5em; padding: 1em 0 0.5em 0; margin: 0;}
 h2 { @include hcaps(); font-size: 1.3em; line-height: 1.4em; padding: 0.8em 0 0.4em 0; margin: 0;}
@@ -44,7 +44,7 @@ u { text-decoration: none;}
 textarea {
   @include ui-basic();
   @include ui-input();
-  max-width: 100%; resize: vertical; max-height: 50vh;  min-height: 6.8em; height: 6.8em;
+  max-width: 100%; resize: vertical; max-height: 50vh; min-height: 6.8em; height: 6.8em;
   padding-top: 0.7em; padding-bottom: 0.7em;
   overflow: auto;
   white-space: initial;
@@ -91,7 +91,8 @@ button.link { border: 0 none !important; line-height: inherit; display: inline; 
 input { height: auto; }
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { appearance: none; }
-input, textarea {caret-color: $orange; }
+input, textarea { caret-color: $orange; }
+#app { padding-bottom: 2em; }
 //
 i { vertical-align: middle; display: inline-block; }
 .wide { width: 100%; display: block; }
@@ -167,7 +168,9 @@ hr {
   }
 }
 .ui { padding-bottom: 1em; position: relative; padding-top: 1em;
-  label { position: absolute; top: 0; left: 0; right: 0; line-height: 1em}
+  label { position: absolute; top: 0; left: 0; right: 0; line-height: 1em;
+    button { float: right; }
+  }
   button { margin-right: 5px; }
   select { @include ui-has-caret(); }
   *:focus + label { color: $ui-act-fg }
@@ -176,9 +179,10 @@ hr {
 }
 .starpos { color: darken($ui-text, 25%); margin-bottom: 0.5em }
 .starpos u { font-size: 0.8em; color: darken($ui-text, 25%); }
-
 .tip-box {
   padding-left: 3.5em;
-  & > i { text-align: center; float: left; margin-left: -3.5em; width: 3.5em; font-size: 1.75em; line-height: 2.2em }
+  & > .icon { text-align: center; float: left; margin-left: -3.5em; width: 3.5em; line-height: 2.2em;
+    i {font-size: 2em }
+  }
   & > div { line-height: 1.2em }
 }

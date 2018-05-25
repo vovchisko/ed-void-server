@@ -188,10 +188,10 @@
         .cords {
             .editable {
                 line-height: 2.4em;
-                b { font-size: 1.1em }
-                span { font-size: 1.4em }
-                span input { border-width: 0 0 1px 0}
-                span u { font-size: 1.4em }
+                b {  }
+                span {  }
+                span input { border-width: 0 0 1px 0;  }
+                span u {   }
             }
             input[type=number] { width: calc(100% - 1em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.4em; max-width: 10em }
             button { margin-top: 15px}

@@ -72,8 +72,8 @@
                 <div class="col-sm curr-location">
 
                     <h2>
-                        LOCATION DETAILS
-                        <button type="button" v-if="!repo.curr._id" class="link" v-on:click="curr_location()"><i class="i-globe"></i> Use Current</button>
+                        location
+                        <button type="button" v-if="!repo.curr._id" class="link" v-on:click="curr_location()"><i class="i-globe"></i> auto</button>
                     </h2>
 
                     <div class="ui">
@@ -125,14 +125,14 @@
                     </div>
 
                     <div class="tip-box">
-                        <i class="i-shield-check"></i>
+                        <div class="icon"><i class="i-shield-check"></i></div>
                         <div>This links is required for report validation.<br>Other CMDRs can't see it.</div>
                     </div>
                 </div>
 
                 <div class="col-sm">
                     <h2>
-                        additional links
+                        links
                         <button type="button" class="link"
                                 v-on:click="repo.curr.links.push('')"
                                 v-if="repo.curr.links.length < 5">
@@ -142,7 +142,7 @@
                     <div class="ui" v-for="(k,i) in repo.curr.links">
                         <input type="text" v-model="repo.curr.links[i]">
                         <label>link #{{i+1}}
-                            <button type="button" class="link" style="float: right" v-on:click="repo.curr.links.splice(i,1)">remove <i class="i-cross"></i></button>
+                            <button type="button" class="link" v-on:click="repo.curr.links.splice(i,1)">remove <i class="i-cross"></i></button>
                         </label>
                     </div>
                 </div>
