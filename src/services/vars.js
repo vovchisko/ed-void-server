@@ -20,6 +20,7 @@ export default {
             'G-CAN': 'Extreme Canyons',
             'G-TER': 'Extteme Terrain',
             'G-CRT': 'Crater Structure',
+            'G-OTR': 'Other',
         },
         'VF': {
             'V-NA': 'Not Identified',

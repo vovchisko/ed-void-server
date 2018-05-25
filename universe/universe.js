@@ -76,6 +76,8 @@ class Universe extends EE3 {
                     this.emit(EV_NET, uid, 'c_body', body);
                 }
 
+                await this.repo_search(user, {uid: user._id});
+
             })
             .catch((e) => {
                 console.log(`UNI::refill_user(${uid}) - can't refill user;`, e);
@@ -165,7 +167,7 @@ class Universe extends EE3 {
             if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec); //todo: << this is probably useless
             if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
         } catch (e) {
-            console.log('UNI.process()',rec.event, e);
+            console.log('UNI.process()', rec.event, e);
         }
         return null;
     }
@@ -194,6 +196,10 @@ class Universe extends EE3 {
             lat: '',
             lon: '',
             reporter: null,
+            screens: {
+                cockpit: '',
+                sys_map: ''
+            },
 
             //user can't edit
             parent_id: null, //for a few reports in the same place
@@ -248,17 +254,30 @@ class Universe extends EE3 {
             })
         }
 
+        if (!report.reporter) {
+            return this.emit(EV_NET, user._id, 'repo-submition', {
+                result: 0,
+                type: 'error',
+                msg: 'Reporter CMDR name is requierd',
+                desc: 'You can\'t submit report anonymously'
+            })
+        }
+
         r.type = report.type;
         r.sub_type = report.sub_type;
         r.subject = report.subject;
         r.system = report.system;
         r.body = report.body;
         r.description = report.description;
-        r.links = report.links;
         r.pub = report.pub;
         r.lat = report.lat;
         r.lon = report.lon;
         r.reporter = report.reporter;
+
+        r.links = report.links;
+
+        r.screens.cockpit = report.screens.cockpit;
+        r.screens.sys_map = report.screens.sys_map;
 
         //user can't edit
         r.starpos = report.starpos;
@@ -271,7 +290,8 @@ class Universe extends EE3 {
         this.emit(EV_NET, user._id, 'repo-submition', {
             result: 1,
             type: '',
-            msg: 'report submited'
+            msg: 'report submited successfully',
+            desc: 'report has been saved to your reports database'
         });
 
         this.emit(EV_NET, user._id, 'repo-current', r);

@@ -30,10 +30,12 @@
 
         <div id="repo-edit" v-if="c_tab==='edit'" class="container-fluid">
 
+            <hr class="bottom">
+
             <div class="row">
                 <div class="col-sm curr-entry">
 
-                    <h2 v-if="repo.curr._id">REP: {{repo.curr.type}}-<span class="id">{{repo.curr._id}}</span></h2>
+                    <h2 v-if="repo.curr._id">REPORT: <span class="id">{{repo.curr._id}}</span></h2>
                     <h2 v-if="!repo.curr._id">NEW REPORT</h2>
 
                     <div class="ui">
@@ -107,27 +109,65 @@
 
             </div>
 
+            <div class="row">
+                <div class="col-sm">
+                    <h2>
+                        screenshots
+                    </h2>
+                    <div class="ui">
+                        <input type="text" v-model="repo.curr.screens.cockpit">
+                        <label>cockpit screenshot link</label>
+                    </div>
+
+                    <div class="ui">
+                        <input type="text" v-model="repo.curr.screens.sys_map">
+                        <label>system map screenshot link</label>
+                    </div>
+
+                    <div class="tip-box">
+                        <i class="i-shield-check"></i>
+                        <div>This links is required for report validation.<br>Other CMDRs can't see it.</div>
+                    </div>
+                </div>
+
+                <div class="col-sm">
+                    <h2>
+                        additional links
+                        <button type="button" class="link"
+                                v-on:click="repo.curr.links.push('')"
+                                v-if="repo.curr.links.length < 5">
+                            <i class="i-file-add"></i> add link
+                        </button>
+                    </h2>
+                    <div class="ui" v-for="(k,i) in repo.curr.links">
+                        <input type="text" v-model="repo.curr.links[i]">
+                        <label>link #{{i+1}}
+                            <button type="button" class="link" style="float: right" v-on:click="repo.curr.links.splice(i,1)">remove <i class="i-cross"></i></button>
+                        </label>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <hr class="both">
+
             <div class="ui">
                 <button type="button" v-on:click="curr_submit()">{{repo.curr._id ? 'save changes' : 'submit report'}}</button>
                 <button type="button" v-on:click="curr_reset()">cancel</button>
             </div>
+
+            <hr class="top">
         </div>
 
         <div id="repo-view" v-if="c_tab==='view'">
 
             <div class="row">
-                <div class="col-sm">
-                    <h2>REP: {{repo.curr.submited | date}} <br>
+                <div class="col-sm listed">
+
+                    <h2>REP: {{repo.curr.submited | date}} <span class="id">{{repo.curr._id}}</span> <br>
                         <small>{{report_types[repo.curr.type]}}</small>
                     </h2>
-                </div>
-                <div class="col-sm">
-                    <h1>ID: {{repo.curr.type}}-{{repo.curr._id}}</h1>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm listed">
 
                     <em v-if="repo.curr.sub_type"><b>classified as:</b><span>{{report_sub_types[repo.curr.type][repo.curr.sub_type]}}</span></em>
                     <em><b>subject</b><span>{{repo.curr.subject}}</span></em>
@@ -149,11 +189,30 @@
                     <div class="user-text">{{repo.curr.description || '[ no details ]'}}</div>
                 </div>
 
-                <div class="desc col-sm-6">
+                <div class="desc col-sm-6 listed">
+                    <h3 v-if="repo.curr.links.length">additional links</h3>
+
+                    <div class="repo-link" v-for="(link , i) in repo.curr.links">
+                        <i class="i-link"></i> <a v-bind:href="link" target="_blank">{{link}}</a>
+                    </div>
+
+                    <br>
+
+                    <h3>screenshots</h3>
+
+                    <em><b>cockpit</b>
+                        <span v-if="repo.curr.screens.cockpit"><a v-bind:href="repo.curr.screens.cockpit" target="_blank"><i class="i-link"></i> {{repo.curr.screens.cockpit}}</a></span>
+                        <span v-if="!repo.curr.screens.cockpit"><i class="i-warning"></i> not specified</span>
+                    </em>
+
+                    <em><b>system</b>
+                        <span v-if="repo.curr.screens.sys_map"><a v-bind:href="repo.curr.screens.sys_map" target="_blank"><i class="i-link"></i> {{repo.curr.screens.sys_map}}</a></span>
+                        <span v-if="!repo.curr.screens.sys_map"><i class="i-warning"></i> not specified</span>
+                    </em>
 
                 </div>
-            </div>
 
+            </div>
         </div>
 
         <div id="repo-reports" v-if="c_tab==='home'">
@@ -203,6 +262,7 @@
                 </li>
             </ul>
         </div>
+
     </div>
 </template>
 
@@ -225,7 +285,6 @@
         },
         complete: false,
     };
-
 
     export default {
         name: "rep",
@@ -290,6 +349,7 @@
                 for (let st in this.report_sub_types[this.repo.curr.type])
                     if (st.includes('-NA')) return (this.repo.curr.sub_type = st);
             },
+
             curr_submit: function () {
                 this.state.loading = true;
                 this.state.alert.show = true;
@@ -347,13 +407,19 @@
     #repo {
         header i.active { font-size: 1.4rem}
         .id {
+            white-space: nowrap;
             font-family: 'Titillium Web', sans-serif;
             text-transform: none;
-            line-height: 0.8rem;
-            font-size: 1.1rem; }
-        .curr-entry {}
-        .curr-location h2 { }
-        .curr-location h2 button { margin-left: 1rem }
+            font-size: 1.2rem;
+            color: $cyan;
+            &:before {
+                content: 'ID: '; font-family: 'Titillium Web', sans-serif;
+                text-transform: none;
+                font-size: 1.0rem;
+                color: darken($cyan,15%);
+            }
+        }
+        h2 button { margin-left: 1rem; vertical-align: bottom }
 
         #repo-reports {
             .alert { font-size: 1.2rem; margin-top: 20vh }
@@ -375,6 +441,10 @@
         h2 { color: lighten($ui-text, 25%); }
         h2 small { @include hcaps(); display: block; color: lighten($ui-text, 15%); margin-bottom: 0.4rem; }
 
+        .repo-link {
+            i {margin-right: 0.5rem}
+            a { padding: 0.3rem; display: inline-block }
+        }
         .user-text { white-space: pre-wrap; word-wrap: break-word;}
         .rep-locked { @include hcaps(); font-size: 1rem; color: $purple}
     }

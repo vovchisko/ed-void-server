@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'icomoon';
   src:
-    url('fonts/icomoon.ttf?5478mi') format('truetype'),
-    url('fonts/icomoon.woff?5478mi') format('woff'),
-    url('fonts/icomoon.svg?5478mi#icomoon') format('svg');
+    url('fonts/icomoon.ttf?oio3lq') format('truetype'),
+    url('fonts/icomoon.woff?oio3lq') format('woff'),
+    url('fonts/icomoon.svg?oio3lq#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -37,6 +37,36 @@ i {
 }
 .i-chevron-down:before {
   content: "\e913";
+}
+.i-warning:before {
+  content: "\e927";
+}
+.i-link:before {
+  content: "\e926";
+}
+.i-url:before {
+  content: "\e926";
+}
+.i-shield-alert:before {
+  content: "\e920";
+}
+.i-shield-cross:before {
+  content: "\e921";
+}
+.i-lock:before {
+  content: "\e922";
+}
+.i-unlock:before {
+  content: "\e923";
+}
+.i-shield-check:before {
+  content: "\e924";
+}
+.i-cross:before {
+  content: "\e925";
+}
+.i-cancel:before {
+  content: "\e925";
 }
 .i-sync:before {
   content: "\e91f";

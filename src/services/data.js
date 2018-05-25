@@ -9,7 +9,12 @@ class DataStorage {
         this._null = {};
 
         this.app = {
-            overload: false
+            overload: false,
+        };
+
+
+        this.cfg = {
+            font_size: '14',
         };
 
         this.modes = {
@@ -18,6 +23,7 @@ class DataStorage {
                 'navi': 'nav',
                 'vass': 'scan',
                 'repo': 'poi',
+                'cfg': 'cfg',
                 'dev': 'dev'
             },
             c_mode: 'cmdr'
@@ -33,6 +39,10 @@ class DataStorage {
                 subject: '',
                 description: '',
                 links: [],
+                screens: {
+                    cockpit: '',
+                    sys_map: ''
+                }, //required
 
                 system: null,
                 body: null,
@@ -41,6 +51,7 @@ class DataStorage {
                 reporter: null,
                 pub: false, //other peopl can find it
                 locked: false, //report confirmed nad locked
+
 
                 //user can't edit
                 parent_id: null, //for a few reports in the same place
@@ -120,12 +131,17 @@ class DataStorage {
         //read wtoken
         let c_mode = localStorage.getItem('c_mode');
         if (c_mode) this.modes.c_mode = c_mode;
+
+        //read wtoken
+        let font_size = localStorage.getItem('font_size');
+        if (font_size) this.cfg.font_size = parseInt(font_size);
     }
 
     save() {
         //save some data to locastorage
         localStorage.setItem('wtoken', this.auth.wtoken);
         localStorage.setItem('c_mode', this.modes.c_mode);
+        localStorage.setItem('font_size', this.cfg.font_size);
     }
 
     nullify(section) {

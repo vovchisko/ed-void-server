@@ -24,15 +24,15 @@ input, textarea, select {
 * { box-sizing: border-box; }
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none !important; }
-pre { margin: 0; padding: 0; overflow: visible; line-height: 100%; font-size: 0.7em}
-html, body { height: 100%; background: $dark-deep; color: $ui-text; font-size: 16px; line-height: 100%; }
-body { padding-top: 1px; }
+pre { margin: 0; padding: 0; overflow: visible; font-size: 0.7rem}
+html, body { height: 100%; background: $dark-deep; color: $ui-text;  }
+body { padding-top: 1px; font-size: 16px;  }
 //
-h1 { @include hcaps(); font-size: 1.4em; padding: 1rem 0 0.5em 0; margin: 0;}
-h2 { @include hcaps(); font-size: 1.3em; padding: 0.8rem 0 0.4em 0; margin: 0;}
-h3 { @include hcaps(); font-size: 1.2em; padding: 0.7rem 0 0.4em 0; margin: 0;}
-h4 { @include hcaps(); font-size: 1.1em; padding: 0.6rem 0 0.3em 0; margin: 0; }
-h5 { @include hcaps(); font-size: 1em; padding: 0.6rem 0 0.3em 0; margin: 0; }
+h1 { @include hcaps(); font-size: 1.4rem; line-height: 1.5rem; padding: 1rem 0 0.5rem 0; margin: 0;}
+h2 { @include hcaps(); font-size: 1.3rem; line-height: 1.4rem; padding: 0.8rem 0 0.4rem 0; margin: 0;}
+h3 { @include hcaps(); font-size: 1.2rem; line-height: 1.3rem; padding: 0.7rem 0 0.4rem 0; margin: 0;}
+h4 { @include hcaps(); font-size: 1.1rem; line-height: 1.2rem; padding: 0.6rem 0 0.3rem 0; margin: 0; }
+h5 { @include hcaps(); font-size: 1rem; line-height: 1.1rem; padding: 0.6rem 0 0.3rem 0; margin: 0; }
 .caps { @include hcaps(); }
 //
 u { text-decoration: none;}
@@ -44,7 +44,7 @@ u { text-decoration: none;}
 textarea {
   @include ui-basic();
   @include ui-input();
-  max-width: 100%; resize: vertical; max-height: 50vh; line-height: 100%; min-height: 6.8rem; height: 6.8rem;
+  max-width: 100%; resize: vertical; max-height: 50vh;  min-height: 6.8rem; height: 6.8rem;
   padding-top: 0.7rem; padding-bottom: 0.7rem;
   overflow: auto;
   white-space: initial;
@@ -71,7 +71,7 @@ button {
     border-color: darken($ui-act-fg, 15%);
   }
 }
-button.link { border-color: transparent !important; line-height: inherit; display: inline-block; padding: 0; }
+button.link { border: 0 none !important; line-height: inherit; display: inline; padding: 0; }
 .clearfix { @include clearfix()}
 @keyframes glitched_text {
   0% { text-shadow: none; }
@@ -126,15 +126,24 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
   em > span { font-size: 1.0rem; color: lighten($ui-fg, 20%); width: 100%; padding: 0;}
   em > span > small { color: darken($ui-fg, 20%) }
 }
+hr {
+  border-width: 1px 0 0 0;
+  border-color: $ui-fg;
+  padding: 0;
+  margin: 5px 0;
+  &.top { margin-top: 15px;}
+  &.bottom { margin-bottom: 15px; }
+  &.both { margin-top: 15px; margin-bottom: 15px;}
+}
 //
 //
 // MESSAGE BOXES
 //
 .alert {
-  color: $ui-text; text-align: center; margin: 1rem; font-size: 1rem; line-height: 100%;
-  & > i { font-size: 2em; display: block; margin-bottom: 1em; }
-  & > div { @include hcaps(); font-size: 1em; }
-  & > small { font-size: 0.8em; margin-top: 0.3rem; display: block; text-transform: lowercase; }
+  color: $ui-text; text-align: center; margin: 1rem; font-size: 1rem;
+  & > i { font-size: 2rem; display: block; margin-bottom: 1rem; }
+  & > div { @include hcaps(); font-size: 1rem; }
+  & > small { font-size: 0.8rem; margin-top: 0.3rem; display: block; text-transform: lowercase; }
   &.info { color: $info;
     & > small { color: darken($info, 10%) }
   }
@@ -165,3 +174,9 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
 }
 .starpos { color: darken($ui-text, 25%); margin-bottom: 0.5rem }
 .starpos u { font-size: 0.8rem; color: darken($ui-text, 25%); }
+
+.tip-box {
+  padding-left: 3.5rem;
+  & > i { text-align: center; float: left; margin-left: -3.5rem; width: 3.5rem; font-size: 1.75rem; line-height: 2.2rem }
+  & > div { line-height: 1.2rem }
+}

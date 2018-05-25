@@ -3,25 +3,17 @@
         <header>
             <button class="logout link" v-on:click="signout()">logout <i class="i-chevron-right"></i></button>
         </header>
-        <div class="row">
-            <div class="col-sm props listed">
-                <h1>pilot profile</h1>
-                <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
-                <em><b>SYSTEM</b>
-                    <span>
+
+        <h1>pilot profile</h1>
+        <em><b>CMDR</b><span>{{cmdr.name}}</span></em>
+        <em><b>SYSTEM</b>
+            <span>
                         {{env.system ? env.system.name : 'N / A'}}
                         <small v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></small>
                     </span>
-                </em>
-                <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>
-            </div>
-            <div class="col-sm props listed">
-                <h1>account info</h1>
-                <em><b>EMAIL</b><span>{{user.email}}</span></em>
-                <em><b>API_KEY</b><span>{{user.api_key}}</span></em>
-            </div>
-        </div>
-
+        </em>
+        <em><b>LOC</b><span>{{env.body ? env.body.name : 'Deep Space'}}</span></em>
+        <br>
         <h3>ED-VOID CLIENT INSTALLATION</h3>
         <div class="row">
             <div class="col-sm-6">
@@ -46,7 +38,7 @@
 
     export default {
         name: 'cmdr',
-        data: () => { return {cmdr: Data.cmdr, user: Data.user, env: Data.env}},
+        data: () => { return {cmdr: Data.cmdr,  env: Data.env}},
         methods: {
             signout: function () {
                 Net.disconnect();
@@ -69,10 +61,7 @@
         extend(Data.cmdr, cmdr);
     });
 
-    Net.on('uni:user', (user) => {
-        Data.user.email = user.email;
-        Data.user.api_key = user.api_key;
-    });
+
 
     Net.on('uni:c_system', (system) => Vue.set(Data.env, 'system', system));
     Net.on('uni:c_body', (body) => Vue.set(Data.env, 'body', body));

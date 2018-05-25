@@ -149,7 +149,7 @@
         h5 { font-weight: normal; color: darken($ui-text, 15%)}
 
         .main em { color: lighten($ui-text, 15%); font-size: 1.05rem; line-height: 1.1rem}
-        .sub em { font-size: 0.8em; line-height: 100%}
+        .sub em { font-size: 0.8rem; }
 
         .scan:last-child { display: none; }
         .scan:first-child { display: block !important; }

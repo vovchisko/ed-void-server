@@ -8,6 +8,7 @@
             <vass v-if="data.modes.c_mode === 'vass'"></vass>
             <navi v-if="data.modes.c_mode === 'navi'"></navi>
             <repo v-if="data.modes.c_mode === 'repo'"></repo>
+            <cfg v-if="data.modes.c_mode === 'cfg'"></cfg>
             <dev v-if="data.modes.c_mode === 'dev'"></dev>
         </div>
 
@@ -31,13 +32,14 @@
     import Navi from './mods/navi.vue'
     import Vass from './mods/vass.vue'
     import Repo from './mods/repo.vue'
+    import Cfg from './mods/cfg.vue'
     import Dev from './mods/dev.vue'
 
     export default {
         name: 'app',
         data: () => {return {data: Data}},
         components: {
-            Navbar, Auth, Cmdr, Navi, Vass, Dev, Repo
+            Navbar, Auth, Cmdr, Navi, Vass, Repo, Cfg, Dev
         },
     }
 
