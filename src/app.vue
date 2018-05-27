@@ -43,6 +43,10 @@
         },
     }
 
+    Net.on('uni:overload', (is_overload) => {
+        Data.app.overload = is_overload;
+    });
+
     Vue.filter('nn', function (num, frac = 3, min_frac = 0, err = 'ERR!') {
         num = parseFloat(num);
         if (isNaN(num) || typeof num !== "number") return err;
@@ -59,10 +63,6 @@
 
     Vue.filter('isval', function (value) {
         return value ? value : 'FALSE';
-    });
-
-    Net.on('uni:overload', (is_overload) => {
-        Data.app.overload = is_overload;
     });
 
     Vue.filter('date', function(value) {

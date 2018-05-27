@@ -10,19 +10,20 @@ class Network extends EventEmitter3 {
         super();
         this.warn_unlistened = false;
         this.ws = null;
-        this.wtoken = null;
+        this.api_key = null;
         this.stat = {online: NS_OFFLINE, error: false};
         this.timer = null;
     }
 
-    init(wtoken) {
+    init(api_key = null) {
         const _net = this;
         this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
         this.stat.online = NS_CONNECTING;
+        this.api_key = api_key;
 
         this.ws.onopen = function () {
-            _net.wtoken = wtoken;
-            _net.send('auth', _net.wtoken);
+
+            _net.send('auth', _net.api_key);
             _net.stat.online = NS_ONLINE;
             _net.stat.error = false;
         };
@@ -31,7 +32,7 @@ class Network extends EventEmitter3 {
             let m = JSON.parse(msg.data);
             if (this.warn_unlistened && !_net._events[m.c]) console.warn('master::no_listeners', m.c, m.dat);
             _net.emit(m.c, m.dat);
-            _net.emit('net:any',m.c, m.dat);
+            _net.emit('net:any', m.c, m.dat);
         };
 
         this.ws.onclose = function (e) {
@@ -39,7 +40,7 @@ class Network extends EventEmitter3 {
             _net.stat.online = NS_OFFLINE;
             if (e.reason) return;
             _net.stat.error = true;
-            _net.timer = setTimeout(() => _net.init(_net.wtoken), 2000);
+            _net.timer = setTimeout(() => _net.init(_net.api_key), 2000);
         };
 
         this.ws.onerror = function (err) {
@@ -62,11 +63,13 @@ class Network extends EventEmitter3 {
 
 
     api(method, data) {
-        return fetch('http://' + window.location.hostname+  (location.port ? ':' + 4200 : '') + '/api/' + method, {
+        return fetch('http://' + window.location.hostname + (location.port ? ':' + 4200 : '') + '/api/' + method, {
             method: 'POST',
             body: JSON.stringify(data),
-            headers: {wtoken: this.wtoken}
-        }).then((res) => res.json());
+            headers: {api_key: this.api_key}
+        })
+            .then((res) => res.json())
+            .catch((e) => {console.log('ED-NET:: ', e)});
     }
 
 }

@@ -50,11 +50,7 @@ class Database {
     }
 
     generate_api_key() {
-        return 'A' + shortid.generate() + shortid.generate();
-    };
-
-    generate_token() {
-        return 'T' + shortid.generate() + shortid.generate();
+        return this.hash(shortid.generate() + shortid.generate());
     };
 
     async bind_collections() {
@@ -86,14 +82,14 @@ class Database {
 
     async wipe_data() {
         await this.db_void.collection('cmdrs').deleteMany({});
-
         await this.db_void.collection('reports').deleteMany({});
         await this.db_void.collection('bodies').deleteMany({});
         await this.db_void.collection('systems').deleteMany({});
-
     }
 }
 
 const DB = new Database();
+
+
 module.exports = DB;
 

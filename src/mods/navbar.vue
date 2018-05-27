@@ -101,7 +101,6 @@
         text-overflow: ellipsis;
         line-height: 2.2em;
         height: calc(2.2em + 2px);
-        font-size: 1em;
         color: lighten($ui-text, 15%);
         button { margin: 0 0.4em 0 0; }
         button.link { padding: 0 0.3em }

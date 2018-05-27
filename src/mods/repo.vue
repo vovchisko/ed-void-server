@@ -20,7 +20,7 @@
 
         <div class="alert modal" v-bind:class="[state.alert.type, state.loading ? 'progress':'']" v-show=" state.alert.show === true">
             <i class="i-ed-alert"></i>
-            <div>{{state.alert.msg}}</div>
+            <div>{{state.alert.text}}</div>
             <small>{{state.alert.desc}}</small>
             <div class="ui" v-if="!state.loading">
                 <button type="button" v-on:click="state.alert.show = false" v-if="!state.complete">roger that</button>
@@ -274,13 +274,12 @@
     import Vue from 'vue';
     import extend from 'deep-extend';
 
-    // todo: pass saveing-error-success through this object
     let state = {
         loading: false,
         alert: {
             show: false,
             type: '',
-            msg: 'nothing happened',
+            text: 'nothing happened',
             desc: '',
         },
         complete: false,
@@ -321,7 +320,7 @@
             get_recent: function () {
                 this.state.loading = true;
                 this.state.alert.show = true;
-                this.state.alert.msg = 'loading reports, please wait';
+                this.state.alert.text = 'loading reports, please wait';
                 this.state.alert.desc = '';
                 this.state.alert.type = 'info';
                 this.repo.reports.splice(0, this.repo.reports.length);
@@ -353,7 +352,7 @@
             curr_submit: function () {
                 this.state.loading = true;
                 this.state.alert.show = true;
-                this.state.alert.msg = 'processing report, please wait';
+                this.state.alert.text = 'processing report, please wait';
                 this.state.alert.desc = '';
                 this.state.alert.type = 'info';
                 this.state.complete = false;
@@ -380,7 +379,7 @@
     Net.on('uni:repo-submition', (dat) => {
         state.loading = false;
         state.alert.show = true;
-        state.alert.msg = dat.msg;
+        state.alert.text = dat.text;
         state.alert.desc = dat.desc;
         state.alert.type = dat.type || 'info';
         state.complete = false;
@@ -446,7 +445,7 @@
             a { padding: 0.3em; display: inline-block }
         }
         .user-text { white-space: pre-wrap; word-wrap: break-word;}
-        .rep-locked { @include hcaps(); font-size: 1em; color: $purple}
+        .rep-locked { @include hcaps();   color: $purple}
     }
 
 </style>

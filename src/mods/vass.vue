@@ -2,7 +2,7 @@
     <div id="vass">
         <header>VOID ADV. SURFACE SCANNER</header>
 
-        <div class="scan" v-for="s in recent" v-if="s.ScanType === 'Detailed'">
+        <div class="scan" v-for="s in recent">
             <h4>
                 <b>{{s.BodyName}}</b>
                 <div>
@@ -136,7 +136,7 @@
     #vass {
         h4 {
             text-transform: uppercase;font-size: 1.1em;margin: 10px 0 5px 0; padding: 5px; text-align: left; background: #100f0f;
-            b { font-size: 1em; }
+            b {  }
             div { text-align: right; font-size: 0.8em;}
             span { display: inline-block; margin-left: 1em }
             span.arrival {color: #d1d2a3; text-align: right;}

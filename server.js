@@ -12,7 +12,8 @@ global.PIPE_EVENTS = [
 exports = module.exports = server;
 
 const NodeStatic = require('node-static');
-const WSM = require('./universe/ws-manager');
+const WSM = require('./universe/services/ws-manager');
+const MailService = require('./universe/services/mailer');
 const app = new NodeStatic.Server('./dist', {cache: 0});
 
 function handle_request(req, res, cb) {
@@ -43,13 +44,15 @@ server.handle_request = handle_request;
 server.parse_json = parse_json;
 
 const tools = server.tools = require('./universe/tools');
-const cfg = server.cfg = require('./universe/config');
-const DB = server.DB = require('./universe/database');
+const cfg = server.cfg = require('./config');
+const EML = server.EML = new MailService(server.cfg.email);
+const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
 
 const action_signup = require('./universe/actions/signup');
 const action_signin = require('./universe/actions/signin');
 const action_record = require('./universe/actions/record');
+const action_passch = require('./universe/actions/passch');
 
 
 class Clients {
@@ -64,7 +67,7 @@ class Clients {
         this.wss_clients.name = 'WSM@CLS';
         this.wss_clients.auth = async (cmd, dat, callback) => {
             if (cmd !== 'auth') return callback(null);
-            let user = await UNI.get_user({wtoken: dat});
+            let user = await UNI.get_user({api_key: dat});
             if (user) { return callback(user._id); }
             else { callback(null); }
         };
@@ -154,7 +157,6 @@ class JCollector {
 const CLS = server.CLS = new Clients();
 const JCL = server.JCL = new JCollector();
 
-
 //
 // WS ON WEB LOGIN PROCEDURE
 //
@@ -169,6 +171,9 @@ require('http').createServer(function (request, response) {
 
     if (request.url === '/api/signin')
         return action_signin(request, response);
+
+    if (request.url === '/api/passch')
+        return action_passch(request, response);
 
     // STATIC
     request.addListener('end', function () {
@@ -211,7 +216,6 @@ function init() {
 
     console.log('http://localhost:' + cfg.main.port);
 }
-
 
 
 

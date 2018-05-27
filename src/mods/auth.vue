@@ -60,7 +60,7 @@
     export default {
         name: "auth",
         data: () => { return {auth: Data.auth, pass_c: '', sign_: 'in', msg: {type: '', text: WELCOME_IN}}},
-        created: function () { if (this.auth.wtoken) this.connect() },
+        created: function () { if (this.auth.api_key) this.connect() },
         methods: {
             sign: function (to = 'in') {
                 this.sign_ = to;
@@ -94,14 +94,14 @@
                             this.msg.text = dat.text;
                             return;
                         }
-                        this.auth.wtoken = dat.user.wtoken;
+                        this.auth.api_key = dat.user.api_key;
                         this.auth.pass = '';
                         this.connect();
                     });
             },
             connect: function () {
                 this.auth.is_logged = true;
-                Net.init(this.auth.wtoken);
+                Net.init(this.auth.api_key);
                 Data.save();
             }
         }
@@ -109,7 +109,7 @@
 
     Net.on('_close', (code, reason) => {
         if (reason === 'unauthorized') {
-            Data.auth.wtoken = '';
+            Data.auth.api_key = '';
             Data.auth.is_logged = false;
             Data.save();
         }

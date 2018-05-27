@@ -26,14 +26,13 @@ module.exports = function (req, res) {
             text: 'invalid email or pass'
         }));
 
-        if (!user.wtoken) {
-            user.wtoken = DB.generate_token();
+        if (!user.api_key) {
+            user.api_key = DB.generate_api_key();
             await DB.users.save(user);
         }
 
         let jdata = {
             result: 1, type: 'success', user: {
-                wtoken: user.wtoken,
                 api_key: user.api_key,
                 name: user.cmdr_name,
                 email: user.email

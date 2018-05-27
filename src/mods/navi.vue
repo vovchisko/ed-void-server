@@ -158,7 +158,7 @@
     // NAV MODULE
 
     #navi {
-        header { font-size: 1em}
+        header {  }
         .justified em { }
         .justified em > b { width: 30%}
         .justified em > span { width: 70%; text-align: left }
@@ -193,7 +193,7 @@
                 span input { border-width: 0 0 1px 0;  }
                 span u {   }
             }
-            input[type=number] { width: calc(100% - 1em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.4em; max-width: 10em }
+            input[type=number] { width: calc(100% - 1em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.2em; max-width: 13em }
             button { margin-top: 15px}
         }
         .location-data {

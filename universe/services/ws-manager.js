@@ -55,7 +55,7 @@ class WSM extends EE3 {
 
                             if (_self.clients[id]) {
                                 if (_self.clients[id]._c.length >= _self.cpu) {
-                                    _self.clients[id]._c[0].close(1000, 'other-client-comes');
+                                    _self.clients[id]._c[0].close(1000, 'other-client-connected');
                                 }
                             } else {
                                 _self.clients[id] = {

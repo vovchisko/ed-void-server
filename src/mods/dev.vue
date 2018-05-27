@@ -34,8 +34,7 @@
     }
 
     Net.on('net:any', (c, dat) => {
-
-        console.log(c, dat);
+        //console.log(c, dat);
     });
 
 

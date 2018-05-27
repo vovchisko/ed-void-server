@@ -28,11 +28,11 @@ pre { margin: 0; padding: 0; overflow: visible; font-size: 0.7em}
 html, body { height: 100%; background: $dark-deep; color: $ui-text; }
 body { padding-top: 1px; font-size: 16px; }
 //
-h1 { @include hcaps(); font-size: 1.4em; line-height: 1.5em; padding: 1em 0 0.5em 0; margin: 0;}
-h2 { @include hcaps(); font-size: 1.3em; line-height: 1.4em; padding: 0.8em 0 0.4em 0; margin: 0;}
-h3 { @include hcaps(); font-size: 1.2em; line-height: 1.3em; padding: 0.7em 0 0.4em 0; margin: 0;}
-h4 { @include hcaps(); font-size: 1.1em; line-height: 1.2em; padding: 0.6em 0 0.3em 0; margin: 0; }
-h5 { @include hcaps(); font-size: 1em; line-height: 1.1em; padding: 0.6em 0 0.3em 0; margin: 0; }
+h1 { @include hcaps(); font-size: 1.5em; padding: 1em 0 0.5em 0; margin: 0;}
+h2 { @include hcaps(); font-size: 1.4em; padding: 0.8em 0 0.4em 0; margin: 0;}
+h3 { @include hcaps(); font-size: 1.3em; padding: 0.7em 0 0.4em 0; margin: 0;}
+h4 { @include hcaps(); font-size: 1.2em; padding: 0.6em 0 0.3em 0; margin: 0; }
+h5 { @include hcaps(); font-size: 1.1em; padding: 0.6em 0 0.3em 0; margin: 0; }
 .caps { @include hcaps(); }
 //
 u { text-decoration: none;}
@@ -141,9 +141,9 @@ hr {
 // MESSAGE BOXES
 //
 .alert {
-  color: $ui-text; text-align: center; margin: 1em; font-size: 1em;
+  color: $ui-text; text-align: center; margin: 1em;
   & > i { font-size: 2em; display: block; margin-bottom: 1em; }
-  & > div { @include hcaps(); font-size: 1em; }
+  & > div { @include hcaps();  }
   & > small { font-size: 0.8em; margin-top: 0.3em; display: block; text-transform: lowercase; }
   &.info { color: $info;
     & > small { color: darken($info, 10%) }

@@ -4,7 +4,7 @@
 const dateformat = require('dateformat');
 const EE3 = require('eventemitter3');
 const extend = require('deep-extend');
-const DB = require('./database');
+const DB = require('./services/database');
 const server = require('../server');
 const pick = server.tools.pick;
 const pickx = server.tools.pickx;
@@ -62,7 +62,7 @@ class Universe extends EE3 {
                 this.emit(EV_NET, user._id, 'status', user._cmdr.status);
 
                 if (user.journal()) {
-                    let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(5);
+                    let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(20);
                     scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
                 }
 
@@ -164,7 +164,7 @@ class Universe extends EE3 {
             if (rec.event === 'Location') return this.proc_Location(cmdr, rec);
             if (rec.event === 'ApproachBody') return this.proc_ApproachBody(cmdr, rec);
             if (rec.event === 'LeaveBody') return this.proc_LeaveBody(cmdr, rec);
-            if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec); //todo: << this is probably useless
+            if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec);
             if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
         } catch (e) {
             console.log('UNI.process()', rec.event, e);
@@ -216,7 +216,7 @@ class Universe extends EE3 {
                 return this.emit(EV_NET, user._id, 'repo-submition', {
                     result: 0,
                     type: 'warn',
-                    msg: 'Report has been locked!',
+                    text: 'Report has been locked!',
                     desc: 'This has been verified and locked, and can`t be edited.'
                 })
             }
@@ -230,7 +230,7 @@ class Universe extends EE3 {
             return this.emit(EV_NET, user._id, 'repo-submition', {
                 result: 0,
                 type: 'error',
-                msg: 'Report Subject not specified!',
+                text: 'Report Subject not specified!',
                 desc: 'This field is required for htis type or reports'
             })
         }
@@ -240,7 +240,7 @@ class Universe extends EE3 {
             return this.emit(EV_NET, user._id, 'repo-submition', {
                 result: 0,
                 type: 'error',
-                msg: 'System not specified!',
+                text: 'System not specified!',
                 desc: 'Location section should contain valid system name'
             })
         }
@@ -249,7 +249,7 @@ class Universe extends EE3 {
             return this.emit(EV_NET, user._id, 'repo-submition', {
                 result: 0,
                 type: 'error',
-                msg: 'Reporter CMDR name is requierd',
+                text: 'Reporter CMDR name is requierd',
                 desc: 'You can\'t submit report anonymously'
             })
         }
@@ -258,7 +258,7 @@ class Universe extends EE3 {
             return this.emit(EV_NET, user._id, 'repo-submition', {
                 result: 0,
                 type: 'error',
-                msg: 'Reporter CMDR name is requierd',
+                text: 'Reporter CMDR name is requierd',
                 desc: 'You can\'t submit report anonymously'
             })
         }
@@ -290,7 +290,7 @@ class Universe extends EE3 {
         this.emit(EV_NET, user._id, 'repo-submition', {
             result: 1,
             type: '',
-            msg: 'report submited successfully',
+            text: 'report submited successfully',
             desc: 'report has been saved to your reports database'
         });
 
@@ -407,7 +407,7 @@ class Universe extends EE3 {
         let body_id = Universe.body_id(system_id, body_name);
         let b = await this.get_body(body_id);
 
-        //todo: shoudl we do socme cache like with cmdrs or users?
+        //todo: shoudl we do same cache like with cmdrs or users?
         if (b) return new BODY(b);
         return new BODY({
             _id: body_id,
@@ -495,7 +495,7 @@ class Universe extends EE3 {
 
         if (s) return new SYSTEM(s);
 
-        //todo: shoudl we do socme cache like with cmdrs or users?
+        //todo: shoudl we do same cache like with cmdrs or users?
         return new SYSTEM({
             _id: id,
             name: name,
@@ -692,6 +692,7 @@ class USER {
         this._id = null;
         this._ch = true;
         this.cmdr_name = null;
+        this.api_key = null;
         this.last_rec = new Date(0);
         this.cmdrs = [];
         this.online = false;
@@ -747,6 +748,11 @@ class USER {
         this._ch = true;
         UNI.emit(EV_NET, this._id, 'user', this);
         UNI.emit(EV_NET, this._id, 'cmdr', this);
+    }
+
+    touch(data = null) {
+        if (data) extend(this, data);
+        this._ch = true;
     }
 
     async save() {

@@ -12,10 +12,9 @@ class DataStorage {
             overload: false,
         };
 
-
         this.cfg = {
             font_size: '100%',
-            font_sizes_list: new Array(17).fill(0).map((x,i)=>{return i * 10 + 40 + '%'})
+            font_sizes_list: new Array(17).fill(0).map((x, i) => {return i * 10 + 40 + '%'})
         };
 
         this.modes = {
@@ -72,7 +71,7 @@ class DataStorage {
             is_logged: false,
             email: '',
             pass: '',
-            wtoken: ''
+            api_key: ''
         };
 
         this.cmdr = {
@@ -125,22 +124,20 @@ class DataStorage {
             }
         }
 
-        //read wtoken
-        let wtoken = localStorage.getItem('wtoken');
-        if (wtoken) this.auth.wtoken = wtoken;
 
-        //read wtoken
+        let api_key = localStorage.getItem('api_key');
+        if (api_key) this.auth.api_key = api_key;
+
         let c_mode = localStorage.getItem('c_mode');
         if (c_mode) this.modes.c_mode = c_mode;
 
-        //read wtoken
         let font_size = localStorage.getItem('font_size');
         if (font_size) this.cfg.font_size = font_size;
     }
 
     save() {
         //save some data to locastorage
-        localStorage.setItem('wtoken', this.auth.wtoken);
+        localStorage.setItem('api_key', this.auth.api_key);
         localStorage.setItem('c_mode', this.modes.c_mode);
         localStorage.setItem('font_size', this.cfg.font_size);
     }

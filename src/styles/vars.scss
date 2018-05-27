@@ -46,7 +46,6 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
   background: transparent;
   border: 1px solid darken($ui-fg, 25%);
   color: $ui-fg;
-  font-size: 1em;
   border-radius: 0;
   &:hover { border-color: darken($ui-act-fg, 25%); color: darken($ui-act-fg, 25%);}
   &.active {
@@ -54,7 +53,7 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
     border-color: $ui-act-fg;
     + label { color: $ui-act-fg }
   }
-  + label { @include hcaps(); margin: 0; font-size: 1em; line-height: 1em }
+  + label { @include hcaps(); margin: 0; }
 }
 @mixin ui-input {
   width: 100%; display: block;
