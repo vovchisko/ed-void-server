@@ -53,6 +53,8 @@ const action_signup = require('./universe/actions/signup');
 const action_signin = require('./universe/actions/signin');
 const action_record = require('./universe/actions/record');
 const action_passch = require('./universe/actions/passch');
+const action_everify = require('./universe/actions/everify');
+const action_passrst = require('./universe/actions/passrst');
 
 
 class Clients {
@@ -174,6 +176,19 @@ require('http').createServer(function (request, response) {
 
     if (request.url === '/api/passch')
         return action_passch(request, response);
+
+    if (request.url === '/api/everify')
+        return action_everify(request, response);
+
+    if (request.url === '/api/passrst')
+        return action_passrst(request, response);
+
+    if (request.url === '/app')
+        return app.serveFile('/index.html', 200, {}, request, response);
+
+    if (request.url === '/')
+        return app.serveFile('/home.html', 200, {}, request, response);
+
 
     // STATIC
     request.addListener('end', function () {

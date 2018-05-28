@@ -92,6 +92,10 @@ input { height: auto; }
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { appearance: none; }
 input, textarea { caret-color: $orange; }
+a {
+  cursor: pointer; color: darken($cyan, 5%); text-decoration: none;
+  &:hover { text-decoration: underline; color: $cyan}
+}
 #app { padding-bottom: 2em; }
 //
 i { vertical-align: middle; display: inline-block; }
@@ -143,7 +147,7 @@ hr {
 .alert {
   color: $ui-text; text-align: center; margin: 1em;
   & > i { font-size: 2em; display: block; margin-bottom: 1em; }
-  & > div { @include hcaps();  }
+  & > div { @include hcaps(); }
   & > small { font-size: 0.8em; margin-top: 0.3em; display: block; text-transform: lowercase; }
   &.info { color: $info;
     & > small { color: darken($info, 10%) }

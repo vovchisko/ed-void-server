@@ -79,7 +79,13 @@ function pickx(A, B) {
     }
 }
 
+function is_valid_email(email) {
+    let re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    return re.test(email);
+}
 
+
+module.exports.is_valid_email = is_valid_email;
 module.exports.pick = pick;
 module.exports.pickx = pickx;
 module.exports.checksum = checksum;

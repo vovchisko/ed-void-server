@@ -1,8 +1,11 @@
 "use strict";
 /*
     API v.0.2
-    Process records form cleint
+    Process change user passwrd using api_key and old password.
 */
+
+//todo: test it as well!
+
 
 const server = require('../../server');
 const UNI = require('../universe');
@@ -10,60 +13,44 @@ const DB = server.DB;
 
 module.exports = function (req, res) {
     server.handle_request(req, res, async (req, res, buffer) => {
-
-        let res_text = '';
-        let log = 'REC: ';
-
+        let result = {
+            result: 0,
+            type: 'error',
+            text: 'unknown error'
+        };
+        let log = 'PASS_CH: ';
         try {
-            let start = new Date().getTime();
             let dat = server.parse_json(buffer.toString());
-
-            if (!dat) res.end();
-
+            if (!dat) return res.end();
             let head = req.headers;
-
             let user = await UNI.get_user({api_key: head.api_key});
-
             if (user) {
                 if (user.pass === DB.hash(dat.curr_pass)) {
-                    if (!dat.new_pass)
-                        return res.end(JSON.stringify({
-                            result: 0,
-                            type: 'error',
-                            text: 'new password not specified'
-                        }));
-
-                    user.touch({
-                        pass: DB.hash(dat.new_pass),
-                        api_key: DB.generate_api_key(),
-                    });
-
-                    await user.save();
-                    return res.end(JSON.stringify({
-                        result: 1,
-                        type: 'info',
-                        text: 'password successfully changed'
-                    }));
+                    if (dat.new_pass && dat.new_pass.length > 3) {
+                        user.touch({
+                            pass: DB.hash(dat.new_pass),
+                            api_key: DB.some_hash(),
+                        });
+                        await user.save();
+                        result.result = 1;
+                        result.type = 'info';
+                        result.text = 'password successfully changed';
+                    } else {
+                        result.text = 'new pussard should contain atleast 3 chars';
+                    }
                 } else {
-                    return res.end(JSON.stringify({
-                        result: 0,
-                        type: 'error',
-                        text: 'invalid current pass'
-                    }));
+                    result.text = 'invalid current password';
                 }
             } else {
                 res.statusCode = 498;
-                res_text = 'invalid api-key';
-                log += res_text;
+                result.text = 'invalid api-key';
             }
         } catch (e) {
             res.statusCode = 500;
-            res_text = 'fail';
-            console.log(log, res_text, e);
+            result.text = 'operation failed';
         }
-
-        res.end(res_text);
-        if (log && server.cfg.rec_log) console.log(log + res_text);
+        res.end(JSON.stringify(result));
+        if (log && server.cfg.rec_log) console.log(log + result.text);
     });
 };
 

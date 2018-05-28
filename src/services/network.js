@@ -13,6 +13,7 @@ class Network extends EventEmitter3 {
         this.api_key = null;
         this.stat = {online: NS_OFFLINE, error: false};
         this.timer = null;
+
     }
 
     init(api_key = null) {
@@ -61,14 +62,19 @@ class Network extends EventEmitter3 {
         this.ws.send(m);
     };
 
-
     api(method, data) {
         return fetch('http://' + window.location.hostname + (location.port ? ':' + 4200 : '') + '/api/' + method, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {api_key: this.api_key}
         })
-            .then((res) => res.json())
+            .then((res) => {
+                return res.json().then((obj) => {
+                    console.log(`API: ${method} :: `, obj);
+                    return obj;
+                });
+
+            })
             .catch((e) => {console.log('ED-NET:: ', e)});
     }
 

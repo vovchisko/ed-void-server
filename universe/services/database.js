@@ -5,9 +5,6 @@ const shortid = require('shortid');
 const crypto = require('crypto');
 const extend = require('deep-extend');
 
-console.log(shortid.generate());
-
-
 class Database {
     constructor() {
         //databases links
@@ -49,8 +46,8 @@ class Database {
         return shortid.generate();
     }
 
-    generate_api_key() {
-        return this.hash(shortid.generate() + shortid.generate());
+    some_hash() {
+        return this.hash(shortid.generate());
     };
 
     async bind_collections() {

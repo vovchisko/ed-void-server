@@ -101,6 +101,7 @@
     Net.on('uni:user', (user) => {
         Data.user.email = user.email;
         Data.user.api_key = user.api_key;
+        Data.user.valid = user.valid;
     });
 
 </script>

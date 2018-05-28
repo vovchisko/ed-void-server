@@ -28,7 +28,6 @@ module.exports = function (req, res) {
                     await UNI.record(user, records[i], head.cmdr, head.gv, head.lng, records.length - (i + 1));
                     if (records[i].event === 'Status') log = ''; //don't log status
                 }
-
                 res.statusCode = 200;
                 res_text = records.length > 1 ? records.length + ' rec. proceed' : 'proceed';
                 res_text += ' / ' + (new Date().getTime() - start) + 'ms';

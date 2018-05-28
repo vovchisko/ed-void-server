@@ -11,28 +11,28 @@ module.exports = function (req, res) {
 
         let dat = server.parse_json(buffer.toString());
 
-        if (!dat) return res.end(JSON.stringify({result: 0, type: 'fail', text: 'request was failed'}));
-        if (!dat.email) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'email is required'}));
-        if (!dat.pass) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'password is required'}));
+        if (!dat) return res.end(JSON.stringify({result: 0, type: 'error', text: 'request was failed'}));
+        if (!dat.email) return res.end(JSON.stringify({result: 0, type: 'error', text: 'email is required'}));
+        if (!dat.pass) return res.end(JSON.stringify({result: 0, type: 'error', text: 'password is required'}));
 
         dat.email = dat.email.toLowerCase();
 
         const user = await UNI.get_user({email: dat.email});
 
-        if (!user) return res.end(JSON.stringify({result: 0, type: 'warn', text: 'invalid email or pass'}));
+        if (!user) return res.end(JSON.stringify({result: 0, type: 'error', text: 'invalid email or password'}));
         if (user.pass !== DB.hash(dat.pass)) return res.end(JSON.stringify({
             result: 0,
-            type: 'warn',
-            text: 'invalid email or pass'
+            type: 'error',
+            text: 'invalid email or password'
         }));
 
         if (!user.api_key) {
-            user.api_key = DB.generate_api_key();
+            user.api_key = DB.some_hash();
             await DB.users.save(user);
         }
 
         let jdata = {
-            result: 1, type: 'success', user: {
+            result: 1, type: 'info', user: {
                 api_key: user.api_key,
                 name: user.cmdr_name,
                 email: user.email
