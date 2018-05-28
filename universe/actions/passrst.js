@@ -23,6 +23,7 @@ module.exports = function (req, res) {
             if (!dat) return res.end();
 
             if (dat.secret) {
+                // verification procedure require only secret key
                 let user = await UNI.get_user({secret: dat.secret});
 
                 if (!dat.pass || dat.pass.length < 5)
@@ -43,16 +44,17 @@ module.exports = function (req, res) {
                     result.text = 'operation failed';
                 }
             } else {
-                if (!dat.email) return res.end(JSON.stringify({result: 0, type: 'error', text: 'invalid email'}));
-                dat.email = dat.email.toLowerCase();
-                let user = await UNI.get_user({email: dat.email});
-                if (!user) return res.end(JSON.stringify({result: 0, type: 'error', text: 'invalid email'}));
-
-                server.EML.send_passrst(dat.email, user.secret);
-
-                result.result = 1;
-                result.type = 'info';
-                result.text = 'We sent you email with rescue link.\nCheck your mail box.';
+                // to request new validation email need header with api_key and correct email in body
+                if (dat.email) {
+                    dat.email = dat.email.toLowerCase();
+                    let user = await UNI.get_user({email: dat.email});
+                    if (user && dat.email === user.email) {
+                        server.EML.send_passrst(dat.email, user.secret);
+                        result.result = 1;
+                        result.type = 'info';
+                        result.text = 'We sent a email with validation link to you.\nCheck your mail box.';
+                    } else result.text = 'invalid email or api-key';
+                } else result.text = 'invalid email or api-key';
             }
 
 
@@ -63,7 +65,7 @@ module.exports = function (req, res) {
             console.log(log, result.text, e);
         }
         res.end(JSON.stringify(result));
-        if (log && server.cfg.rec_log) console.log(log + result.text);
+        console.log(log + result.text);
     });
 };
 

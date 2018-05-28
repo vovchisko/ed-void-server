@@ -55,38 +55,39 @@ const action_record = require('./universe/actions/record');
 const action_passch = require('./universe/actions/passch');
 const action_everify = require('./universe/actions/everify');
 const action_passrst = require('./universe/actions/passrst');
+const action_apirst = require('./universe/actions/apirst');
 
 
 class Clients {
     constructor() {
-        this.wss_clients = null;
+        this.wss = null;
         this.port = null;
     }
 
     init(port) {
         this.port = port;
-        this.wss_clients = new WSM(this.port);
-        this.wss_clients.name = 'WSM@CLS';
-        this.wss_clients.auth = async (cmd, dat, callback) => {
+        this.wss = new WSM(this.port);
+        this.wss.name = 'WSM@CLS';
+        this.wss.auth = async (cmd, dat, callback) => {
             if (cmd !== 'auth') return callback(null);
             let user = await UNI.get_user({api_key: dat});
             if (user) { return callback(user._id); }
             else { callback(null); }
         };
 
-        this.wss_clients.on('disconnected', async (client) => {
+        this.wss.on('disconnected', async (client) => {
             let user = await UNI.get_user({_id: client.id});
             console.log(`USR: ${user._id} [CMDR ${user.cmdr_name}] leave`);
             user.online = false;
             user.save();
         });
 
-        this.wss_clients.on('message', async (client, c, dat) => {
+        this.wss.on('message', async (client, c, dat) => {
             let user = await UNI.get_user({_id: client.id});
             UNI.user_data(user, c, dat);
         });
 
-        this.wss_clients.on('connected', async (client) => {
+        this.wss.on('connected', async (client) => {
 
             let user = await UNI.get_user({_id: client.id});
             if (!user) return client.close();
@@ -97,13 +98,13 @@ class Clients {
             user.save();
         });
 
-        this.wss_clients.init();
+        this.wss.init();
         console.log(`CLIENTS APP WS [${this.port}]: OK`);
     }
 
     send_to(uid, c, dat) {
-        if (this.wss_clients && this.wss_clients.clients[uid]) {
-            this.wss_clients.clients[uid].c_send(c, dat);
+        if (this.wss && this.wss.clients[uid]) {
+            this.wss.clients[uid].c_send(c, dat);
         }
     }
 }
@@ -111,47 +112,47 @@ class Clients {
 
 class JCollector {
     constructor() {
-        this.wss_journals = null;
+        this.wss = null;
         this.port = 0;
     }
 
     init(port) {
         this.port = port;
-        this.wss_journals = new WSM(this.port);
-        this.wss_journals.cpu = 1;
-        this.wss_journals.name = 'WSM@JCL';
+        this.wss = new WSM(this.port);
+        this.wss.cpu = 1;
+        this.wss.name = 'WSM@JCL';
 
-        this.wss_journals.auth = async (cmd, dat, callback) => {
+        this.wss.auth = async (cmd, dat, callback) => {
             if (cmd !== 'auth') return callback(null);
             let juser = await UNI.get_user({api_key: dat});
             if (juser) { return callback(juser._id); }
             else { callback(null); }
         };
 
-        this.wss_journals.on('disconnected', async (client) => {
+        this.wss.on('disconnected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
             console.log(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] - journal disconnected`);
         });
 
-        this.wss_journals.on('connected', async (client) => {
+        this.wss.on('connected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
             if (!juser) return client.close();
 
             console.log(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] - journal connected`);
         });
 
-        this.wss_journals.on('message', async (client, c, dat) => {
+        this.wss.on('message', async (client, c, dat) => {
             let user = await UNI.get_user({_id: client.id});
             UNI.upd_status(user, dat.rec, dat.cmdr_name, dat.gv, dat.lng);
         });
 
-        this.wss_journals.init();
+        this.wss.init();
         console.log(`JCL: [${this.port}] - OK`);
     }
 
     send_to(uid, c, dat) {
-        if (this.wss_journals && this.wss_journals.clients[uid]) {
-            this.wss_journals.clients[uid].c_send(c, dat);
+        if (this.wss && this.wss.clients[uid]) {
+            this.wss.clients[uid].c_send(c, dat);
         }
     }
 }
@@ -164,33 +165,39 @@ const JCL = server.JCL = new JCollector();
 //
 require('http').createServer(function (request, response) {
 
+    let route_url = request.url.endsWith('/') ? request.url.slice(0, -1) : request.url;
+
+
     // API
-    if (request.url === '/api/record')
+    if (route_url === '/api/record')
         return action_record(request, response);
 
-    if (request.url === '/api/signup')
+    if (route_url === '/api/signup')
         return action_signup(request, response);
 
-    if (request.url === '/api/signin')
+    if (route_url === '/api/signin')
         return action_signin(request, response);
 
-    if (request.url === '/api/passch')
+    if (route_url === '/api/passch')
         return action_passch(request, response);
 
-    if (request.url === '/api/everify')
+    if (route_url === '/api/everify')
         return action_everify(request, response);
 
-    if (request.url === '/api/passrst')
+    if (route_url === '/api/passrst')
         return action_passrst(request, response);
 
-    if (request.url === '/app')
+    if (route_url === '/api/apirst')
+        return action_apirst(request, response);
+
+    if (route_url === '/app') // APP
         return app.serveFile('/index.html', 200, {}, request, response);
 
-    if (request.url === '/')
+    if (route_url === '/') // HOME
         return app.serveFile('/home.html', 200, {}, request, response);
 
 
-    // STATIC
+    // OTHER STATIC
     request.addListener('end', function () {
         app.serve(request, response, function (e, res) {
             if (e && (e.status === 404)) { // If the file wasn't found

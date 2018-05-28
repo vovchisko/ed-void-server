@@ -19,11 +19,9 @@
             <div class="ui">
                 <button type="button" v-on:click="signin()">Signin</button>
             </div>
-            <div class="ui">
-                <button type="button" v-on:click="sign('up')">Register Pilot</button>
-            </div>
 
             <div class="ui links">
+                <button type="button" class="link" v-on:click="sign('up')">New Pilot</button>
                 <button type="button" class="link" v-on:click="sign('reset')">reset password</button>
             </div>
         </form>
@@ -46,7 +44,6 @@
             <div class="ui">
                 <button type="button" v-on:click="signup()">Register</button>
             </div>
-
 
             <div class="ui links">
                 <button type="button" class="link" v-on:click="sign('in')">back to login</button>
@@ -88,9 +85,6 @@
                 <div class="ui" v-if="!reset.result">
                     <button type="button" v-on:click="request_reset()">send me a link</button>
                 </div>
-                <div class="ui" v-if="!reset.result">
-
-                </div>
 
                 <div class="ui links">
                     <button type="button" class="link" v-on:click="sign('in')">back to login</button>
@@ -98,7 +92,6 @@
 
             </div>
         </form>
-
 
     </div>
 </template>
@@ -132,6 +125,7 @@
                         .then((result) => {
                             if (result.result) {
                                 Data.auth.api_key = result.api_key;
+                                Data.c_mode = 'cfg';
                                 Data.save();
                                 Route.reset_route();
                             } else {
@@ -158,6 +152,8 @@
                             this.reset.result = result.result;
                             this.reset.text = result.text;
                             this.reset.type = result.type;
+                        }else{
+                            throw new Error('no result')
                         }
                     })
                     .catch((err) => {
@@ -175,7 +171,7 @@
                     return;
                 }
 
-                //todo: global spinner
+                //todo: global preloader required!
                 Net.api('passrst', {secret: this.secret, pass: this.reset.new_pass})
                     .then((result) => {
                         if (result.result) {
@@ -185,7 +181,6 @@
                         } else {
                             this.reset.text = result.text;
                             this.reset.type = result.type;
-
                         }
                     })
                     .catch((err) => {
@@ -216,6 +211,10 @@
                         }
                         this.signin();
                         this.sign = 'in';
+                    })
+                    .catch((e) => {
+                        this.msg.type = 'error';
+                        this.msg.text = 'undable to complete request. please try again later';
                     });
             },
             signin: function () {
@@ -229,6 +228,10 @@
                         this.auth.api_key = dat.user.api_key;
                         this.auth.pass = '';
                         this.connect();
+                    })
+                    .catch((e) => {
+                        this.msg.type = 'error';
+                        this.msg.text = 'undable to complete request. please try again later';
                     });
             },
             connect: function () {
@@ -246,7 +249,6 @@
             Data.save();
         }
     });
-
 
 </script>
 
@@ -270,7 +272,9 @@
                 text-transform: uppercase; margin: 10px 0 10px 0;
                 &.error { color: $ui-err;}
             }
-            .links { text-align: center; }
+            .ui.links { text-align: center;
+                button { display: inline-block; margin: 0 1em;  clear: none; width: auto}
+            }
         }
     }
 </style>

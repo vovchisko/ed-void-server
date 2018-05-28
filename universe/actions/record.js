@@ -44,7 +44,7 @@ module.exports = function (req, res) {
         }
 
         res.end(res_text);
-        if (log && server.cfg.rec_log) console.log(log + res_text);
+        if (log && server.cfg.main.rec_log) console.log(log + res_text);
     });
 };
 

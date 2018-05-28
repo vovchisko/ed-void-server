@@ -14,6 +14,8 @@ class MailService {
     }
 
     send_everify(email, secret) {
+        let link = `http://${this.cfg.domain}/app/#verify/${secret}`;
+
         this.transporter.sendMail({
             from: 'ED-VOID Account Service <ed.void.dev@gmail.com>',
             to: email,
@@ -23,7 +25,7 @@ class MailService {
 <p>
     We're glad to see you in our ranks.<br>
     To verify your account use link below:<br><br>
-    <a href="http://${this.cfg.domain}/#verify/${secret}" style="">http://${this.cfg.domain}/#verify/${secret}</a>
+    <a href="${link}" style="">${link}</a>
 </p>
 `
         }).then((info) => {
@@ -36,6 +38,8 @@ class MailService {
     }
 
     send_passrst(email, secret) {
+        let link = `http://${this.cfg.domain}/app/#reset/${secret}`;
+
         this.transporter.sendMail({
             from: 'ED-VOID Account Service <ed.void.dev@gmail.com>',
             to: email,
@@ -45,7 +49,7 @@ class MailService {
 <p>
     Seems you have a trouble with login.<br>
     To reset your password use link below:<br><br>
-    <a href="http://${this.cfg.domain}/#reset/${secret}" style="">http://${this.cfg.domain}/#reset/${secret}</a>
+    <a href="${link}">${link}</a>
 </p>
 `
         }).then((info) => {

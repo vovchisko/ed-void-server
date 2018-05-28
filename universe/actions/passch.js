@@ -4,9 +4,6 @@
     Process change user passwrd using api_key and old password.
 */
 
-//todo: test it as well!
-
-
 const server = require('../../server');
 const UNI = require('../universe');
 const DB = server.DB;
@@ -26,17 +23,21 @@ module.exports = function (req, res) {
             let user = await UNI.get_user({api_key: head.api_key});
             if (user) {
                 if (user.pass === DB.hash(dat.curr_pass)) {
-                    if (dat.new_pass && dat.new_pass.length > 3) {
+                    if (dat.new_pass && dat.new_pass.length >= 5) {
+
+                        //server.JCL.wss.drop_client(user._id);
+                        //server.CLS.wss.drop_client(user._id);
+
                         user.touch({
                             pass: DB.hash(dat.new_pass),
-                            api_key: DB.some_hash(),
+                           // api_key: DB.some_hash(),
                         });
                         await user.save();
                         result.result = 1;
                         result.type = 'info';
                         result.text = 'password successfully changed';
                     } else {
-                        result.text = 'new pussard should contain atleast 3 chars';
+                        result.text = 'new passwrd should contain atleast 5 chars';
                     }
                 } else {
                     result.text = 'invalid current password';
@@ -50,7 +51,7 @@ module.exports = function (req, res) {
             result.text = 'operation failed';
         }
         res.end(JSON.stringify(result));
-        if (log && server.cfg.rec_log) console.log(log + result.text);
+        console.log(log + result.text);
     });
 };
 

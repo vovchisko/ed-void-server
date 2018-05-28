@@ -15,7 +15,7 @@
                     <b class="head">{{navi.pos.head}}</b>
                 </div>
                 <div class="dest" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
-                    <b class="head" v-bind:class="navi.dest.align">{{navi.dest.head}}</b>
+                    <b class="head" v-bind:class="navi.dest.align" v-bind:style="navi.style_dest_pointer">{{navi.dest.head}}</b>
                 </div>
             </div>
             <div class="container-fluid">
@@ -36,11 +36,11 @@
                         <div v-if="navi.dest.enabled">
                             <em class="editable">
                                 <b>LAT</b>
-                                <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lat"><u>°</u></span>
+                                <span><input type="number" min="-90" max="90" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lat"><u>°</u></span>
                             </em>
                             <em class="editable">
                                 <b>LON</b>
-                                <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lon"><u>°</u></span>
+                                <span><input type="number" min="-180" max="180" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lon"><u>°</u></span>
                             </em>
                             <em class="editable" v-if="!env.body">
                                 <b>RADIUS</b>
@@ -139,14 +139,25 @@
 
         if (_navi.dest.enabled) {
 
-            let odest = (rw / 2) - (_navi.pos.head - _navi.dest.head) * 4;
-            _navi.style_dest['background-position-x'] = odest + 'px';
+            if(isNaN(_navi.dest.head)){
+                _navi.style_dest['background-position-x'] = '0px';
+                _navi.style_dest_pointer['transform'] = `translate(0px)`;
+                _navi.dest.align = 'err';
 
-            let alg = Math.abs(_navi.dest.head - _navi.pos.head);
+            }else{
+                let odest = (rw / 2) - (_navi.pos.head - _navi.dest.head) * 4;
+                _navi.style_dest['background-position-x'] = odest + 'px';
 
-            if (alg <= 3) _navi.dest.align = 'alg0';
-            if (alg > 3) _navi.dest.align = 'alg1';
-            if (alg > 10) _navi.dest.align = 'alg2';
+                let miss = _navi.dest.head - _navi.pos.head;
+                _navi.style_dest_pointer['transform'] = `translate(${miss/2}px)`;
+
+                let alg = Math.abs(miss);
+
+                if (alg <= 3) _navi.dest.align = 'alg0';
+                if (alg > 3) _navi.dest.align = 'alg1';
+                if (alg > 10) _navi.dest.align = 'alg2';
+            }
+
         }
     }
 
@@ -169,7 +180,7 @@
             .dest {
                 background: transparent url('../../public/assets/nav-ruler-dest.gif') 0 0; width: 100%;height: 7px;position: relative;transition: all linear 1000ms;
 
-                .head {width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #555;color: #555;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
+                .head {transition: transform linear 0.5s; width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #555;color: #555;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
                 .head:after {content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-bottom: 5px solid #555;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;top: -14px;}
                 .head:before {content: "vector";color: #676767;display: block;position: absolute;left: 50%;margin: 5px 0 0 -100px;top: -42px;width: 200px;text-align: center;text-transform: uppercase;font-size: 13px;}
                 .head.alg0 {border-color: #0098f9;color: #0098f9;}
@@ -181,6 +192,8 @@
                 .head.alg2 {border-color: red;color: red;}
                 .head.alg2:after {border-bottom-color: red;top: -14px;}
                 .head.alg2:before {content: 'wrong course vector!'; color: red; }
+                .head.err { @include semiglitch(); animation: glitched_text 1s infinite; }
+                .head.err:before { content: 'destination data invalid' }
 
             }
 

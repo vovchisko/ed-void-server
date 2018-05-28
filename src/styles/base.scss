@@ -22,6 +22,7 @@ input, textarea, select {
   }
 }
 * { box-sizing: border-box; }
+*::selection { background: $purple; color: $white}
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none !important; }
 pre { margin: 0; padding: 0; overflow: visible; font-size: 0.7em}
@@ -185,8 +186,13 @@ hr {
 .starpos u { font-size: 0.8em; color: darken($ui-text, 25%); }
 .tip-box {
   padding-left: 3.5em;
-  & > .icon { text-align: center; float: left; margin-left: -3.5em; width: 3.5em; line-height: 2.2em;
+  & > .icon { padding: 0.6em 0 0.3em 0; text-align: center; float: left; margin-left: -3.5em; width: 3.5em; line-height: 2.2em;
     i {font-size: 2em }
   }
-  & > div { line-height: 1.2em }
+  & > div { line-height: 1.2em;
+    h5 { display: block; text-transform: uppercase; }
+    b { display: block; text-transform: uppercase; padding: 0.3em 0 }
+    p { margin: 0; padding: 0; }
+    small { display: block; font-size: 0.9em; line-height: 1.2em }
+  }
 }

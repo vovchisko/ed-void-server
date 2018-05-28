@@ -91,6 +91,7 @@ class DataStorage {
         this.navi = {
             style_ruler: {'background-position-x': 0},
             style_dest: {'background-position-x': 0},
+            style_dest_pointer: {'transform': 'translateX(0)'},
             pos: {
                 lat: 0, lon: 0, alt: 0, head: 0
             },

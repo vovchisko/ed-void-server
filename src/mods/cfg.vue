@@ -15,34 +15,70 @@
                     <label>font size</label>
                 </div>
 
-                <h2>account passwrd
-                    <button type="button" class="link float-right" v-if="!pass_ch.toggle" v-on:click="pass_ch.toggle = true"><i class="i-chevron-down"></i> change</button>
-                    <button type="button" class="link float-right" v-if="pass_ch.toggle" v-on:click="pass_ch.toggle = false"><i class="i-chevron-up"></i> cancel</button>
-                </h2>
-                <div v-if="pass_ch.toggle">
-                    <div class="ui">
-                        <input type="password" v-model="pass_ch.c">
-                        <label>current password</label>
-                    </div>
-
-                    <div class="ui">
-                        <input type="password" v-model="pass_ch.n">
-                        <label>new password</label>
-                    </div>
-                    <div class="ui">
-                        <input type="password" v-model="pass_ch.nc">
-                        <label>confirm new password</label>
-                    </div>
-                    <button type="button" v-on:click="change_pass()">change password</button>
-                </div>
-
-
             </div>
 
             <div class="col-sm listed">
-                <h1>account info</h1>
-                <em><b>EMAIL</b><span>{{user.email}}</span></em>
-                <em><b>API_KEY</b><span>{{user.api_key}}</span></em>
+                <h2>account details</h2>
+                <div class="tip-box email">
+                    <div class="icon">
+                        <i class="i-shield-check valid" v-if="user.valid"></i>
+                        <i class="i-shield-alert not-valid" v-if="!user.valid"></i>
+                    </div>
+                    <div>
+                        <h5>{{user.email}}</h5>
+                        <p v-if="!user.valid">
+                            <button type="button" v-if="re_everify_result.result===0" v-on:click="re_everify()">request verification email</button>
+                            <small v-bind:class="['msg', re_everify_result.type]">{{re_everify_result.text}}</small>
+                        </p>
+                        <p v-if="user.valid">Email Verified</p>
+                    </div>
+                </div>
+
+                <div class="tip-box api-key">
+                    <div class="icon">
+                        <i class="i-barcode"></i>
+                    </div>
+                    <div>
+                        <h5>
+                            API-KEY &nbsp;
+                            <button type="button" class="link float-right" v-on:click="apikey_reset()"><i class="i-cross"></i> reset</button>
+                        </h5>
+                        <p>{{user.api_key}}</p>
+                    </div>
+                </div>
+
+                <div class="tip-box pass">
+                    <div class="icon">
+                        <i class="i-key"></i>
+                    </div>
+                    <div>
+                        <h5>password &nbsp;
+                            <button type="button" class="link float-right" v-if="!pass_ch.toggle" v-on:click="pass_ch.toggle = true; pass_ch.result.text = ''"><i class="i-chevron-down"></i> change</button>
+                            <button type="button" class="link float-right" v-if="pass_ch.toggle" v-on:click="pass_ch.toggle = false; pass_ch.result.text = ''"><i class="i-chevron-up"></i> cancel</button>
+                        </h5>
+                        <p v-if="!pass_ch.toggle && !pass_ch.result.text">*************</p>
+                        <p v-if="pass_ch.toggle || pass_ch.result.text" v-bind:class="['msg',pass_ch.result.type]">{{pass_ch.result.text}}</p>
+
+                        <div v-if="pass_ch.toggle">
+                            <div class="ui">
+                                <input type="password" v-model="pass_ch.c">
+                                <label>current password</label>
+                            </div>
+
+                            <div class="ui">
+                                <input type="password" v-model="pass_ch.n">
+                                <label>new password</label>
+                            </div>
+                            <div class="ui">
+                                <input type="password" v-model="pass_ch.nc">
+                                <label>confirm new password</label>
+                            </div>
+
+                            <button type="button" v-on:click="change_pass()">change password</button>
+                        </div>
+
+                    </div>
+                </div>
 
                 <br>
                 <h3>ED-VOID CLIENT INSTALLATION</h3>
@@ -70,7 +106,8 @@
             return {
                 cfg: Data.cfg,
                 user: Data.user,
-                pass_ch: {toggle: false, c: '', n: '', nc: '',}
+                re_everify_result: {result: 0, type: '', text: ''},
+                pass_ch: {toggle: false, c: '', n: '', nc: '', result: {result: 0, text: '', type: ''}}
             }
         },
         mounted: function () { this.font_size_change(); },
@@ -78,10 +115,45 @@
             change_pass() {
                 Net.api('passch', {curr_pass: this.pass_ch.c, new_pass: this.pass_ch.n})
                     .then((res) => {
-                        console.log('res: ', res);
+                        this.pass_ch.result.type = res.type;
+                        this.pass_ch.result.text = res.text;
+                        this.pass_ch.result.result = res.result;
+                        if (res.result) {
+                            this.pass_ch.toggle = false;
+                        }
                     })
                     .catch((e) => {
                         console.log('res: ', e);
+                    });
+            },
+            apikey_reset: function () {
+                if (!confirm(`This operation will disconnect all your devices and ED-VOID client and ask to re-login.\nAre you sure that you want to reset API-KEY?`)) return;
+                Net.api('apirst', {})
+                    .then((result) => {
+                        if (result.result) {
+                            location.reload();
+                        } else {
+                            alert("Unable to reset api-key\n" + result.text);
+                        }
+                    })
+                    .catch((err) => {
+                        console.log('email validation failed', err);
+                    });
+            },
+            re_everify: function () {
+                Net.api('everify', {email: this.user.email})
+                    .then((result) => {
+                        if (result.result) {
+                            this.re_everify_result.result = result.result;
+                            this.re_everify_result.text = result.text;
+                            this.re_everify_result.type = result.type;
+                            Data.save();
+                        } else {
+                            alert('invalid verification link');
+                        }
+                    })
+                    .catch((err) => {
+                        console.log('email validation failed', err);
                     });
             },
             signout: function () {
@@ -109,6 +181,26 @@
 <style lang="scss">
     @import '../styles/vars';
     #cfg {
+
+        .tip-box {
+            margin: 2em 0;
+            b > button.link { display: inline; line-height: inherit; vertical-align: inherit }
+            &.email {
+                .valid { color: lighten($green, 0%); }
+                .not-valid { color: darken($red, 15%); }
+            }
+            &.api-key {
+                .icon { color: $purple; }
+            }
+            &.pass {
+                .icon { color: $orange}
+                .msg { padding-top: 0.5em; text-transform: uppercase;
+                    &.error { color: $ui-err;}
+                    &.info { color: $green;}
+                }
+            }
+        }
+
         button.logout { float: right; margin: 0 }
     }
 </style>

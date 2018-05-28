@@ -27,6 +27,14 @@ class WSM extends EE3 {
         }
     }
 
+    drop_client(id) {
+        if (this.clients[id]) {
+            for (let i in this.clients[id]._c) {
+                this.clients[id]._c[i].close(1000, 'unauthorized');
+            }
+        }
+    }
+
     init() {
 
         let _self = this;

@@ -35,8 +35,8 @@
             <div class="row">
                 <div class="col-sm curr-entry">
 
-                    <h2 v-if="repo.curr._id">REPORT: <span class="id">{{repo.curr._id}}</span></h2>
-                    <h2 v-if="!repo.curr._id">NEW REPORT</h2>
+                    <h3 v-if="repo.curr._id">REPORT: <span class="id">{{repo.curr._id}}</span></h3>
+                    <h3 v-if="!repo.curr._id">NEW REPORT</h3>
 
                     <div class="ui">
                         <select v-model="repo.curr.type" v-on:change="curr_change_type()">
@@ -71,10 +71,10 @@
 
                 <div class="col-sm curr-location">
 
-                    <h2>
+                    <h3>
                         location
                         <button type="button" v-if="!repo.curr._id" class="link" v-on:click="curr_location()"><i class="i-globe"></i> auto</button>
-                    </h2>
+                    </h3>
 
                     <div class="ui">
                         <input v-model="repo.curr.system" placeholder="Not Specified">
@@ -111,9 +111,9 @@
 
             <div class="row">
                 <div class="col-sm">
-                    <h2>
+                    <h3>
                         screenshots
-                    </h2>
+                    </h3>
                     <div class="ui">
                         <input type="text" v-model="repo.curr.screens.cockpit">
                         <label>cockpit screenshot link</label>
@@ -126,19 +126,22 @@
 
                     <div class="tip-box">
                         <div class="icon"><i class="i-shield-check"></i></div>
-                        <div>This links is required for report validation.<br>Other CMDRs can't see it.</div>
+                        <div>
+                            <h5>private information</h5>
+                            <small>This links is required for report validation.<br>Other CMDRs can't see it.</small>
+                        </div>
                     </div>
                 </div>
 
                 <div class="col-sm">
-                    <h2>
+                    <h3>
                         links
                         <button type="button" class="link"
                                 v-on:click="repo.curr.links.push('')"
                                 v-if="repo.curr.links.length < 5">
                             <i class="i-file-add"></i> add link
                         </button>
-                    </h2>
+                    </h3>
                     <div class="ui" v-for="(k,i) in repo.curr.links">
                         <input type="text" v-model="repo.curr.links[i]">
                         <label>link #{{i+1}}
@@ -146,7 +149,6 @@
                         </label>
                     </div>
                 </div>
-
 
             </div>
 
@@ -237,9 +239,9 @@
 
                     <div class="row">
                         <div class="col-sm listed">
-                            <h2>REP: {{r.submited | date}}
+                            <h3>REP: {{r.submited | date}}
                                 <small>{{report_types[r.type]}}</small>
-                            </h2>
+                            </h3>
                             <div class="actions">
                                 <button class="link" v-on:click="select_report(r)"><i class="i-file"></i> report details</button>
                                 <span v-if="r.locked" class="rep-locked"><i class="i-bookmark"></i> protected</span>
@@ -415,10 +417,9 @@
                 content: 'ID: '; font-family: 'Titillium Web', sans-serif;
                 text-transform: none;
                 font-size: 1.0em;
-                color: darken($cyan,15%);
+                color: darken($cyan, 15%);
             }
         }
-        h2 button { margin-left: 1em; vertical-align: bottom }
 
         #repo-reports {
             .alert { font-size: 1.2em; margin-top: 20vh }
@@ -433,19 +434,20 @@
                 margin: 0.5em 0 0.9em 0; line-height: 1.5em;
                 button { padding-right: 1em; color: darken($ui-act-fg, 25%); }
             }
-
         }
 
-        h1 { color: lighten($ui-text, 25%)}
-        h2 { color: lighten($ui-text, 25%); }
-        h2 small { @include hcaps(); display: block; color: lighten($ui-text, 15%); margin-bottom: 0.4em; }
+        h3 {
+            color: lighten($ui-text, 25%);
+            button { margin-left: 1em; font-size: 0.8em; }
+            small { @include hcaps(); display: block; color: lighten($ui-text, 15%); margin-bottom: 0.4em; }
+        }
 
         .repo-link {
             i {margin-right: 0.5em}
             a { padding: 0.3em; display: inline-block }
         }
         .user-text { white-space: pre-wrap; word-wrap: break-word;}
-        .rep-locked { @include hcaps();   color: $purple}
+        .rep-locked { @include hcaps(); color: $purple}
     }
 
 </style>
