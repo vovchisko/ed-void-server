@@ -167,7 +167,6 @@ require('http').createServer(function (request, response) {
 
     let route_url = request.url.endsWith('/') ? request.url.slice(0, -1) : request.url;
 
-
     // API
     if (route_url === '/api/record')
         return action_record(request, response);
@@ -193,9 +192,8 @@ require('http').createServer(function (request, response) {
     if (route_url === '/app') // APP
         return app.serveFile('/index.html', 200, {}, request, response);
 
-    if (route_url === '/') // HOME
-        return app.serveFile('/home.html', 200, {}, request, response);
-
+    if (route_url === '/' || route_url === '') // HOME
+        return app.serveFile('/landing.html', 200, {}, request, response);
 
     // OTHER STATIC
     request.addListener('end', function () {
