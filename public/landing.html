@@ -33,17 +33,19 @@
     <div class="container text-center">
         <h1>
             ed-void
-            <small>beta</small>
+            <small>beta 2</small>
         </h1>
-        <h3>ultimate explorer's tool</h3>
-
-        <p class="top-line"> What you are looking in the void -<br>
-                             with void you will find</p>
-
+        <strong class="hcaps">ultimate explorer's tool</strong>
+        <p class="quote"> What you are looking in the void -<br>
+                          with void you will find</p>
         <a href="/app" class="btn btn-lg hcaps">Lift-off</a>
+        <div class="links">
+            <a href="#about" class="hcaps">about ed-void</a>
+            <a href="#how-to" class="hcaps">how to start</a>
+            <a href="#changelog" class="hcaps">release notes</a>
 
-        <a class="arrow" href="#about">Read more</a>
-
+            <p class="warning"><b>30th May 2018 ED-VOID has been updated!</b><br>All data was removed, including your profile data.<br>Please, create new account and download new client.</p>
+        </div>
     </div>
 
 </section>
@@ -51,44 +53,114 @@
     <div class="container">
         <div class="row">
             <div class="col-sm">
-                <h3>About ED-VOID</h3>
             </div>
             <div class="col-sm">
+                <h1>ED-VOID IS...</h1>
+
+                <p>A tool designed by explorers for explorers. It helps you with scanning stellar bodies, reporting POI and stellar anomalies or planetary features, navigation, reporting your exploration data,
+                   and get extended body information, based on existing reports.</p>
+
+                <p>After Beta2 update ED-VOID also collect market and POI-reporting data to use it in coming updates.</p>
+
+                <h4>What is next?</h4>
                 <p>
-                    ED-VOID is a tool designed for explorers. It helps you with scaning stellar boides, navigation,
-                    reporting your exploreation data, and get extended body information, based on existing reports.
-                </p>
-                <p>For now ED-VOID in beta-testing stage. We collecting data, building database structure and working on
-                   upcoming data analyzing tools.
+                    Currently we are collecting data and developing analytic system to predict possibility of life on the planets based on existing reports, exploration data and body characteristics. The more data we
+                    collect - as more accurate result we get.
                 </p>
 
             </div>
         </div>
-
+    </div>
+</section>
+<section id="how-to">
+    <div class="container">
         <div class="row">
             <div class="col-sm">
-                <h3>How to start</h3>
+                <h2 class="side-title">How to start</h2>
             </div>
             <div class="col-sm">
-                <p>
-                    - Register New Pilot.<br>
-                    - Download Client App.<br>
-                    - Go back web-app and enjoy.<br>
+                <p class="steps hcaps">
+                    <span>#1</span> Register <a href="/app" class="hcaps">new pilot</a>.<br>
+                    <span>#2</span> Download and Run Client App.<br>
+                    <span>#3</span> Go to the <a href="/app" class="hcaps">VOID!</a><br>
                 </p>
                 <p>
-                    Link for downloading ED-VOID client always available in your profile. And your API-key as well.
-                </p>
-                <p class="links">
-                    If you have any questions or maybe need some help
-                    - visit our <a href="https://discord.gg/s7qchpj" target="_blank">Discord Server</a>
+                    <a href="/download/ed-void-client.zip" class="btn btn-lg download">
+                        <span class="hcaps">download Client</span>
+                        <small>ed-void-client.zip [ 8.6 mb ]</small>
+                    </a>
                 </p>
 
+                <h4>Need help?</h4>
+                <p class="links">
+                    If you have any questions or maybe need some help - visit our discord channel. We always glad to see new pilots!
+                    <a href="https://discord.gg/s7qchpj" target="_blank" class="ext-link">
+                        <img src="landing/discord-logo.svg" class="img-icon">
+                        ED-VOID Channel
+                    </a>
+                </p>
+
+                <h4>3rd party developer?</h4>
+                <p>
+                    ED-VOID Client is open-source project. Interested how it works? Or maybe You have some ideas how to make tool better - come around. Contributors always welcome
+                </p>
+                <p>
+                    <a class="ext-link" href="https://github.com/vovchisko/ed-void-client" target="_blank">
+                        <img src="landing/github-logo.svg" class="img-icon">
+                        ED-VOID Client on GitHub
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="changelog">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <h2 class="side-title">dev: changes log</h2>
+            </div>
+            <div class="col-sm">
+                <h2 class="version">version 0.2 Beta</h2>
+                <ul>
+                    <li class="title">New</li>
+                    <li>POI report system</li>
+                    <li>Brand new client app - blazing fast and not affect machine performance!</li>
+                    <li>Client now automatically retrieve api-key and lookup for journals folder.</li>
+                    <li>Run ED-VOID on multiple devices - it syncs automatically.</li>
+                    <li class="title">Brand New UI.</li>
+                    <li>Fully-responsive layout for any device.</li>
+                    <li>Mobile-app-friendly: Add ED-VOID to home screen through browser menu and work with ED-VOID like with regular mobile app.</li>
+                    <li>Ability to change UI & Text scale for each device.</li>
+                    <li class="title">Server</li>
+                    <li>Backend was re-designed from scratch.</li>
+                    <li>WS Connection between server-journal-client allow to react on events instantly.</li>
+                    <li>Databases with market, POI, shipyard and stellar bodies for future updates and analyze system.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                Powered By ED-VOID team<br>
+                <a href="https://twitter.com/CmdrRitaMertens" target="_blank">CMDR Rita Mertens</a>
+                and
+                <a href="https://twitter.com/cmdrsleeprunner" target="_blank">CMDR Sleep Runner</a>
+
+                <br>
+                <br>
+                <a><img src="landing/vue-logo.svg" class="img-icon"> with Vue.JS and Love</a>
+            </div>
+            <div class="col-sm">
                 <p class="disclamer">
-                    Unfortunately, we are not part of Frontier Developments Plc. development team.
-                    We using assets from original game to make people feel more comfortable playeing
+                    Unfortunately, we are not a part of Frontier Developments Plc. development team.
+                    We use assets from original game to make people feel more comfortable playing
                     Elite Dangerous. All right on Elite Dangerous and assets belongs to Frontier Dev Plc.
                 </p>
-
             </div>
         </div>
     </div>

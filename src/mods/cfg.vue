@@ -83,7 +83,7 @@
                 <br>
                 <h3>ED-VOID CLIENT INSTALLATION</h3>
                 <p class="help">
-                    - Download <a href="download/ed-void-journal.zip">Jouranl Client [8.6Mb]</a><br>
+                    - Download <a href="download/ed-void-client.zip">ED-VOID Client [8.6Mb]</a><br>
                     - Run and follow the instructions.<br>
                     - Come back to ED-VOID
                 </p>
@@ -99,6 +99,7 @@
 <script>
     import Data from '../services/data';
     import Net from '../services/network';
+    import Vue from 'vue';
 
     export default {
         name: 'cfg',
@@ -174,6 +175,12 @@
         Data.user.email = user.email;
         Data.user.api_key = user.api_key;
         Data.user.valid = user.valid;
+        Data.user.dev = user.dev;
+
+        if (user.dev) {
+            // user in dev mode
+            Vue.set(Data.modes.modes, 'dev' , 'dev');
+        }
     });
 
 </script>

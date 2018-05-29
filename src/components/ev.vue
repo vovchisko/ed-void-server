@@ -26,7 +26,9 @@
 </script>
 
 <style lang="scss">
+    @import '../styles/vars';
+
     .ev {
-        margin: 0.5em 0;
+        padding: .5em 0;
     }
 </style>

@@ -24,7 +24,6 @@ class DataStorage {
                 'vass': 'scan',
                 'repo': 'poi',
                 'cfg': 'cfg',
-                'dev': 'dev'
             },
             c_mode: 'cmdr'
         };
@@ -85,7 +84,9 @@ class DataStorage {
 
         this.user = {
             email: 'n/a',
-            api_key: 'n/a'
+            api_key: 'n/a',
+            valid: null,
+            dev: false,
         };
 
         this.navi = {

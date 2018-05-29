@@ -54,7 +54,8 @@ class Universe extends EE3 {
                 this.emit(EV_NET, user._id, 'user', {
                     email: user.email,
                     api_key: user.api_key,
-                    valid: user.valid
+                    valid: user.valid,
+                    dev: user.dev,
                 });
 
                 if (!user._cmdr) return;

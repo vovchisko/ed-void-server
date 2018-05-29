@@ -54,6 +54,14 @@
     @import "../styles/vars";
     #vass {
 
+        .ev {
+            .head { margin: 0 -5px 0.8em -5px; padding: 0.8em 5px 0.4em 5px;
+                background: darken($ui-bg, 2%); }
+
+            padding: 1em 0;
+
+        }
+
         .main em { color: lighten($ui-text, 15%); font-size: 1.05em; line-height: 1.1em}
         .sub em { font-size: 0.8em; }
 

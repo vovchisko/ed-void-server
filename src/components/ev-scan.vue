@@ -1,18 +1,17 @@
 <template>
     <div class="ev scan">
-        <h3>{{s.BodyName}}</h3>
-        <div>
-            <span class="arrival">ARR: {{s.DistanceFromArrivalLS | nn(0)}} ls</span>
-            <span class="star" v-show="s.StarType">[ STAR ]</span>
-            <span class="planet" v-show="s.PlanetClass && !s.Landable">[ BODY ]</span>
-            <span class="landable" v-show="s.PlanetClass && s.Landable">[ BODY / LANDABLE ]</span>
-            <span class="value" v-if="s.EstimatedValue">Value: {{s.EstimatedValue | nn(0)}} Cr</span>
+        <div class="head">
+            <h2>{{s.BodyName}}</h2>
+            <h4 class="star" v-show="s.StarType">{{s.StarType}}</h4>
+            <h4 class="planet" v-show="s.PlanetClass && !s.Landable">{{s.PlanetClass}}</h4>
+            <h4 class="landable" v-show="s.PlanetClass && s.Landable">{{s.PlanetClass}}</h4>
+            <h5 class="arrival">arrival: {{s.DistanceFromArrivalLS | nn(0)}} ls</h5>
+            <h5 class="value" v-if="s.EstimatedValue">est.value: {{s.EstimatedValue | nn(0)}} Cr</h5>
         </div>
         <div class="container-fluid">
             <div v-show="s.StarType" class="row">
                 <div class="col-sm">
                     <div class="main">
-                        <em><b>Class</b><span>{{s.StarType}}</span></em>
                         <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
                         <em><b>Solar Masses</b><span>{{s.StellarMass | nn(4)}}</span></em>
                         <em><b>Solar Radius</b><span>{{s.Radius / 696000000 | nn(4)}}</span></em>
@@ -34,7 +33,6 @@
             <div v-if="s.PlanetClass" class="row">
                 <div class="col-sm">
                     <div class="main">
-                        <em><b>Planet Class</b><span>{{s.PlanetClass}}</span></em>
                         <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
                         <em><b>Tidal Lock</b><span v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
                         <em><b>Volcanism</b><span v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
@@ -59,7 +57,6 @@
 
                     <h5 v-if="s.AtmosphereComposition">Atmosphere Composition</h5>
                     <em v-for="acomp in s.AtmosphereComposition"><b>{{acomp.Name}}</b><span>{{acomp.Percent | nn(2,2)}} <u>%</u></span></em>
-
 
                     <div class="sub materials" v-if="s.Materials">
                         <h5>Materials</h5>
@@ -109,6 +106,18 @@
     }
 </script>
 
-<style>
-
+<style lang="scss">
+    @import '../styles/vars';
+    .ev.scan {
+        .head {
+            padding-bottom: 0.8em;
+            h2 { padding: 0; color: lighten($ui-text, 20%) }
+            h4 { padding: 0.05em 0;
+                &.star { color: $yellow }
+                &.planet { color: $orange }
+                &.landable { color: $cyan }
+            }
+            h5 { padding: 0.05em 0; }
+        }
+    }
 </style>
