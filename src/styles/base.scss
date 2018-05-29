@@ -27,7 +27,7 @@ input, textarea, select {
 *:focus, *:active { outline: none !important; }
 pre { margin: 0; padding: 0; overflow: visible; font-size: 0.7em}
 html, body { height: 100%; background: $dark-deep; color: $ui-text; }
-body { padding-top: 1px; font-size: 16px; }
+body { padding-top: 1px; font-size: 16px; line-height: 1.1em }
 //
 h1 { @include hcaps(); font-size: 1.5em; padding: 1em 0 0.5em 0; margin: 0;}
 h2 { @include hcaps(); font-size: 1.4em; padding: 0.8em 0 0.4em 0; margin: 0;}
@@ -97,6 +97,7 @@ a {
   cursor: pointer; color: darken($cyan, 5%); text-decoration: none;
   &:hover { text-decoration: underline; color: $cyan}
 }
+.float-right {float: right }
 #app { padding-bottom: 2em; }
 //
 i { vertical-align: middle; display: inline-block; }
@@ -132,6 +133,7 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
   em > span { font-size: 1.0em; color: lighten($ui-fg, 20%); width: 100%; padding: 0;}
   em > span > small { color: darken($ui-fg, 20%) }
 }
+.solid-word { white-space: nowrap; }
 hr {
   border-width: 1px 0 0 0;
   border-color: $ui-fg;

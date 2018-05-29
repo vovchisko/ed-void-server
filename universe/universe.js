@@ -63,7 +63,10 @@ class Universe extends EE3 {
                 this.emit(EV_NET, user._id, 'status', user._cmdr.status);
 
                 if (user.journal()) {
-                    let scans = user.journal().find({event: 'Scan'}).sort({timestamp: -1}).limit(20);
+                    let scans = user.journal()
+                        .find({event: {$in: ['Scan', 'FSDJump']}})
+                        .sort({timestamp: -1})
+                        .limit(25);
                     scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
                 }
 
@@ -415,8 +418,9 @@ class Universe extends EE3 {
             sys_id: sys._id, // or by sys id
             sys_name: sys.name, // to make search by system easy
             starpos: sys.starpos.slice(), // to make search by pos easy
-            name: con.ED_CAPS(body_name),
-            short_name: con.ED_CAPS(body_name).replace(sys.name, '').trim() || FIRST_SYS_OBJ,
+            name: con.LOW_CASE(body_name),
+            name_raw: body_name,
+            short_name: con.LOW_CASE(body_name).replace(sys.name, '').trim() || FIRST_SYS_OBJ,
             type: null,
         });
     }
@@ -517,11 +521,11 @@ class Universe extends EE3 {
      * @returns {string} Cool System ID
      */
     static system_id(name, starpos) {
-        return con.ED_CAPS(name) + SEP_SYSTEM + starpos.map(x => Math.round(x * 32)).join(SEP_COORD);
+        return con.LOW_CASE(name) + SEP_SYSTEM + starpos.map(x => Math.round(x * 32)).join(SEP_COORD);
     }
 
     static body_id(system_id, body_name) {
-        let n = con.ED_CAPS(body_name).replace(system_id.split(SEP_SYSTEM)[0], '').trim();
+        let n = con.LOW_CASE(body_name).replace(system_id.split(SEP_SYSTEM)[0], '').trim();
         return system_id + SEP_BODY + (n ? n : FIRST_SYS_OBJ);
     }
 
@@ -547,7 +551,7 @@ class BODY {
         if (rec.PlanetClass) this.type = 'planet';
 
         pickx(rec, this,
-            ['BodyName', 'name', con.ED_CAPS],
+            ['BodyName', 'name', con.LOW_CASE],
             ['BodyName', 'name_raw'],
             ['BodyID', 'body_id'],
             ['DistanceFromArrivalLS', 'arrival'],
@@ -641,7 +645,7 @@ class SYSTEM {
 
     append(cmdr, rec) {
         pickx(rec, this,
-            ['StarSystem', 'name', con.ED_CAPS],
+            ['StarSystem', 'name', con.LOW_CASE],
             ['StarSystem', 'name_raw'],
             ['StarPos', 'starpos', arr => arr.map((x) => {return Math.floor(x * 32)})],
             ['SystemSecurity', 'security'],

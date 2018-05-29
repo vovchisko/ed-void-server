@@ -99,7 +99,7 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        line-height: 2.2em;
+        line-height: 2.4em;
         height: calc(2.2em + 2px);
         color: lighten($ui-text, 15%);
         button { margin: 0 0.4em 0 0; }

@@ -7,8 +7,11 @@ const AU = 149597870700; //m?
 
 const convert = {
 
-    ED_CAPS(x) {
+    UP_CASE(x) {
         return x.toUpperCase();
+    },
+    LOW_CASE(x) {
+        return x.toLowerCase();
     },
     ED_ID(x) {
         return x.toLowerCase().replace(/ /g, '_');

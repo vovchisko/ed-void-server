@@ -14,7 +14,7 @@
                     </select>
                     <label>font size</label>
                 </div>
-
+                <small>This option will be applied only for this device.</small>
             </div>
 
             <div class="col-sm listed">
@@ -41,7 +41,7 @@
                     <div>
                         <h5>
                             API-KEY &nbsp;
-                            <button type="button" class="link float-right" v-on:click="apikey_reset()"><i class="i-cross"></i> reset</button>
+                            <button type="button" class="link" v-on:click="apikey_reset()"><i class="i-cross"></i> reset</button>
                         </h5>
                         <p>{{user.api_key}}</p>
                     </div>
@@ -53,8 +53,8 @@
                     </div>
                     <div>
                         <h5>password &nbsp;
-                            <button type="button" class="link float-right" v-if="!pass_ch.toggle" v-on:click="pass_ch.toggle = true; pass_ch.result.text = ''"><i class="i-chevron-down"></i> change</button>
-                            <button type="button" class="link float-right" v-if="pass_ch.toggle" v-on:click="pass_ch.toggle = false; pass_ch.result.text = ''"><i class="i-chevron-up"></i> cancel</button>
+                            <button type="button" class="link" v-if="!pass_ch.toggle" v-on:click="pass_ch.toggle = true; pass_ch.result.text = ''"><i class="i-chevron-down"></i> change</button>
+                            <button type="button" class="link" v-if="pass_ch.toggle" v-on:click="pass_ch.toggle = false; pass_ch.result.text = ''"><i class="i-chevron-up"></i> cancel</button>
                         </h5>
                         <p v-if="!pass_ch.toggle && !pass_ch.result.text">*************</p>
                         <p v-if="pass_ch.toggle || pass_ch.result.text" v-bind:class="['msg',pass_ch.result.type]">{{pass_ch.result.text}}</p>
@@ -184,7 +184,7 @@
 
         .tip-box {
             margin: 2em 0;
-            b > button.link { display: inline; line-height: inherit; vertical-align: inherit }
+            h5 > button.link { display: inline; line-height: inherit; vertical-align: inherit; float: right; margin-right: 1em; }
             &.email {
                 .valid { color: lighten($green, 0%); }
                 .not-valid { color: darken($red, 15%); }

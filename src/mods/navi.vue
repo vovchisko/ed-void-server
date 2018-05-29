@@ -15,7 +15,7 @@
                     <b class="head">{{navi.pos.head}}</b>
                 </div>
                 <div class="dest" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
-                    <b class="head" v-bind:class="navi.dest.align" v-bind:style="navi.style_dest_pointer">{{navi.dest.head}}</b>
+                    <b class="head" v-bind:class="navi.dest.align">{{navi.dest.head}}</b>
                 </div>
             </div>
             <div class="container-fluid">
@@ -44,7 +44,7 @@
                             </em>
                             <em class="editable" v-if="!env.body">
                                 <b>RADIUS</b>
-                                <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.body.c_radius_km"><u>km</u></span>
+                                <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.body.c_radius_km"><u>KM</u></span>
                             </em>
                         </div>
                         <button v-bind:class="navi.dest.enabled?'semi-active':''"
@@ -139,19 +139,14 @@
 
         if (_navi.dest.enabled) {
 
-            if(isNaN(_navi.dest.head)){
+            if (isNaN(_navi.dest.head)) {
                 _navi.style_dest['background-position-x'] = '0px';
-                _navi.style_dest_pointer['transform'] = `translate(0px)`;
                 _navi.dest.align = 'err';
+            } else {
 
-            }else{
-                let odest = (rw / 2) - (_navi.pos.head - _navi.dest.head) * 4;
-                _navi.style_dest['background-position-x'] = odest + 'px';
+                _navi.style_dest['background-position-x'] = (rw / 2) - ((_navi.pos.head - _navi.dest.head) * 4) + 'px';
 
-                let miss = _navi.dest.head - _navi.pos.head;
-                _navi.style_dest_pointer['transform'] = `translate(${miss/2}px)`;
-
-                let alg = Math.abs(miss);
+                let alg = Math.abs(_navi.dest.head - _navi.pos.head);
 
                 if (alg <= 3) _navi.dest.align = 'alg0';
                 if (alg > 3) _navi.dest.align = 'alg1';
@@ -169,19 +164,21 @@
     // NAV MODULE
 
     #navi {
-        header {  }
+        header { }
         .justified em { }
         .justified em > b { width: 30%}
         .justified em > span { width: 70%; text-align: left }
         .compass {overflow: hidden; height: 145px;margin: 0 -5px 10px -5px;
-            .ruler { background: transparent url('../../public/assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
+            .ruler { image-rendering: pixelated;
+                background: transparent url('../../public/assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
             .ruler .head {width: 50px;font-size: 14px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -30px 0 0 -25px;}
             .ruler .head:after { content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-top: 5px solid #ff8800;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;}
             .dest {
+                image-rendering: pixelated;
                 background: transparent url('../../public/assets/nav-ruler-dest.gif') 0 0; width: 100%;height: 7px;position: relative;transition: all linear 1000ms;
 
                 .head {transition: transform linear 0.5s; width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #555;color: #555;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
-                .head:after {content: "";width: 0;height: 0;border-left: 5px solid transparent;border-right: 5px solid transparent;border-bottom: 5px solid #555;display: block;position: absolute;left: 50%;margin: 5px 0 0 -5px;top: -14px;}
+                .head:after {content: "";width: 0;height: 0;border-left: 7px solid transparent;border-right: 7px solid transparent;border-bottom: 7px solid #555;display: block;position: absolute;left: 50%;margin:3px 0 0 -6.5px;top: -14px;}
                 .head:before {content: "vector";color: #676767;display: block;position: absolute;left: 50%;margin: 5px 0 0 -100px;top: -42px;width: 200px;text-align: center;text-transform: uppercase;font-size: 13px;}
                 .head.alg0 {border-color: #0098f9;color: #0098f9;}
                 .head.alg0:after {border-bottom-color: #0098f9;top: -14px;}
@@ -189,11 +186,12 @@
                 .head.alg1 {border-color: #FF8800;color: #FF8800;}
                 .head.alg1:after {border-bottom-color: #FF8800;top: -14px;}
                 .head.alg1:before {content: 'missaligment'; color: #FF8800; }
-                .head.alg2 {border-color: red;color: red;}
-                .head.alg2:after {border-bottom-color: red;top: -14px;}
-                .head.alg2:before {content: 'wrong course vector!'; color: red; }
-                .head.err { @include semiglitch(); animation: glitched_text 1s infinite; }
-                .head.err:before { content: 'destination data invalid' }
+                .head.alg2 {border-color: $red;color: $red;}
+                .head.alg2:after {border-bottom-color: $red; top: -14px;}
+                .head.alg2:before {content: 'wrong course vector!'; color: $red; }
+                .head.err { animation: glitched_text 2.5s infinite; color: $red; border-color: $red; }
+                .head.err:after { border-bottom-color: $red; }
+                .head.err:before { content: 'destination data invalid'; color: $red }
 
             }
 
@@ -201,12 +199,12 @@
         .cords {
             .editable {
                 line-height: 2.4em;
-                b {  }
-                span {  }
-                span input { border-width: 0 0 1px 0;  }
-                span u {   }
+                b { }
+                span { }
+                span input { border-width: 0 0 1px 0; }
+                span u { }
             }
-            input[type=number] { width: calc(100% - 1em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.2em; max-width: 13em }
+            input[type=number] { width: calc(100% - 3em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.2em; max-width: 13em; }
             button { margin-top: 15px}
         }
         .location-data {
