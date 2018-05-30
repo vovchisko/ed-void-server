@@ -1,8 +1,8 @@
 module.exports = {};
 
 module.exports.main = {
-    host: 'localhost:4200',
-    port: 4200,
+    host: 'localhost',
+    port: 80,
     ws_user: 4201,
     ws_journals: 4202,
     rec_log: false

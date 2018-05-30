@@ -1,0 +1,46 @@
+BUGS
+
+- клиент падает после логина если сервис не доступен (можно протестиь с неправильным доменом например)
+  ообще он так же падает если ввести не правильный пароль...
+- прелоадер пытается пропасть когда за раз прриходит 1-2 эвента (неокторые журнали смехотворно малы)
+
+
+
+/* СПАМ ОБ АПДЕЙТЕ */
+[
+    "vovchisko@gmail.com",
+    "margiesolar@gmail.com",
+    "dennis_digiacinto@hotmail.com",
+    "pakpayback@gmail.com",
+    "denismail@ukr.net",
+    "asasinn1546@gmail.com",
+    "spss@i.ua",
+    "cclafmusician@yahoo.com",
+    "bagolu@laposte.net",
+    "79mustang@stangranch.com",
+    "mesa.monoris@gmail.com",
+    "al.loncham@gmail.com",
+    "Nanjan.Ohare@gmx.de",
+    "67MistakeNot@gmail.com",
+    "theob72@gmail.com",
+    "diego@fragnul.com",
+    "tominyman@hotmail.com",
+    "vasyannyasha@gmail.com",
+    "matttoynton01@gmail.com",
+    "7helium7@gmail.com",
+    "Keylar Konstance",
+    "keylarkonstance@gmail.com",
+    "Nicolas.Schuler@gmx.de",
+    "zoltral@outlook.fr",
+    "ilyapravotkin@gmail.com",
+    "Spidey002@me.com",
+    "talshafik@gmail.com",
+    "donredhorse@hotmail.fr",
+    "hthstudios.crowchild@gmail.com",
+    "Nanjan.OHare@gmx.de",
+    "mielkman_1@yahoo.com",
+    "stimv1@gmail.com",
+    "vaexorn@gmail.com",
+    "albert.vancutsem@telenet.be",
+    "matt@doova.net"
+]

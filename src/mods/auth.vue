@@ -129,7 +129,7 @@
                                 Data.save();
                                 Route.reset_route();
                             } else {
-                                alert('invalid verification link');
+                                alert('invalid verification link\n' + result.type + ': ' + result.text);
                             }
                         })
                         .catch((err) => {
@@ -152,7 +152,7 @@
                             this.reset.result = result.result;
                             this.reset.text = result.text;
                             this.reset.type = result.type;
-                        }else{
+                        } else {
                             throw new Error('no result')
                         }
                     })
@@ -273,7 +273,7 @@
                 &.error { color: $ui-err;}
             }
             .ui.links { text-align: center;
-                button { display: inline-block; margin: 0 1em;  clear: none; width: auto}
+                button { display: inline-block; margin: 0 1em; clear: none; width: auto}
             }
         }
     }

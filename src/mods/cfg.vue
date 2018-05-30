@@ -25,12 +25,16 @@
                         <i class="i-shield-alert not-valid" v-if="!user.valid"></i>
                     </div>
                     <div>
-                        <h5>{{user.email}}</h5>
-                        <p v-if="!user.valid">
-                            <button type="button" v-if="re_everify_result.result===0" v-on:click="re_everify()">request verification email</button>
-                            <small v-bind:class="['msg', re_everify_result.type]">{{re_everify_result.text}}</small>
-                        </p>
+                        <h5>
+                            {{user.email}}
+                            <button type="button" class="link" v-if="!user.valid && re_everify_result.result===0" v-on:click="re_everify()">request new link</button>
+                        </h5>
                         <p v-if="user.valid">Email Verified</p>
+                        <p v-if="!re_everify_result.text && !user.valid">We send you email with a link. Check your mail box.</p>
+                        <p v-if="re_everify_result.text">
+                            {{re_everify_result.text}}
+                        </p>
+
                     </div>
                 </div>
 
@@ -83,7 +87,7 @@
                 <br>
                 <h3>ED-VOID CLIENT INSTALLATION</h3>
                 <p class="help">
-                    - Download <a href="download/ed-void-client.zip">ED-VOID Client [8.6Mb]</a><br>
+                    - Download <a href="download/ed-void-client.zip">ED-VOID Client [8.17Mb]</a><br>
                     - Run and follow the instructions.<br>
                     - Come back to ED-VOID
                 </p>
@@ -150,7 +154,7 @@
                             this.re_everify_result.type = result.type;
                             Data.save();
                         } else {
-                            alert('invalid verification link');
+                            alert(result.type + ': ' + result.text);
                         }
                     })
                     .catch((err) => {
@@ -179,7 +183,7 @@
 
         if (user.dev) {
             // user in dev mode
-            Vue.set(Data.modes.modes, 'dev' , 'dev');
+            Vue.set(Data.modes.modes, 'dev', 'dev');
         }
     });
 

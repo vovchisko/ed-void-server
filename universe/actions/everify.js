@@ -9,23 +9,18 @@ const UNI = require('../universe');
 
 module.exports = function (req, res) {
     server.handle_request(req, res, async (req, res, buffer) => {
-
         let result = {
             result: 0,
             type: 'error',
             text: ''
         };
-
         let log = 'E-VERIFY: ';
-
         try {
             let dat = server.parse_json(buffer.toString());
             if (!dat) return res.end();
-            console.log(dat);
-
             if (dat.secret) {
-                //we got secret - let's validate
                 let user = await UNI.get_user({secret: dat.secret});
+
                 if (user) {
                     user.touch({
                         valid: true,
@@ -47,9 +42,6 @@ module.exports = function (req, res) {
 
                     let user = await UNI.get_user({api_key: head.api_key});
                     if (user && user.email === dat.email) {
-
-                        user.touch({secret: server.DB.some_hash()});
-
                         server.EML.send_everify(dat.email, user.secret);
                         result.result = 1;
                         result.type = 'info';

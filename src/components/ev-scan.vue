@@ -1,29 +1,32 @@
 <template>
     <div class="ev scan">
         <div class="head">
-            <h2>{{s.BodyName}}</h2>
-            <h4 class="star" v-show="s.StarType">{{s.StarType}}</h4>
-            <h4 class="planet" v-show="s.PlanetClass && !s.Landable">{{s.PlanetClass}}</h4>
-            <h4 class="landable" v-show="s.PlanetClass && s.Landable">{{s.PlanetClass}}</h4>
-            <h5 class="arrival">arrival: {{s.DistanceFromArrivalLS | nn(0)}} ls</h5>
-            <h5 class="value" v-if="s.EstimatedValue">est.value: {{s.EstimatedValue | nn(0)}} Cr</h5>
+            <div class="row">
+                <div class="col-sm">
+                    <h3>{{s.BodyName}}</h3>
+                    <h5 class="star" v-show="s.StarType">{{STAR_CLASS[s.StarType]}}</h5>
+                    <h5 class="planet" v-show="s.PlanetClass">{{s.PlanetClass}} <span class="landable" v-if="s.Landable">[landable]</span></h5>
+                </div>
+                <div class="col-sm">
+                    <h5 class="arrival">arrival: <span>{{s.DistanceFromArrivalLS | nn(0)}} ls</span></h5>
+                    <h5 class="value" v-if="s.EstimatedValue">est.value: <span>{{s.EstimatedValue | nn(0)}} cr</span></h5>
+                </div>
+            </div>
         </div>
         <div class="container-fluid">
             <div v-show="s.StarType" class="row">
                 <div class="col-sm">
-                    <div class="main">
-                        <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
-                        <em><b>Solar Masses</b><span>{{s.StellarMass | nn(4)}}</span></em>
-                        <em><b>Solar Radius</b><span>{{s.Radius / 696000000 | nn(4)}}</span></em>
-                        <em><b>Age</b><span>{{s.Age_MY | nn(4)}} <u>MILLION YEARS</u></span></em>
-                        <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(1) }} <u>K</u></span></em>
-                        <em><b>Rot.Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
-                    </div>
+                    <em><b>Luminosity</b><span>{{s.Luminosity}}</span></em>
+                    <em><b>Solar Masses</b><span>{{s.StellarMass | nn(4)}}</span></em>
+                    <em><b>Solar Radius</b><span>{{s.Radius / 696000000 | nn(4)}}</span></em>
+                    <em><b>Age</b><span>{{s.Age_MY | nn(4)}} <u>MILLION YEARS</u></span></em>
+                    <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(1) }} <u>K</u></span></em>
+                    <em><b>Rot.Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
                 </div>
                 <div class="col-sm">
                     <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
                         <h5>{{ring.Name}}</h5>
-                        <em><b>Class</b><span>{{ring.RingClass}}</span></em>
+                        <em><b>Class</b><span>{{BELT_CLASS[ring.RingClass]}}</span></em>
                         <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <u>MT</u></span></em>
                         <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <u>KM</u></span></em>
                         <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <u>KM</u></span></em>
@@ -32,15 +35,13 @@
             </div>
             <div v-if="s.PlanetClass" class="row">
                 <div class="col-sm">
-                    <div class="main">
-                        <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
-                        <em><b>Tidal Lock</b><span v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
-                        <em><b>Volcanism</b><span v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
-                        <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
-                        <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <u>KM</u></span></em>
-                        <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <u>G</u></span></em>
-                        <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <u>K</u></span></em>
-                    </div>
+                    <em><b>Terraform State</b><span v-bind:class="s.TerraformState?'':'false'">{{s.TerraformState | isval}}</span></em>
+                    <em><b>Tidal Lock</b><span v-bind:class="s.TidalLock?'':'false'">{{s.TidalLock | yn}}</span></em>
+                    <em><b>Volcanism</b><span v-bind:class="s.Volcanism?'':'false'">{{s.Volcanism | isval}}</span></em>
+                    <em><b>Earth Masses</b><span>{{s.MassEM | nn(4)}}</span></em>
+                    <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <u>KM</u></span></em>
+                    <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <u>G</u></span></em>
+                    <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <u>K</u></span></em>
                 </div>
                 <div class="col-sm">
                     <div class="sub" v-if="s.Composition">
@@ -77,8 +78,8 @@
                     </div>
 
                     <div class="sub" v-if="s.Rings" v-for="ring in s.Rings">
-                        <h5>Ring: {{ring.Name}}</h5>
-                        <em><b>Class</b><span>{{ring.RingClass}}</span></em>
+                        <h5>{{ring.Name}}</h5>
+                        <em><b>Class</b><span>{{BELT_CLASS[ring.RingClass]}}</span></em>
                         <em><b>Mass</b><span>{{ring.MassMT | nn(0)}} <u>MT</u></span></em>
                         <em><b>Inner Radius</b><span>{{ring.InnerRad / 1000 | nn(0)}} <u>KM</u></span></em>
                         <em><b>Outer Radius</b><span>{{ring.OuterRad / 1000 | nn(0)}} <u>KM</u></span></em>
@@ -91,6 +92,8 @@
 </template>
 
 <script>
+    import VARS from '../services/vars';
+
     export default {
         name: "ev-scan",
         props: {
@@ -99,7 +102,13 @@
                 required: true,
             }
         },
-        data: function () { return {s: this.rec} },
+        data: function () {
+            return {
+                s: this.rec,
+                STAR_CLASS: VARS.STAR_CLASS,
+                BELT_CLASS: VARS.BELT_CLASS
+            }
+        },
         methods: {
             // here wil be some methods to analyze body
         }
@@ -111,13 +120,20 @@
     .ev.scan {
         .head {
             padding-bottom: 0.8em;
-            h2 { padding: 0; color: lighten($ui-text, 20%) }
-            h4 { padding: 0.05em 0;
-                &.star { color: $yellow }
+            h3 { padding: 0.1em 0; color: lighten($ui-text, 20%) }
+            h5 { padding: 0em 0;
+                &.star { color: $purple-light }
                 &.planet { color: $orange }
-                &.landable { color: $cyan }
+                & .landable { color: $cyan }
+                &.arrival { padding: 0.05em 0;
+                    span { color: lighten($ui-text, 20%)}
+                }
+                &.value { padding: 0;
+                    span {color: #e09f39}
+                }
             }
-            h5 { padding: 0.05em 0; }
         }
+        em > span { text-transform: capitalize; }
+        em > span u { color: darken($ui-text, 30%)}
     }
 </style>

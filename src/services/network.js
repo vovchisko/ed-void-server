@@ -63,7 +63,7 @@ class Network extends EventEmitter3 {
     };
 
     api(method, data) {
-        return fetch('http://' + window.location.hostname + (location.port ? ':' + 4200 : '') + '/api/' + method, {
+        return fetch('http://' + window.location.hostname + /*(location.port ? ':' + 4200 : '') +*/ '/api/' + method, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {api_key: this.api_key}
