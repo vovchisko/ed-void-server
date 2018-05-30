@@ -1,7 +1,7 @@
 <template>
     <div id="cmdr">
         <header>
-            CMDR PRIFILE
+            CMDR PROFILE
         </header>
 
         <h1>pilot profile</h1>

@@ -42,12 +42,22 @@
                     <em><b>Radius</b><span>{{s.Radius / 1000 | nn(0)}} <u>KM</u></span></em>
                     <em><b>Gravity</b><span>{{s.SurfaceGravity / 9.80665 | nn(4)}} <u>G</u></span></em>
                     <em><b>Temperature</b><span>{{s.SurfaceTemperature | nn(0)}} <u>K</u></span></em>
+
+
+                    <div class="sub">
+                        <h5>Orbit</h5>
+                        <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <u>AU</u></span></em>
+                        <em><b>Orbital Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
+                        <em><b>Rotation Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
+                        <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
+                        <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <u>°</u></span></em>
+                        <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <u>°</u></span></em>
+                        <em><b>Axial Tilt</b><span>{{s.AxialTilt  * 180 / Math.PI | nn(2,2)}} <u>°</u></span></em>
+                    </div>
+
+
                 </div>
                 <div class="col-sm">
-                    <div class="sub" v-if="s.Composition">
-                        <h5>Body Composition</h5>
-                        <em v-for="(com ,val) in s.Composition"><b>{{val}}</b><span>{{com * 100 | nn(2)}} <u>%</u></span></em>
-                    </div>
 
                     <div class="sub" v-if="s.Atmosphere">
                         <h5>Atmosphere</h5>
@@ -66,16 +76,12 @@
                         </em>
                     </div>
 
-                    <div class="sub">
-                        <h5>Orbit</h5>
-                        <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <u>AU</u></span></em>
-                        <em><b>Orbital Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
-                        <em><b>Rotation Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
-                        <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
-                        <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <u>°</u></span></em>
-                        <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <u>°</u></span></em>
-                        <em><b>Axial Tilt</b><span>{{s.AxialTilt  * 180 / Math.PI | nn(2,2)}} <u>°</u></span></em>
+
+                    <div class="sub" v-if="s.Composition">
+                        <h5>Body Composition</h5>
+                        <em v-for="(com ,val) in s.Composition"><b>{{val}}</b><span>{{com * 100 | nn(2)}} <u>%</u></span></em>
                     </div>
+
 
                     <div class="sub" v-if="s.Rings" v-for="ring in s.Rings">
                         <h5>{{ring.Name}}</h5>

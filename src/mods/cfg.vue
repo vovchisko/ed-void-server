@@ -91,8 +91,11 @@
                     - Run and follow the instructions.<br>
                     - Come back to ED-VOID
                 </p>
-                <p>If you need help - visit our
-                    <a href="https://discord.gg/s7qchpj" target="_blank">Discord Server</a>
+                <p class="help">
+                    <a href="https://discord.gg/s7qchpj" target="_blank" class="ext-link">
+                        <img src="/landing/discord-logo.svg" class="img-icon">
+                        Discord Support Channel
+                    </a>
                 </p>
 
             </div>
@@ -211,7 +214,8 @@
                 }
             }
         }
-
+        .help a { white-space: nowrap}
+        .img-icon { max-height: 2em; max-width: 2em; display: inline-block}
         button.logout { float: right; margin: 0 }
     }
 </style>
