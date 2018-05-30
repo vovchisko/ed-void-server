@@ -15,9 +15,35 @@
                     <label>font size</label>
                 </div>
                 <small>This option will be applied only for this device.</small>
+
+
+
+                <br>
+                <br>
+                <br>
+                <h3>ED-VOID CLIENT INSTALLATION</h3>
+                <p class="help">
+                    - Download <a href="download/ed-void-client.zip">ED-VOID Client [8.17Mb]</a><br>
+                    - Run and follow the instructions.<br>
+                    - Come back to ED-VOID
+                </p>
+                <p class="help">
+                    <a href="https://discord.gg/s7qchpj" target="_blank" class="ext-link">
+                        <img src="/landing/discord-logo.svg" class="img-icon">
+                        Discord Support Channel
+                    </a>
+                </p>
+
+                <p class="help">
+                    <a href="/" target="_blank" class="ext-link">
+                        <img src="/favicon/favicon-96x96.png" class="img-icon" style="border-radius: 20%">
+                        Go to Home Page
+                    </a>
+                </p>
+
             </div>
 
-            <div class="col-sm listed">
+            <div class="col-sm ">
                 <h2>account details</h2>
                 <div class="tip-box email">
                     <div class="icon">
@@ -84,19 +110,6 @@
                     </div>
                 </div>
 
-                <br>
-                <h3>ED-VOID CLIENT INSTALLATION</h3>
-                <p class="help">
-                    - Download <a href="download/ed-void-client.zip">ED-VOID Client [8.17Mb]</a><br>
-                    - Run and follow the instructions.<br>
-                    - Come back to ED-VOID
-                </p>
-                <p class="help">
-                    <a href="https://discord.gg/s7qchpj" target="_blank" class="ext-link">
-                        <img src="/landing/discord-logo.svg" class="img-icon">
-                        Discord Support Channel
-                    </a>
-                </p>
 
             </div>
         </div>
@@ -214,7 +227,9 @@
                 }
             }
         }
-        .help a { white-space: nowrap}
+        .help a { white-space: nowrap; color: lighten($ui-text, 15%); font-size: 0.9em; text-transform: uppercase}
+        .help a:hover { white-space: nowrap; color: #fff; @include semiglitch-text(); text-decoration: none;}
+        .help a:active { white-space: nowrap; color: #fff; @include glitch-text()}
         .img-icon { max-height: 2em; max-width: 2em; display: inline-block}
         button.logout { float: right; margin: 0 }
     }

@@ -73,6 +73,12 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
   text-shadow: -2px -4px 0 rgba(0, 255, 240, .35), 2px 4px 0 rgba(255, 0, 230, .35);
   box-shadow: -2px -4px 0 0 rgba(0, 255, 240, .35), 2px 4px 0 0 rgba(255, 0, 230, .35);
 }
+@mixin semiglitch-text {
+  text-shadow: -2px -4px 0 rgba(0, 255, 240, .15), 2px 4px 0 rgba(255, 0, 230, .15);
+}
+@mixin glitch-text {
+  text-shadow: -2px -4px 0 rgba(0, 255, 240, .35), 2px 4px 0 rgba(255, 0, 230, .35);
+}
 @mixin redshift($intense:0.25) {
   text-shadow: -3px 0 1px rgba(255, 0, 0, $intense), 3px 0 1px rgba(255, 0, 0, $intense);
   box-shadow: -3px 0 1px rgba(255, 0, 0, $intense), 3px 0 1px rgba(255, 0, 0, $intense) //, -3px 0 1px rgba(255, 0, 0, 0.25) inset, 3px 0 1px rgba(255, 0, 0, 0.25) inset;
