@@ -67,7 +67,7 @@ class Universe extends EE3 {
                     let scans = user.journal()
                         .find({event: {$in: ['Scan', 'FSDJump']}})
                         .sort({timestamp: -1})
-                        .limit(64);
+                        .limit(20);
                     scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
                 }
 

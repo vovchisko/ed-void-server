@@ -26,7 +26,7 @@ input, textarea, select {
 *::placeholder { color: #444; }
 *:focus, *:active { outline: none !important; }
 pre { margin: 0; padding: 0; overflow: visible; font-size: 0.7em}
-html, body { height: 100%; background: $dark-deep; color: $ui-text; }
+html, body { height: 100%; background: $dark-deep; color: $ui-text; overflow-x: hidden }
 body { padding-top: 1px; font-size: 16px; line-height: 1.1em }
 //
 h1 { @include hcaps(); font-size: 1.5em; padding: 1em 0 0.5em 0; margin: 0;}
@@ -196,3 +196,5 @@ hr {
     small { display: block; font-size: 0.9em; line-height: 1.2em }
   }
 }
+
+@import 'fx';

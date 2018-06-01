@@ -1,6 +1,6 @@
 <template>
     <div id="navbar" class="container-fluid clearfix">
-        <div class="nav-right">
+        <div class="nav-right edfx">
             <div v-bind:class="['net', net.error ? 'err':'', net.online]">
                 <i class="i i-wifi" v-if="net.online === 'online'"></i>
                 <i class="i i-wifi-alert" v-if="net.online === 'offline'"></i>
@@ -13,7 +13,7 @@
                 <i class="i-menu"></i> {{nav.modes[nav.c_mode]}}<i class="caret i-chevron-down"></i>
             </button>
 
-            <nav v-if="toggle">
+            <nav v-if="toggle" class="edfx edfx-fast">
                 <button v-for="(name, mode) in nav.modes" v-bind:class="nav.c_mode === mode ? 'semi-active':''" v-on:click="do_nav(mode)">{{name}}</button>
             </nav>
         </div>

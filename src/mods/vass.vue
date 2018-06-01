@@ -1,6 +1,6 @@
 <template>
     <div id="vass">
-        <header>VOID ADV. SCANNER</header>
+        <header class="edfx">VOID ADV. SCANNER</header>
 
         <div class="alert info" v-if="!recent.length">
             <i class="i-ed-alert"></i>
@@ -8,7 +8,7 @@
             <small>no recent activity was found in database</small>
         </div>
 
-        <ev v-for="rec in recent" v-bind:rec="rec" v-bind:key="rec._id"></ev>
+        <ev class="edfx" v-for="rec in recent" v-bind:rec="rec" v-bind:key="rec._id"></ev>
 
     </div>
 </template>
