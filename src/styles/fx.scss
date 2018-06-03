@@ -10,10 +10,10 @@
 }
 @keyframes edfx-appear-block {
   0% {
-    opacity: 0.5;
+    opacity: 0;
     @include edfx-glitch(2, 1);
-    transform: scale(0.95);
-    filter: brightness(3) hue-rotate(2turn);
+    transform: scale(0.98);
+    filter: brightness(2.5) hue-rotate(2turn);
     background: #00ffee44;
   }
   30% {
@@ -24,13 +24,13 @@
   }
   40% { @include edfx-glitch(1, 0.5); }
   50% { transform: translateY(0); background: transparent;}
-  51% { @include edfx-glitch(0.1, 0.3); transform: translateY(0.5em)}
+  51% { @include edfx-glitch(0.1, 0.3); transform: translateY(0.2em)}
   70% { transform: translateY(0)}
   100% { transform: none; opacity: 1; }
 }
-$speed: 360;
+$speed: 260;
 
-.edfx, .ui { opacity: 0; animation: edfx-appear-block #{$speed}ms forwards; }
+.edfx, .ui { opacity: 0; animation: edfx-appear-block #{$speed}ms steps(3,end) forwards;  }
 @for $i from 1 to 50 {
   .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed * 0.7}ms; }
   .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed * .3}ms; }

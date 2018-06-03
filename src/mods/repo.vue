@@ -167,47 +167,47 @@
             <div class="row">
                 <div class="col-sm listed">
 
-                    <h2>REP: {{repo.curr.submited | date}} <span class="id">{{repo.curr._id}}</span> <br>
+                    <h2 class="edfx">REP: {{repo.curr.submited | date}} <span class="id">{{repo.curr._id}}</span> <br>
                         <small>{{report_types[repo.curr.type]}}</small>
                     </h2>
 
-                    <em v-if="repo.curr.sub_type"><b>classified as:</b><span>{{report_sub_types[repo.curr.type][repo.curr.sub_type]}}</span></em>
-                    <em><b>subject</b><span>{{repo.curr.subject}}</span></em>
-                    <em><b>cmdr</b><span>{{repo.curr.reporter}}</span></em>
+                    <em class="edfx" v-if="repo.curr.sub_type"><b>classified as:</b><span>{{report_sub_types[repo.curr.type][repo.curr.sub_type]}}</span></em>
+                    <em class="edfx"><b>subject</b><span>{{repo.curr.subject}}</span></em>
+                    <em class="edfx"><b>cmdr</b><span>{{repo.curr.reporter}}</span></em>
                 </div>
                 <div class="col-sm">
-                    <h3>Location</h3>
+                    <h3 class="edfx">Location</h3>
 
-                    <em><b>system</b><span>{{repo.curr.system}} <small class="starpos"><u v-for="x in repo.curr.starpos">{{x/32}}</u></small></span></em>
-                    <em v-if="repo.curr.body"><b>body</b><span>{{repo.curr.body.replace(repo.curr.system,'')}}</span></em>
-                    <em v-if="repo.curr.lat"><b>LAT</b><span>{{repo.curr.lat | nn(4,4)}} <u>°</u></span></em>
-                    <em v-if="repo.curr.lon"><b>LON</b><span>{{repo.curr.lon | nn(4,4)}} <u>°</u></span></em>
+                    <em class="edfx"><b>system</b><span>{{repo.curr.system}} <small class="starpos"><u v-for="x in repo.curr.starpos">{{x/32}}</u></small></span></em>
+                    <em class="edfx" v-if="repo.curr.body"><b>body</b><span>{{repo.curr.body.replace(repo.curr.system,'')}}</span></em>
+                    <em class="edfx" v-if="repo.curr.lat"><b>LAT</b><span>{{repo.curr.lat | nn(4,4)}} <u>°</u></span></em>
+                    <em class="edfx" v-if="repo.curr.lon"><b>LON</b><span>{{repo.curr.lon | nn(4,4)}} <u>°</u></span></em>
 
                 </div>
             </div>
             <div class="row">
-                <div class="desc col-sm-6">
+                <div class="desc col-sm-6 edfx">
                     <h3>Description</h3>
                     <div class="user-text">{{repo.curr.description || '[ no details ]'}}</div>
                 </div>
 
                 <div class="desc col-sm-6 listed">
-                    <h3 v-if="repo.curr.links.length">additional links</h3>
+                    <h3 class="edfx" v-if="repo.curr.links.length">additional links</h3>
 
-                    <div class="repo-link" v-for="(link , i) in repo.curr.links">
+                    <div class="edfx repo-link" v-for="(link , i) in repo.curr.links" v-if="link">
                         <i class="i-link"></i> <a v-bind:href="link" target="_blank">{{link}}</a>
                     </div>
 
                     <br>
 
-                    <h3>screenshots</h3>
+                    <h3 class="edfx">screenshots</h3>
 
-                    <em><b>cockpit</b>
+                    <em class="edfx"><b>cockpit</b>
                         <span v-if="repo.curr.screens.cockpit"><a v-bind:href="repo.curr.screens.cockpit" target="_blank"><i class="i-link"></i> {{repo.curr.screens.cockpit}}</a></span>
                         <span v-if="!repo.curr.screens.cockpit"><i class="i-warning"></i> not specified</span>
                     </em>
 
-                    <em><b>system</b>
+                    <em class="edfx"><b>system</b>
                         <span v-if="repo.curr.screens.sys_map"><a v-bind:href="repo.curr.screens.sys_map" target="_blank"><i class="i-link"></i> {{repo.curr.screens.sys_map}}</a></span>
                         <span v-if="!repo.curr.screens.sys_map"><i class="i-warning"></i> not specified</span>
                     </em>
@@ -219,7 +219,7 @@
 
         <div id="repo-reports" v-if="c_tab==='home'">
 
-            <div class="alert info" v-if="repo.reports_count === null && !state.loading">
+            <div class="alert info edfx" v-if="repo.reports_count === null && !state.loading">
                 <i class="i-ed-alert"></i>
                 <div>No reports to display</div>
                 <small>load your recent reports or create new one</small>
@@ -228,14 +228,14 @@
                 </div>
             </div>
 
-            <div class="alert info" v-if="repo.reports_count === 0 && !state.loading">
+            <div class="alert info edfx" v-if="repo.reports_count === 0 && !state.loading">
                 <i class="i-ed-alert"></i>
                 <div>No reports found</div>
-                <small>there is no reports mathing your request</small>
+                <small>there is no reports matching your request</small>
             </div>
 
             <ul class="search-results">
-                <li class="repo-item" v-for="r in repo.reports">
+                <li class="repo-item edfx" v-for="r in repo.reports">
 
                     <div class="row">
                         <div class="col-sm listed">

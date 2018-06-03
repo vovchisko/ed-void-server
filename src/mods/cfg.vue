@@ -17,24 +17,23 @@
                 <small>This option will be applied only for this device.</small>
 
 
-
                 <br>
                 <br>
                 <br>
                 <h3>ED-VOID CLIENT INSTALLATION</h3>
-                <p class="help">
+                <p class="help edfx">
                     - Download <a href="download/ed-void-client.zip">ED-VOID Client [8.17Mb]</a><br>
                     - Run and follow the instructions.<br>
                     - Come back to ED-VOID
                 </p>
-                <p class="help">
+                <p class="help edfx">
                     <a href="https://discord.gg/s7qchpj" target="_blank" class="ext-link">
                         <img src="/landing/discord-logo.svg" class="img-icon">
                         Discord Support Channel
                     </a>
                 </p>
 
-                <p class="help">
+                <p class="help edfx">
                     <a href="/" target="_blank" class="ext-link">
                         <img src="/favicon/favicon-96x96.png" class="img-icon" style="border-radius: 20%">
                         Go to Home Page
@@ -45,7 +44,7 @@
 
             <div class="col-sm ">
                 <h2>account details</h2>
-                <div class="tip-box email">
+                <div class="tip-box email edfx">
                     <div class="icon">
                         <i class="i-shield-check valid" v-if="user.valid"></i>
                         <i class="i-shield-alert not-valid" v-if="!user.valid"></i>
@@ -64,7 +63,7 @@
                     </div>
                 </div>
 
-                <div class="tip-box api-key">
+                <div class="tip-box api-key edfx">
                     <div class="icon">
                         <i class="i-barcode"></i>
                     </div>
@@ -77,7 +76,7 @@
                     </div>
                 </div>
 
-                <div class="tip-box pass">
+                <div class="tip-box pass edfx">
                     <div class="icon">
                         <i class="i-key"></i>
                     </div>
