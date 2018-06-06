@@ -184,7 +184,7 @@
                 Data.nullify('auth');
             },
             font_size_change: function () {
-                document.body.style.fontSize = this.cfg.font_size;
+                Data.apply_ui_cfg();
                 Data.save();
             },
 
@@ -201,6 +201,7 @@
             Vue.set(Data.modes.modes, 'dev', 'dev');
         }
     });
+
 
 </script>
 

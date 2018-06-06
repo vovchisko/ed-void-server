@@ -5,11 +5,12 @@ const dateformat = require('dateformat');
 const EE3 = require('eventemitter3');
 const extend = require('deep-extend');
 const DB = require('./services/database');
-const server = require('../server');
-const pick = server.tools.pick;
-const pickx = server.tools.pickx;
-const con = server.tools.convert;
-const checksum = server.tools.checksum;
+
+const tools = require('./tools');
+const pick = tools.pick;
+const pickx = tools.pickx;
+const con = tools.convert;
+const checksum = tools.checksum;
 const pre = require('./pre');
 
 global.EV_PIPE = 'uni-pipe';
@@ -32,12 +33,19 @@ class Universe extends EE3 {
     init() {
         this.alive = true;
 
-        console.log('UNIVERSE ALIVE & CAN BROADCAST');
+        if (GHOST) {
+            console.log('UNIVERSE IS A GHOST');
+        } else {
+            console.log('UNIVERSE ALIVE & CAN BROADCAST');
 
-        this.autosave = setInterval(() => {
-            for (let c in this.cmdrs) this.cmdrs[c].save();
-            for (let u in this.users) this.users[u].save();
-        }, 60000);
+        }
+        if (!GHOST)
+            this.autosave = setInterval(() => this.save_cache().catch(err => { console.log('Autosave failed', err)}), 30000);
+    }
+
+    async save_cache() {
+        for (let c in this.cmdrs) await this.cmdrs[c].save();
+        for (let u in this.users) await this.users[u].save();
     }
 
     refill_user(uid) {
@@ -67,7 +75,7 @@ class Universe extends EE3 {
                     let scans = user.journal()
                         .find({event: {$in: ['Scan', 'FSDJump']}})
                         .sort({timestamp: -1})
-                        .limit(20);
+                        .limit(16);
                     scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
                 }
 
@@ -81,7 +89,7 @@ class Universe extends EE3 {
                     this.emit(EV_NET, uid, 'c_body', body);
                 }
 
-                await this.repo_search(user, {uid: user._id});
+               await this.repo_search(user, {uid: user._id});
 
             })
             .catch((e) => {
@@ -97,7 +105,7 @@ class Universe extends EE3 {
 
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
-        // user._cmdr.touch({ status: ...don't cause unnecessary update.
+        // user._cmdr.touch not used because we no need unnecessary update.
         // send only status
         extend(user._cmdr.status, {
             flags: Status.Flags,
@@ -113,7 +121,7 @@ class Universe extends EE3 {
         this.emit(EV_NET, user._id, 'status', user._cmdr.status);
     }
 
-    /* ONLY FOR NEW RECORDS!! */
+    /* ONLY FOR NEW RECORDS!! */ //todo: I guess this should be in handle_record()
     async record(user, rec, cmdr_name, gv, lng, records_left = 0) {
 
         if (cmdr_name !== user.cmdr_name) await user.set_cmdr(cmdr_name);
@@ -128,7 +136,6 @@ class Universe extends EE3 {
             delete rec._jl;
 
             user.track_overload(records_left);
-
 
             this.emit(EV_PIPE, user._id, rec.event, rec);
 
@@ -157,8 +164,9 @@ class Universe extends EE3 {
                     if (!user._overload) super.emit(...arguments);
                 });
         } else {
-            super.emit(...arguments);
+            return super.emit(...arguments);
         }
+
     }
 
     // for any records but careful with others cmdrs
@@ -180,6 +188,7 @@ class Universe extends EE3 {
     async repo_search(user, query) {
         DB.reports
             .find({uid: user._id})
+            .limit(32)
             .sort({submited: -1})
             .toArray()
             .then(list => this.emit(EV_NET, user._id, 'repo-search', list));

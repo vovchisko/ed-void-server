@@ -134,6 +134,8 @@ class DataStorage {
 
         let font_size = localStorage.getItem('font_size');
         if (font_size) this.cfg.font_size = font_size;
+
+        this.apply_ui_cfg();
     }
 
     save() {
@@ -145,6 +147,10 @@ class DataStorage {
 
     nullify(section) {
         if (section === 'repo.curr') extend(this.repo.curr, this._null.repo.curr);
+    }
+
+    apply_ui_cfg() {
+        document.body.style.fontSize = this.cfg.font_size;
     }
 }
 

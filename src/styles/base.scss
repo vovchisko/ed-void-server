@@ -131,7 +131,7 @@ em::after, .cls::after { content: ""; clear: both; display: table; }
   em > span { font-size: 1.0em; color: lighten($ui-fg, 20%); width: 100%; padding: 0;}
   em > span > small { color: darken($ui-fg, 20%) }
 }
-.solid-word { white-space: nowrap; }
+.solid-word { white-space: nowrap; display: inline-block }
 hr {
   border-width: 1px 0 0 0;
   border-color: $ui-fg;
@@ -169,7 +169,7 @@ hr {
   }
   &.progress { animation: glitched_text 2s infinite;}
   .ui { margin-top: 1em; text-align: center;
-    button { margin: 1em; padding: 0em 3em; line-height: 2.5em; font-size: 1.2em }
+    button { margin: 1em auto; padding: 0em 2em; width: auto; line-height: 2.0em; font-size: 1.1em; display: block }
   }
 }
 .ui { padding-bottom: 1em; position: relative; padding-top: 1em;

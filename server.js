@@ -7,7 +7,7 @@ global.PIPE_EVENTS = [
     'DiscoveryScan', 'Scan',
     'SupercruiseEntry', 'SupercruiseExit', 'FSDJump', 'ApproachBody', 'LeaveBody', 'Location', 'StartJump', 'Docked', 'Undocked', 'Touchdown', 'Liftoff', 'LaunchSRV', 'DockSRV', 'LaunchFighter', 'DockFighter'
 ];
-
+global.GHOST = false;
 
 exports = module.exports = server;
 

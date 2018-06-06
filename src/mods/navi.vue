@@ -1,31 +1,33 @@
 <template>
     <div id="navi">
 
-        <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{navi.body.name ? ' / ' + navi.body.name : '' }}</header>
+        <header class="edfx">{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{navi.body.name ? ' / ' + navi.body.name : '' }}</header>
 
-        <div class="alert info" v-if="navi.pos.alt===null">
+        <div class="alert info edfx" v-if="navi.pos.alt===null">
             <i class="i-ed-alert"></i>
             <div>Approach to the body<br/>NAV-Module will engage automatically</div>
             <small>Scan body Before approaching to identify radius and gravity correctly</small>
         </div>
 
         <div class="navi-surf" v-if="navi.pos.alt!==null">
-            <div class="compass">
-                <div class="ruler" v-bind:style="navi.style_ruler">
+            <div class="compass edfx">
+                <div class="ruler edfx" v-bind:style="navi.style_ruler">
                     <b class="head">{{navi.pos.head}}</b>
                 </div>
-                <div class="dest" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
+                <div class="dest edfx edfx-delay-1" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
                     <b class="head" v-bind:class="navi.dest.align">{{navi.dest.head}}</b>
                 </div>
             </div>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-6 cords justified">
+                        <div class="edfx">
                         <h5>CURR. POSITION</h5>
                         <em><b>LAT</b><span>{{navi.pos.lat | nn(4,4)}} <u>°</u></span></em>
                         <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <u>°</u></span></em>
                         <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <u>KM</u></span></em>
-                        <div v-if="navi.dest.enabled">
+                        </div>
+                        <div v-if="navi.dest.enabled" class="edfx edfx-delay-2">
                             <br>
                             <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0)}} <u>°</u></span></em>
                             <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3)}} <u>KM</u></span></em>
@@ -33,7 +35,7 @@
                     </div>
                     <div class="col-6 cords justified">
                         <h5>DESTINATION</h5>
-                        <div v-if="navi.dest.enabled">
+                        <div v-if="navi.dest.enabled" class="edfx edfx-delay-3">
                             <em class="editable">
                                 <b>LAT</b>
                                 <span><input type="number" min="-90" max="90" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lat"><u>°</u></span>
@@ -47,7 +49,7 @@
                                 <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.body.c_radius_km"><u>KM</u></span>
                             </em>
                         </div>
-                        <button v-bind:class="navi.dest.enabled?'semi-active':''"
+                        <button class="edfx" v-bind:class="navi.dest.enabled?'semi-active':''"
                                 v-on:click="navi.dest.enabled = !navi.dest.enabled; recalc_dest()">
                             <i v-if="!navi.dest.enabled " class="i-aim"></i>
                             <i v-if="navi.dest.enabled " class="i-chevron-up"></i>
@@ -58,21 +60,20 @@
             </div>
         </div>
 
-        <div class="container-fluid location-data">
+        <div class="container-fluid location-data edfx">
             <div class="centered">
-                <div class="alert warn" v-if="navi.body.name !== null && !navi.body.radius">
+                <div class="alert warn " v-if="navi.body.name !== null && !navi.body.radius">
                     <i class="i-ed-alert"></i>
                     <div>No scan data in database</div>
                     <small>Scan body to identify radius and gravity correctly</small>
                 </div>
-
-                <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
-                <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
-
-                <em><b>BODY</b> <span>{{navi.body.name || 'N / A'}}</span></em>
-                <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 || null | nn(3,3, 'N / A') }} <u>KM</u></span></em>
-                <em><b>GRAVITY</b> <span>{{navi.body.gravity | nn(3,3, 'N / A')}} <u>G</u></span></em>
-
+                <div>
+                    <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
+                    <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
+                    <em><b>BODY</b> <span>{{navi.body.name || 'N / A'}}</span></em>
+                    <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 || null | nn(3,3, 'N / A') }} <u>KM</u></span></em>
+                    <em><b>GRAVITY</b> <span>{{navi.body.gravity | nn(3,3, 'N / A')}} <u>G</u></span></em>
+                </div>
             </div>
         </div>
         <!-- <pre>{{env.body}}</pre> -->
@@ -178,7 +179,7 @@
                 background: transparent url('../../public/assets/nav-ruler-dest.gif') 0 0; width: 100%;height: 7px;position: relative;transition: all linear 1000ms;
 
                 .head {transition: transform linear 0.5s; width: 60px;font-size: 15px;display: block;text-align: center;border: 1px solid #555;color: #555;position: absolute;left: 50%;margin: 10px 0 0 -30px;}
-                .head:after {content: "";width: 0;height: 0;border-left: 7px solid transparent;border-right: 7px solid transparent;border-bottom: 7px solid #555;display: block;position: absolute;left: 50%;margin:3px 0 0 -6.5px;top: -14px;}
+                .head:after {content: "";width: 0;height: 0;border-left: 7px solid transparent;border-right: 7px solid transparent;border-bottom: 7px solid #555;display: block;position: absolute;left: 50%;margin: 3px 0 0 -6.5px;top: -14px;}
                 .head:before {content: "vector";color: #676767;display: block;position: absolute;left: 50%;margin: 5px 0 0 -100px;top: -42px;width: 200px;text-align: center;text-transform: uppercase;font-size: 13px;}
                 .head.alg0 {border-color: #0098f9;color: #0098f9;}
                 .head.alg0:after {border-bottom-color: #0098f9;top: -14px;}

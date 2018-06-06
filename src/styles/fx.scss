@@ -1,7 +1,7 @@
 @import 'vars';
 @mixin edfx-glitch($shift:2, $fill:0.1) {
-  text-shadow: -#{$shift}em -#{$shift*2}em 0 RGBA(0, 255, 240, #{$fill}),
-  #{$shift}em #{$shift*2}em 0 RGBA(255, 0, 230, #{$fill});
+  text-shadow: #{$shift}em -#{$shift*2}em 0 RGBA(0, 255, 240, #{$fill}),
+  -#{$shift}em #{$shift*2}em 0 RGBA(255, 0, 230, #{$fill});
   //box-shadow: -#{$shift * 4}em -#{$shift * 1}em 0 0 RGBA(0, 255, 240, #{$fill}), #{$shift * 4}em #{$shift * 2}em 0 0 RGBA(255, 0, 230, #{$fill});
 }
 @mixin edfx-glitch0 {
@@ -19,20 +19,22 @@
   30% {
     transform: scale(1.01);
     opacity: 1;
-    filter: brightness(1.5) hue-rotate(1turn);
+    filter: brightness(1.4) hue-rotate(1.1turn);
     @include edfx-glitch(1, 1);
   }
   40% { @include edfx-glitch(1, 0.5); }
   50% { transform: translateY(0); background: transparent;}
-  51% { @include edfx-glitch(0.1, 0.3); transform: translateY(0.2em)}
+  51% { @include edfx-glitch(0.2, 0.3); transform: translateY(0.2em)}
   70% { transform: translateY(0)}
   100% { transform: none; opacity: 1; }
 }
-$speed: 260;
+$speed: 320;
 
-.edfx, .ui { opacity: 0; animation: edfx-appear-block #{$speed}ms steps(3,end) forwards;  }
-@for $i from 1 to 50 {
+//body.edfx-full { //todo make it optinal. maybe also we need simplified animation.
+.edfx, .ui { opacity: 0; animation: edfx-appear-block #{$speed}ms steps(2) forwards; }
+@for $i from 1 to 30 {
   .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed * 0.7}ms; }
   .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed * .3}ms; }
+  .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed * 0.7}ms !important; }
 }
-
+//}

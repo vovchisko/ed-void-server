@@ -30,14 +30,16 @@
 
         <div id="repo-edit" v-if="c_tab==='edit'" class="container-fluid">
 
-            <hr class="bottom">
-
             <div class="row">
                 <div class="col-sm curr-entry">
+                    <h4 class="title edfx" v-if="repo.curr._id">
+                        <span class="date">{{repo.curr.submited | date}}</span>
+                        <span class="id">{{repo.curr._id}}</span>
+                        <span class="type">{{report_types[repo.curr.type]}}</span>
+                    </h4>
 
-                    <h3 v-if="repo.curr._id">REPORT: <span class="id">{{repo.curr._id}}</span></h3>
-                    <h3 v-if="!repo.curr._id">NEW REPORT</h3>
-
+                    <h4 class="title edfx" v-if="!repo.curr._id">NEW REPORT</h4>
+                    <br>
                     <div class="ui">
                         <select v-model="repo.curr.type" v-on:change="curr_change_type()">
                             <option v-for="(type, t) in report_types" v-bind:value="t">{{type}}</option>
@@ -62,7 +64,7 @@
                         <label>report description ({{repo.curr.description.length}} / 1000)</label>
                     </div>
 
-                    <div class="alert warn" v-if="navi.body.name !== null && !navi.body.radius">
+                    <div class="alert warn edfx" v-if="navi.body.name !== null && !navi.body.radius">
                         <i class="i-ed-alert"></i>
                         <div>No body data in database</div>
                         <small>Scan body to identify radius and gravity correctly</small>
@@ -71,10 +73,10 @@
 
                 <div class="col-sm curr-location">
 
-                    <h3>
+                    <h4 class="edfx">
                         location
                         <button type="button" v-if="!repo.curr._id" class="link" v-on:click="curr_location()"><i class="i-globe"></i> auto</button>
-                    </h3>
+                    </h4>
 
                     <div class="ui">
                         <input v-model="repo.curr.system" placeholder="Not Specified">
@@ -111,9 +113,9 @@
 
             <div class="row">
                 <div class="col-sm">
-                    <h3>
+                    <h4 class="edfx">
                         screenshots
-                    </h3>
+                    </h4>
                     <div class="ui">
                         <input type="text" v-model="repo.curr.screens.cockpit">
                         <label>cockpit screenshot link</label>
@@ -134,14 +136,14 @@
                 </div>
 
                 <div class="col-sm">
-                    <h3>
+                    <h4>
                         links
                         <button type="button" class="link"
                                 v-on:click="repo.curr.links.push('')"
                                 v-if="repo.curr.links.length < 5">
                             <i class="i-file-add"></i> add link
                         </button>
-                    </h3>
+                    </h4>
                     <div class="ui" v-for="(k,i) in repo.curr.links">
                         <input type="text" v-model="repo.curr.links[i]">
                         <label>link #{{i+1}}
@@ -164,50 +166,53 @@
 
         <div id="repo-view" v-if="c_tab==='view'">
 
-            <div class="row">
+            <div class="row edfx">
                 <div class="col-sm listed">
 
-                    <h2 class="edfx">REP: {{repo.curr.submited | date}} <span class="id">{{repo.curr._id}}</span> <br>
-                        <small>{{report_types[repo.curr.type]}}</small>
-                    </h2>
+                    <h4 class="title">
+                        <span class="date">{{repo.curr.submited | date}}</span>
+                        <span class="id">{{repo.curr._id}}</span>
+                        <span class="type">{{report_types[repo.curr.type]}}</span>
+                    </h4>
+                    <br>
 
-                    <em class="edfx" v-if="repo.curr.sub_type"><b>classified as:</b><span>{{report_sub_types[repo.curr.type][repo.curr.sub_type]}}</span></em>
-                    <em class="edfx"><b>subject</b><span>{{repo.curr.subject}}</span></em>
-                    <em class="edfx"><b>cmdr</b><span>{{repo.curr.reporter}}</span></em>
+                    <em v-if="repo.curr.sub_type"><b>classified as:</b><span>{{report_sub_types[repo.curr.type][repo.curr.sub_type]}}</span></em>
+                    <em><b>subject</b><span>{{repo.curr.subject}}</span></em>
+                    <em><b>cmdr</b><span>{{repo.curr.reporter}}</span></em>
                 </div>
                 <div class="col-sm">
-                    <h3 class="edfx">Location</h3>
+                    <h4>Location</h4>
 
-                    <em class="edfx"><b>system</b><span>{{repo.curr.system}} <small class="starpos"><u v-for="x in repo.curr.starpos">{{x/32}}</u></small></span></em>
-                    <em class="edfx" v-if="repo.curr.body"><b>body</b><span>{{repo.curr.body.replace(repo.curr.system,'')}}</span></em>
-                    <em class="edfx" v-if="repo.curr.lat"><b>LAT</b><span>{{repo.curr.lat | nn(4,4)}} <u>°</u></span></em>
-                    <em class="edfx" v-if="repo.curr.lon"><b>LON</b><span>{{repo.curr.lon | nn(4,4)}} <u>°</u></span></em>
+                    <em><b>system</b><span>{{repo.curr.system}} <small class="starpos"><u v-for="x in repo.curr.starpos">{{x/32}}</u></small></span></em>
+                    <em v-if="repo.curr.body"><b>body</b><span>{{repo.curr.body.replace(repo.curr.system,'')}}</span></em>
+                    <em v-if="repo.curr.lat"><b>LAT</b><span>{{repo.curr.lat | nn(4,4)}} <u>°</u></span></em>
+                    <em v-if="repo.curr.lon"><b>LON</b><span>{{repo.curr.lon | nn(4,4)}} <u>°</u></span></em>
 
                 </div>
             </div>
-            <div class="row">
-                <div class="desc col-sm-6 edfx">
-                    <h3>Description</h3>
+            <div class="row edfx">
+                <div class="desc col-sm-6">
+                    <h4>Description</h4>
                     <div class="user-text">{{repo.curr.description || '[ no details ]'}}</div>
                 </div>
 
                 <div class="desc col-sm-6 listed">
-                    <h3 class="edfx" v-if="repo.curr.links.length">additional links</h3>
+                    <h4 v-if="repo.curr.links.length">additional links</h4>
 
-                    <div class="edfx repo-link" v-for="(link , i) in repo.curr.links" v-if="link">
+                    <div class=" repo-link" v-for="(link , i) in repo.curr.links" v-if="link">
                         <i class="i-link"></i> <a v-bind:href="link" target="_blank">{{link}}</a>
                     </div>
 
                     <br>
 
-                    <h3 class="edfx">screenshots</h3>
+                    <h4>screenshots</h4>
 
-                    <em class="edfx"><b>cockpit</b>
+                    <em><b>cockpit</b>
                         <span v-if="repo.curr.screens.cockpit"><a v-bind:href="repo.curr.screens.cockpit" target="_blank"><i class="i-link"></i> {{repo.curr.screens.cockpit}}</a></span>
                         <span v-if="!repo.curr.screens.cockpit"><i class="i-warning"></i> not specified</span>
                     </em>
 
-                    <em class="edfx"><b>system</b>
+                    <em><b>system</b>
                         <span v-if="repo.curr.screens.sys_map"><a v-bind:href="repo.curr.screens.sys_map" target="_blank"><i class="i-link"></i> {{repo.curr.screens.sys_map}}</a></span>
                         <span v-if="!repo.curr.screens.sys_map"><i class="i-warning"></i> not specified</span>
                     </em>
@@ -218,15 +223,6 @@
         </div>
 
         <div id="repo-reports" v-if="c_tab==='home'">
-
-            <div class="alert info edfx" v-if="repo.reports_count === null && !state.loading">
-                <i class="i-ed-alert"></i>
-                <div>No reports to display</div>
-                <small>load your recent reports or create new one</small>
-                <div class="ui">
-                    <button type="button" v-on:click="get_recent()" class="link" v-if=""><i class="i-sync"></i> get recent reports</button>
-                </div>
-            </div>
 
             <div class="alert info edfx" v-if="repo.reports_count === 0 && !state.loading">
                 <i class="i-ed-alert"></i>
@@ -239,9 +235,11 @@
 
                     <div class="row">
                         <div class="col-sm listed">
-                            <h3>REP: {{r.submited | date}}
-                                <small>{{report_types[r.type]}}</small>
-                            </h3>
+                            <h4 class="title">
+                                <span class="date">{{r.submited | date}}</span>
+                                <span class="id">{{r._id}}</span>
+                                <span class="type">{{report_types[r.type]}}</span>
+                            </h4>
                             <div class="actions">
                                 <button class="link" v-on:click="select_report(r)"><i class="i-file"></i> report details</button>
                                 <span v-if="r.locked" class="rep-locked"><i class="i-bookmark"></i> protected</span>
@@ -251,7 +249,7 @@
                             <em><b>cmdr</b><span>{{r.reporter}}</span></em>
                         </div>
                         <div class="col-sm">
-                            <h3>Location</h3>
+                            <h4>Location</h4>
 
                             <em><b>system</b><span>{{r.system}}</span></em>
                             <em v-if="r.body"><b>body</b><span>{{r.body.replace(r.system,'')}}</span></em>
@@ -407,19 +405,6 @@
     @import "../styles/vars";
     #repo {
         header i.active { font-size: 1.4em}
-        .id {
-            white-space: nowrap;
-            font-family: 'Titillium Web', sans-serif;
-            text-transform: none;
-            font-size: 1.2em;
-            color: $cyan;
-            &:before {
-                content: 'ID: '; font-family: 'Titillium Web', sans-serif;
-                text-transform: none;
-                font-size: 1.0em;
-                color: darken($cyan, 15%);
-            }
-        }
 
         #repo-reports {
             .alert { font-size: 1.2em; margin-top: 20vh }
@@ -436,10 +421,32 @@
             }
         }
 
-        h3 {
-            color: lighten($ui-text, 25%);
+        h4 {
+            //color: lighten($ui-text, 15%);
             button { margin-left: 1em; font-size: 0.8em; }
-            small { @include hcaps(); display: block; color: lighten($ui-text, 15%); margin-bottom: 0.4em; }
+
+        }
+
+        .title {
+            @include hcaps();
+            span {
+                &.date { display: inline-block; white-space: nowrap; font-size: 0.7em; }
+                &.id {
+                    display: inline-block; white-space: nowrap;
+                    font-size: 0.7em;
+                    //font-family: 'Titillium Web', sans-serif;
+                    text-transform: none;
+                    color: darken($orange, 15%);
+                    padding-left: 1em;
+                    &:before {
+                        content: 'REP: ';
+                        text-transform: none;
+                        // color: darken($cyan, 15%);
+                    }
+                }
+                &.type { display: block; color: lighten($ui-text, 15%); }
+            }
+
         }
 
         .repo-link {
