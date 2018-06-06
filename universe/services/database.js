@@ -37,8 +37,8 @@ class Database {
                 callback();
             })
             .catch((err) => {
-                setTimeout(() => process.exit(-1), 10);
-                throw err;
+                console.log('DB::connect() Failed!', err);
+                process.exit(-1);
             });
     }
 
@@ -73,6 +73,9 @@ class Database {
     journal(journal_id) {
         if (!this.journals[journal_id]) {
             this.journals[journal_id] = this.db_journals.collection(journal_id);
+            this.journals[journal_id].ensureIndex([["timestamp", 1]])
+                .then((r) => console.log(`DB:: "${journal_id}" >> indexed: ${r}`))
+                .catch(e => { console.log('DB:: journal()', e)});
         }
         return this.journals[journal_id];
     }

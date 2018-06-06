@@ -89,7 +89,7 @@ class Universe extends EE3 {
                     this.emit(EV_NET, uid, 'c_body', body);
                 }
 
-               await this.repo_search(user, {uid: user._id});
+                await this.repo_search(user, {uid: user._id});
 
             })
             .catch((e) => {
@@ -423,7 +423,7 @@ class Universe extends EE3 {
 
         //todo: shoudl we do same cache like with cmdrs or users?
         if (b) return new BODY(b);
-        return new BODY({
+        b = new BODY({
             _id: body_id,
             sys_id: sys._id, // or by sys id
             sys_name: sys.name, // to make search by system easy
@@ -433,6 +433,8 @@ class Universe extends EE3 {
             short_name: con.LOW_CASE(body_name).replace(sys.name, '').trim() || FIRST_SYS_OBJ,
             type: null,
         });
+        await b.save();
+        return b;
     }
 
     /**
@@ -510,12 +512,14 @@ class Universe extends EE3 {
 
         if (s) return new SYSTEM(s);
 
-        //todo: shoudl we do same cache like with cmdrs or users?
-        return new SYSTEM({
+        //todo: should we do same cache like with cmdrs or users?
+        s = new SYSTEM({
             _id: id,
             name: name,
             starpos: starpos,
         });
+        await s.save();
+        return s;
     }
 
     async get_system(system_id) {
@@ -802,6 +806,14 @@ class CMDR {
         this.metrics = {curr_ds: 0};
         this.status = {};
         extend(this, cmdr_data);
+    }
+
+    __reset() {
+        this.system_id = null;
+        this.body_id = null;
+        this.starpos = [0, 0, 0];
+        this.metrics.curr_ds = 0;
+        this.status = {};
     }
 
     touch(data = null) {
