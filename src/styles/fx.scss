@@ -2,13 +2,12 @@
 @mixin edfx-glitch($shift:2, $fill:0.1) {
   text-shadow: #{$shift}em -#{$shift*2}em 0 RGBA(0, 255, 240, #{$fill}),
   -#{$shift}em #{$shift*2}em 0 RGBA(255, 0, 230, #{$fill});
-  //box-shadow: -#{$shift * 4}em -#{$shift * 1}em 0 0 RGBA(0, 255, 240, #{$fill}), #{$shift * 4}em #{$shift * 2}em 0 0 RGBA(255, 0, 230, #{$fill});
 }
 @mixin edfx-glitch0 {
   text-shadow: none;
   box-shadow: none;
 }
-@keyframes edfx-appear-block {
+@keyframes edfx-animation-full {
   0% {
     opacity: 0;
     @include edfx-glitch(2, 1);
@@ -28,13 +27,56 @@
   70% { transform: translateY(0)}
   100% { transform: none; opacity: 1; }
 }
-$speed: 320;
-
-//body.edfx-full { //todo make it optinal. maybe also we need simplified animation.
-.edfx, .ui { opacity: 0; animation: edfx-appear-block #{$speed}ms steps(2) forwards; }
-@for $i from 1 to 30 {
-  .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed * 0.7}ms; }
-  .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed * .3}ms; }
-  .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed * 0.7}ms !important; }
+@keyframes edfx-animation-medium {
+  0% {
+    opacity: 0;
+    @include edfx-glitch(2, 1);
+    filter: brightness(2.5) hue-rotate(2turn);
+    background: #00ffee44;
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(0.5) hue-rotate(0.2turn);
+    @include edfx-glitch(1, 0.3);
+  }
+  100% { transform: none; opacity: 1; }
 }
-//}
+@keyframes edfx-animation-low {
+  0% {
+    opacity: 0;
+    @include edfx-glitch(1, 1);
+  }
+  70% {
+    opacity: 1;
+    @include edfx-glitch(0.2, 0.3);
+  }
+  100% { transform: none; opacity: 1; }
+}
+$speed-full: 320;
+$speed-medium: 220;
+$speed-low: 180;
+
+body.edfx-lv-full { //todo make it optinal. maybe also we need simplified animation.
+  .edfx, .ui { opacity: 0; animation: edfx-animation-full #{$speed-full}ms steps(2) forwards; }
+  @for $i from 1 to 32 {
+    .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-full * 0.7}ms; }
+    .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-full * .3}ms; }
+    .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed-full * 0.7}ms !important; }
+  }
+}
+body.edfx-lv-medium { //todo make it optinal. maybe also we need simplified animation.
+  .edfx, .ui { opacity: 0; animation: edfx-animation-medium #{$speed-medium}ms steps(3) forwards; }
+  @for $i from 1 to 32 {
+    .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-medium * 0.7}ms; }
+    .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-medium * .3}ms; }
+    .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed-medium * 0.7}ms !important; }
+  }
+}
+body.edfx-lv-low { //todo make it optinal. maybe also we need simplified animation.
+  .edfx, .ui { opacity: 0; animation: edfx-animation-low #{$speed-low}ms  steps(3) forwards; }
+  @for $i from 1 to 32 {
+    .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-low * 0.7}ms; }
+    .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-low * .3}ms; }
+    .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed-low * 0.7}ms !important; }
+  }
+}

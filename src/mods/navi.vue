@@ -1,7 +1,7 @@
 <template>
     <div id="navi">
 
-        <header class="edfx">{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{navi.body.name ? ' / ' + navi.body.name : '' }}</header>
+        <header class="edfx">{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{navi.body.name ? ' / ' + navi.body.name.replace(env.system.name,'') : '' }}</header>
 
         <div class="alert info edfx" v-if="navi.pos.alt===null">
             <i class="i-ed-alert"></i>
@@ -22,10 +22,10 @@
                 <div class="row">
                     <div class="col-6 cords justified">
                         <div class="edfx">
-                        <h5>CURR. POSITION</h5>
-                        <em><b>LAT</b><span>{{navi.pos.lat | nn(4,4)}} <u>°</u></span></em>
-                        <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <u>°</u></span></em>
-                        <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <u>KM</u></span></em>
+                            <h5>CURR. POSITION</h5>
+                            <em><b>LAT</b><span>{{navi.pos.lat | nn(4,4)}} <u>°</u></span></em>
+                            <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <u>°</u></span></em>
+                            <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <u>KM</u></span></em>
                         </div>
                         <div v-if="navi.dest.enabled" class="edfx edfx-delay-2">
                             <br>
@@ -202,7 +202,7 @@
                 line-height: 2.4em;
                 b { }
                 span { }
-                span input { border-width: 0 0 1px 0; }
+                span input { border-width: 0 0 1px 0 !important; }
                 span u { }
             }
             input[type=number] { width: calc(100% - 2.2em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.2em; max-width: 13em; }

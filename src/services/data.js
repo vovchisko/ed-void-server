@@ -13,8 +13,10 @@ class DataStorage {
         };
 
         this.cfg = {
-            font_size: '100%',
-            font_sizes_list: new Array(17).fill(0).map((x, i) => {return i * 10 + 40 + '%'})
+            ui_font_size: '100%',
+            ui_fx_level: 'unknown',
+            _font_size_vars: new Array(17).fill(0).map((x, i) => {return i * 10 + 40 + '%'}),
+            _fx_level_vars: ['full', 'medium', 'low', 'disabled']
         };
 
         this.modes = {
@@ -50,7 +52,6 @@ class DataStorage {
                 reporter: null,
                 pub: false, //other peopl can find it
                 locked: false, //report confirmed nad locked
-
 
                 //user can't edit
                 parent_id: null, //for a few reports in the same place
@@ -124,16 +125,12 @@ class DataStorage {
                 extend(this._null[i], this[i])
             }
         }
+console.log((localStorage.getItem('ui_font_size')));
 
-
-        let api_key = localStorage.getItem('api_key');
-        if (api_key) this.auth.api_key = api_key;
-
-        let c_mode = localStorage.getItem('c_mode');
-        if (c_mode) this.modes.c_mode = c_mode;
-
-        let font_size = localStorage.getItem('font_size');
-        if (font_size) this.cfg.font_size = font_size;
+        this.auth.api_key = (localStorage.getItem('api_key')) || this.auth.api_key;
+        this.modes.c_mode = (localStorage.getItem('c_mode')) || this.modes.c_mode;
+        this.cfg.ui_font_size = (localStorage.getItem('ui_font_size')) || this.cfg.ui_font_size;
+        this.cfg.ui_fx_level = (localStorage.getItem('ui_fx_level')) || this.cfg.ui_fx_level;
 
         this.apply_ui_cfg();
     }
@@ -142,7 +139,8 @@ class DataStorage {
         //save some data to locastorage
         localStorage.setItem('api_key', this.auth.api_key);
         localStorage.setItem('c_mode', this.modes.c_mode);
-        localStorage.setItem('font_size', this.cfg.font_size);
+        localStorage.setItem('ui_font_size', this.cfg.ui_font_size);
+        localStorage.setItem('ui_fx_level', this.cfg.ui_fx_level);
     }
 
     nullify(section) {
@@ -150,7 +148,9 @@ class DataStorage {
     }
 
     apply_ui_cfg() {
-        document.body.style.fontSize = this.cfg.font_size;
+        document.body.style.fontSize = this.cfg.ui_font_size;
+        document.body.className = 'edfx-lv-' + this.cfg.ui_fx_level;
+
     }
 }
 

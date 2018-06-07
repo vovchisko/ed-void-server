@@ -9,12 +9,20 @@
                 <h2>ui settings </h2>
 
                 <div class="ui short">
-                    <select v-model="cfg.font_size" @change="font_size_change()">
-                        <option v-for="i in cfg.font_sizes_list" v-model="cfg.font_sizes_list[i]">{{i}}</option>
+                    <select v-model="cfg.ui_font_size" @change="cgf_apply()">
+                        <option v-for="i in cfg._font_size_vars" v-model="cfg._font_size_vars[i]">{{i}}</option>
                     </select>
                     <label>font size</label>
                 </div>
-                <small>This option will be applied only for this device.</small>
+
+                <div class="ui short">
+                    <select v-model="cfg.ui_fx_level" @change="cgf_apply()">
+                        <option v-for="i in cfg._fx_level_vars" v-model="cfg._fx_level_vars[i]">{{i}}</option>
+                    </select>
+                    <label>ui effects</label>
+                </div>
+
+                <small>This options applied only for this device.</small>
 
 
                 <br>
@@ -130,7 +138,7 @@
                 pass_ch: {toggle: false, c: '', n: '', nc: '', result: {result: 0, text: '', type: ''}}
             }
         },
-        mounted: function () { this.font_size_change(); },
+        mounted: function () { this.cgf_apply(); },
         methods: {
             change_pass() {
                 Net.api('passch', {curr_pass: this.pass_ch.c, new_pass: this.pass_ch.n})
@@ -183,7 +191,7 @@
                 Data.save();
                 Data.nullify('auth');
             },
-            font_size_change: function () {
+            cgf_apply: function () {
                 Data.apply_ui_cfg();
                 Data.save();
             },

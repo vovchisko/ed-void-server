@@ -34,10 +34,10 @@ async function init() {
 
     UNI.init();
 
-    // await re_index_journals();
+    await re_index_journals();
 
     await re_process();
-    
+
 }
 
 
@@ -82,18 +82,21 @@ async function re_process() {
         let per_bar = Math.floor(total_r / 64);
         let records_stack = [];
         while (await journal.hasNext()) {
-            const rec = await journal.next();
-            records_stack.push(rec);
+
+            records_stack.push(await journal.next());
             if (r > per_bar) {
-                process.stdout.write("\u2592");
+                process.stdout.write("\u00BB");
                 r = 0;
             } else {++r;}
-            await UNI.process(user._cmdr, rec);
         }
-
-//        for (let i = 0; i < records_stack.length; i++) {
-//            await UNI.process(user._cmdr, rec);
-//        }
+        process.stdout.write("\n");
+        for (let i = 0; i < records_stack.length; i++) {
+            await UNI.process(user._cmdr, records_stack[i]);
+            if (r > per_bar) {
+                process.stdout.write("\u00AB");
+                r = 0;
+            } else {++r;}
+        }
 
 
         await journal.close();

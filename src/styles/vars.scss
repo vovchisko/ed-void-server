@@ -50,6 +50,7 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
   color: $ui-fg;
   border-radius: 0;
   &:hover { border-color: darken($ui-act-fg, 25%); color: darken($ui-act-fg, 25%);}
+  &:invalid { border-color: $danger; box-shadow: none; color: $danger}
   &.active {
     color: $ui-act-fg;
     border-color: $ui-act-fg;
