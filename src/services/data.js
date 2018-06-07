@@ -14,7 +14,7 @@ class DataStorage {
 
         this.cfg = {
             ui_font_size: '100%',
-            ui_fx_level: 'unknown',
+            ui_fx_level: 'full',
             _font_size_vars: new Array(17).fill(0).map((x, i) => {return i * 10 + 40 + '%'}),
             _fx_level_vars: ['full', 'medium', 'low', 'disabled']
         };
