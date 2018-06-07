@@ -6,6 +6,7 @@
 
 const server = require('../../server');
 const UNI = require('../universe');
+const clog = require('../../clog');
 
 module.exports = function (req, res) {
     server.handle_request(req, res, async (req, res, buffer) => {
@@ -57,10 +58,10 @@ module.exports = function (req, res) {
             res.statusCode = 500;
             result.result = 0;
             result.text = 'operation failed';
-            console.log(log, result.text, e);
+            clog(log, result.text, e);
         }
         res.end(JSON.stringify(result));
-        if (log && server.cfg.main.rec_log) console.log(log + result.text);
+        if (log && server.cfg.main.rec_log) clog(log + result.text);
     });
 };
 

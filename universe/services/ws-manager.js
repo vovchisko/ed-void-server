@@ -6,6 +6,7 @@ const EE3 = require('eventemitter3');
 const CLIENT_NOOB = 0;
 const CLIENT_VALIDATING = 1;
 const CLIENT_VALID = 2;
+const clog = require('../../clog');
 
 class WSM extends EE3 {
     constructor(port) {
@@ -22,7 +23,7 @@ class WSM extends EE3 {
         try {
             return JSON.parse(string);
         } catch (e) {
-            console.log(this.name, 'JSON-ERROR!', e);
+            clog(this.name, 'JSON-ERROR!', e);
             return null;
         }
     }
@@ -77,10 +78,10 @@ class WSM extends EE3 {
                             _self.clients[id].c_send('welcome', {connections: _self.clients[id]._c.length});
                             _self.emit('connected', _self.clients[id], _self.clients[id]._c.indexOf(conn));
 
-                            if (_self._logging) console.log(_self.name + ` ${conn.id} (${_self.clients[id]._c.length}) one link added`);
+                            if (_self._logging) clog(_self.name + ` ${conn.id} (${_self.clients[id]._c.length}) one link added`);
 
                         } else {
-                            if (_self._logging) console.log(_self.name + 'ws login failed', msg.c, msg.dat);
+                            if (_self._logging) clog(_self.name + 'ws login failed', msg.c, msg.dat);
                             conn.close(1000, 'unauthorized');
                         }
                     });
@@ -93,7 +94,7 @@ class WSM extends EE3 {
                     let i_disc = _self.clients[conn.id]._c.indexOf(conn);
                     _self.clients[conn.id]._c.splice(i_disc, 1);
 
-                    if (_self._logging) console.log(_self.name + ` ${conn.id} (${_self.clients[conn.id]._c.length}) one link lost`);
+                    if (_self._logging) clog(_self.name + ` ${conn.id} (${_self.clients[conn.id]._c.length}) one link lost`);
 
                     if (!_self.clients[conn.id]._c.length) {
                         _self.emit('disconnected', conn);
@@ -102,7 +103,7 @@ class WSM extends EE3 {
                 }
             });
             conn.onerror = function (e) {
-                if (_self._logging) console.log(_self.name + 'ws-err: cc-master.init.clients_wss > ', e.code);
+                if (_self._logging) clog(_self.name + 'ws-err: cc-master.init.clients_wss > ', e.code);
             };
 
         });

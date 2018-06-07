@@ -4,6 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const shortid = require('shortid');
 const crypto = require('crypto');
 const extend = require('deep-extend');
+const clog = require('../../clog');
 
 class Database {
     constructor() {
@@ -37,7 +38,7 @@ class Database {
                 callback();
             })
             .catch((err) => {
-                console.log('DB::connect() Failed!', err);
+                clog('DB::connect() Failed!', err);
                 process.exit(-1);
             });
     }
@@ -73,19 +74,16 @@ class Database {
     journal(journal_id) {
         if (!this.journals[journal_id]) {
             this.journals[journal_id] = this.db_journals.collection(journal_id);
-            this.journals[journal_id].ensureIndex([["timestamp", 1]])
-                .then((r) => console.log(`DB:: "${journal_id}" >> indexed: ${r}`))
-                .catch(e => { console.log('DB:: journal()', e)});
         }
         return this.journals[journal_id];
     }
 
-    async wipe_data() {
-        await this.db_void.collection('cmdrs').deleteMany({});
-        await this.db_void.collection('reports').deleteMany({});
-        await this.db_void.collection('bodies').deleteMany({});
-        await this.db_void.collection('systems').deleteMany({});
+    journal_index(journal_id) {
+        return this.db_journals.collection(journal_id).ensureIndex([["timestamp", 1]])
+            .then((r) => clog(`DB:: "${journal_id}" >> indexed: ${r}`))
+            .catch(e => { clog('DB:: journal()', e)});
     }
+
 }
 
 const DB = new Database();

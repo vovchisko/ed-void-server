@@ -10,7 +10,7 @@ global.PIPE_EVENTS = [
 global.GHOST = false;
 
 exports = module.exports = server;
-
+const clog = require('./clog');
 const NodeStatic = require('node-static');
 const WSM = require('./universe/services/ws-manager');
 const MailService = require('./universe/services/mailer');
@@ -48,6 +48,7 @@ const cfg = server.cfg = require('./config');
 const EML = server.EML = new MailService(server.cfg.email);
 const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
+const log = server.log = require('./clog');
 
 const action_signup = require('./universe/actions/signup');
 const action_signin = require('./universe/actions/signin');
@@ -77,7 +78,7 @@ class Clients {
 
         this.wss.on('disconnected', async (client) => {
             let user = await UNI.get_user({_id: client.id});
-            console.log(`USR: ${user._id} [CMDR ${user.cmdr_name}] leave`);
+            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] leave`);
             user.online = false;
             user.save();
         });
@@ -91,7 +92,7 @@ class Clients {
 
             let user = await UNI.get_user({_id: client.id});
             if (!user) return client.close();
-            console.log(`USR: ${user._id} [CMDR ${user.cmdr_name}] joined`);
+            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] joined`);
             UNI.refill_user(user._id);
 
             user.online = true;
@@ -99,7 +100,7 @@ class Clients {
         });
 
         this.wss.init();
-        console.log(`CLIENTS APP WS [${this.port}]: OK`);
+        clog(`CLIENTS APP WS [${this.port}]: OK`);
     }
 
     send_to(uid, c, dat) {
@@ -131,14 +132,14 @@ class JCollector {
 
         this.wss.on('disconnected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
-            console.log(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] - journal disconnected`);
+            clog(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] journal disconnected`);
         });
 
         this.wss.on('connected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
             if (!juser) return client.close();
 
-            console.log(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] - journal connected`);
+            clog(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] journal connected`);
         });
 
         this.wss.on('message', async (client, c, dat) => {
@@ -147,7 +148,7 @@ class JCollector {
         });
 
         this.wss.init();
-        console.log(`JCL: [${this.port}] - OK`);
+        clog(`JCL: [${this.port}] - OK`);
     }
 
     send_to(uid, c, dat) {
@@ -206,20 +207,20 @@ require('http').createServer(function (request, response) {
     }).resume();
 
 }).listen(cfg.main.port);
-console.log('WEB & API-SERVER ON PORT: ' + cfg.main.port);
+clog('WEB & API-SERVER ON PORT: ' + cfg.main.port);
 
 DB.connect(cfg.database, init);
 
 process.on('unhandledRejection', (error) => {
-    console.log('ERROR: unhandledRejection', error);
+    clog('ERROR: unhandledRejection', error);
     process.exit(-1);
 });
 
 function init() {
 
-    console.log('DATABSE: CONNECTED ' + cfg.database.host + ':' + cfg.database.port);
-    console.log('  VOID_DB - ' + cfg.database.db_void);
-    console.log('   JRN_DB - ' + cfg.database.db_journals);
+    clog('DATABSE: CONNECTED ' + cfg.database.host + ':' + cfg.database.port);
+    clog('  VOID_DB - ' + cfg.database.db_void);
+    clog('   JRN_DB - ' + cfg.database.db_journals);
 
 
     UNI.on(EV_PIPE, (uid, rec_event, rec) => {
@@ -234,7 +235,7 @@ function init() {
     JCL.init(cfg.main.ws_journals);
     UNI.init();
 
-    console.log('http://localhost:' + cfg.main.port);
+    clog('http://localhost:' + cfg.main.port);
 }
 
 

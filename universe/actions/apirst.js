@@ -4,7 +4,7 @@
     Reset api-key and re-login all cleints
 */
 
-
+const clog = require('../../clog');
 const server = require('../../server');
 const UNI = require('../universe');
 const DB = server.DB;
@@ -46,7 +46,7 @@ module.exports = function (req, res) {
             result.text = 'operation failed';
         }
         res.end(JSON.stringify(result));
-        console.log(log + result.text);
+        clog(log + result.text);
     });
 };
 

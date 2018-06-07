@@ -7,6 +7,7 @@
 const server = require('../../server');
 const UNI = require('../universe');
 const pre = require('../pre');
+const clog = require('../../clog');
 
 module.exports = function (req, res) {
     server.handle_request(req, res, async (req, res, buffer) => {
@@ -40,11 +41,11 @@ module.exports = function (req, res) {
         } catch (e) {
             res.statusCode = 500;
             res_text = 'fail';
-            console.log(log, res_text, e);
+            clog(log, res_text, e);
         }
 
         res.end(res_text);
-        if (log && server.cfg.main.rec_log) console.log(log + res_text);
+        if (log && server.cfg.main.rec_log) clog(log + res_text);
     });
 };
 

@@ -5,7 +5,7 @@ const dateformat = require('dateformat');
 const EE3 = require('eventemitter3');
 const extend = require('deep-extend');
 const DB = require('./services/database');
-
+const log = require('../clog');
 const tools = require('./tools');
 const pick = tools.pick;
 const pickx = tools.pickx;
@@ -27,20 +27,20 @@ class Universe extends EE3 {
         this.cmdrs = {};
         this.users_api_key = {};
         this.alive = false;
-        console.log('UNIVERSE: OK');
+        log('UNIVERSE: OK');
     }
 
     init() {
         this.alive = true;
 
         if (GHOST) {
-            console.log('UNIVERSE IS A GHOST');
+            log('UNIVERSE IS A GHOST');
         } else {
-            console.log('UNIVERSE ALIVE & CAN BROADCAST');
+            log('UNIVERSE ALIVE & CAN BROADCAST');
 
         }
         if (!GHOST)
-            this.autosave = setInterval(() => this.save_cache().catch(err => { console.log('Autosave failed', err)}), 30000);
+            this.autosave = setInterval(() => this.save_cache().catch(err => { log('Autosave failed', err)}), 30000);
     }
 
     async save_cache() {
@@ -93,7 +93,7 @@ class Universe extends EE3 {
 
             })
             .catch((e) => {
-                console.log(`UNI::refill_user(${uid}) - can't refill user;`, e);
+                log(`UNI::refill_user(${uid}) - can't refill user;`, e);
             });
     }
 
@@ -180,7 +180,7 @@ class Universe extends EE3 {
             if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec);
             if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
         } catch (e) {
-            console.log('UNI.process()', rec.event, e);
+            log('UNI.process()', rec.event, e);
         }
         return null;
     }
@@ -764,7 +764,10 @@ class USER {
         if (!name) return;
         this._cmdr = await UNI.get_cmdr(this._id, name);
         this.cmdr_name = name;
-        if (!this.cmdrs.includes(name)) this.cmdrs.push(name);
+        if (!this.cmdrs.includes(name)) {
+            this.cmdrs.push(name);
+            this.journal_index();
+        }
         this._ch = true;
         UNI.emit(EV_NET, this._id, 'user', this);
         UNI.emit(EV_NET, this._id, 'cmdr', this);
@@ -790,6 +793,11 @@ class USER {
     journal() {
         if (this._cmdr)
             return DB.journal(`[${this._id}] ${this._cmdr.name}`);
+    }
+
+    journal_index(){
+        if (this._cmdr)
+            return DB.journal_index(`[${this._id}] ${this._cmdr.name}`);
     }
 }
 

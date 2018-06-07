@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-
+const clog = require('../../clog');
 
 class MailService {
     constructor(cfg) {
@@ -29,11 +29,10 @@ class MailService {
 </p>
 `
         }).then((info) => {
-            console.log(`EMAIL SENT: [email_confirmation] ${email} / ${secret}`);
-            console.log(' - response: ' + info.response);
+            clog(`EML: [email_conf] ${email} / res: ${info.response}`);
             return true;
         }).catch((err) => {
-            console.log(err);
+            clog(err);
         });
     }
 
@@ -53,11 +52,10 @@ class MailService {
 </p>
 `
         }).then((info) => {
-            console.log(`EMAIL SENT: [email_confirmation] ${email} / ${secret}`);
-            console.log(' - response: ' + info.response);
+            clog(`EML: [pass_reset] ${email} / res: ${info.response}`);
             return true;
         }).catch((err) => {
-            console.log(err);
+            clog(err);
         });
     }
 }

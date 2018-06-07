@@ -34,22 +34,37 @@ async function init() {
 
     UNI.init();
 
+    await wipe_stellars();
     await re_index_journals();
-
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
+    await re_process();
     await re_process();
 
 }
 
+async function wipe_stellars() {
+    await DB.db_void.collection('bodies').deleteMany({});
+    await DB.db_void.collection('systems').deleteMany({});
+}
 
 async function re_index_journals(cb) {
     let count = await DB.cmdrs.count();
-    console.log('\n>> RE_INDEXING JOURNALS...');
+    console.log(`\n>> RE_INDEXING ${count} JOURNALS...`);
     let cmdrs = DB.cmdrs.find();
     while (await cmdrs.hasNext()) {
         const c = await cmdrs.next();
         let user = await UNI.get_user({_id: c.uid});
         await user.set_cmdr(c.name);
-        user.journal();
+        await user.journal_index();
     }
 }
 
@@ -74,38 +89,31 @@ async function re_process() {
         user._cmdr.__reset();
 
         let total_r = await user.journal().count();
-        journal = await user.journal().find().sort({timestamp: 1});//.addCursorFlag('noCursorTimeout', true);
+        journal = await user.journal().find().batchSize(10).sort({timestamp: 1});//.addCursorFlag('noCursorTimeout', true);
 
         console.log(`${++i}/${count}\t ${c.uid}\t CMDR: ${c.name}`);
         console.log(`records: ${total_r}`);
 
         let per_bar = Math.floor(total_r / 64);
-        let records_stack = [];
+        let recs = 0;
         while (await journal.hasNext()) {
-
-            records_stack.push(await journal.next());
+            await UNI.process(user._cmdr, await journal.next());
             if (r > per_bar) {
                 process.stdout.write("\u00BB");
                 r = 0;
             } else {++r;}
+            recs++;
         }
-        process.stdout.write("\n");
-        for (let i = 0; i < records_stack.length; i++) {
-            await UNI.process(user._cmdr, records_stack[i]);
-            if (r > per_bar) {
-                process.stdout.write("\u00AB");
-                r = 0;
-            } else {++r;}
-        }
-
-
         await journal.close();
+
+        process.stdout.write("\n");
         let end_j = new Date().getTime() - start_j;
-        console.log(`\n\u2713 took: ${end_j / 1000}sec\``);
+        console.log(`\u2713 took: ${end_j / 1000}sec; ${recs} records proceed;`);
         console.log('')
 
     }
     await cmdrs.close();
+
     let end_all = new Date().getTime() - start_all;
     console.log(`total time: ${end_all / 1000}sec`);
 }
