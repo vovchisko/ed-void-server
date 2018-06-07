@@ -730,7 +730,7 @@ class USER {
             records_left = this._rec_left;
         }
 
-        if (records_left > 5 && !this._overload) {
+        if (records_left && !this._overload) {
             UNI.emitf(EV_NET, this._id, 'overload', true);
             this._overload = true;
         }

@@ -22,32 +22,14 @@ async function init() {
     console.log('  VOID_DB - ' + cfg.database.db_void);
     console.log('   JRN_DB - ' + cfg.database.db_journals);
 
-    /*
-        UNI.on(EV_PIPE, (uid, rec_event, rec) => {
-            console.log('EV_PIPE::', uid, 'pipe:' + rec_event, rec);
-        });
-
-        UNI.on(EV_NET, (uid, uni_event, data) => {
-            console.log('EV_NET::', uid, 'uni:' + uni_event, data);
-        });
-    */
+    // UNI.on(EV_PIPE, (uid, rec_event, rec) => { });
+    // UNI.on(EV_NET, (uid, uni_event, data) => { });
 
     UNI.init();
 
-    await wipe_stellars();
+    //await wipe_stellars();
     await re_index_journals();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
-    await re_process();
+    //await re_process();
 
 }
 
