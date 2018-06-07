@@ -730,7 +730,7 @@ class USER {
             records_left = this._rec_left;
         }
 
-        if (records_left && !this._overload) {
+        if (records_left > 5 && !this._overload) {
             UNI.emitf(EV_NET, this._id, 'overload', true);
             this._overload = true;
         }
@@ -751,7 +751,7 @@ class USER {
                     clearTimeout(this._overtimeout);
                     this._overtimeout = null;
                 }
-            }, 500);
+            }, 800);
         }
         this._rec_left = records_left;
     }
