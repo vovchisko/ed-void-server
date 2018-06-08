@@ -11,10 +11,10 @@
 
         <div class="navi-surf" v-if="navi.pos.alt!==null">
             <div class="compass edfx">
-                <div class="ruler edfx" v-bind:style="navi.style_ruler">
+                <div class="ruler" v-bind:style="navi.style_ruler">
                     <b class="head">{{navi.pos.head}}</b>
                 </div>
-                <div class="dest edfx edfx-delay-1" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
+                <div class="dest edfx-delay-1" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
                     <b class="head" v-bind:class="navi.dest.align">{{navi.dest.head}}</b>
                 </div>
             </div>
