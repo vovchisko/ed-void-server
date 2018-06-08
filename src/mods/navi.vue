@@ -14,7 +14,7 @@
                 <div class="ruler" v-bind:style="navi.style_ruler">
                     <b class="head">{{navi.pos.head}}</b>
                 </div>
-                <div class="dest edfx-delay-1" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
+                <div class="dest" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
                     <b class="head" v-bind:class="navi.dest.align">{{navi.dest.head}}</b>
                 </div>
             </div>
@@ -27,7 +27,7 @@
                             <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <u>°</u></span></em>
                             <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <u>KM</u></span></em>
                         </div>
-                        <div v-if="navi.dest.enabled" class="edfx edfx-delay-2">
+                        <div v-if="navi.dest.enabled" class="edfx">
                             <br>
                             <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0)}} <u>°</u></span></em>
                             <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3)}} <u>KM</u></span></em>
@@ -35,7 +35,7 @@
                     </div>
                     <div class="col-6 cords justified">
                         <h5>DESTINATION</h5>
-                        <div v-if="navi.dest.enabled" class="edfx edfx-delay-3">
+                        <div v-if="navi.dest.enabled" class="edfx">
                             <em class="editable">
                                 <b>LAT</b>
                                 <span><input type="number" min="-90" max="90" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lat"><u>°</u></span>
