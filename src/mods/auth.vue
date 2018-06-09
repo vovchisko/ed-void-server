@@ -17,7 +17,7 @@
             </div>
 
             <div class="ui">
-                <button type="button" v-on:click="signin()">Signin</button>
+                <button type="button" v-on:click="signin()">Sign in</button>
             </div>
 
             <div class="ui links">

@@ -1,15 +1,20 @@
 <template>
     <div id="vass">
-        <header class="edfx">VOID ADV. SCANNER</header>
+        <header class="edfx">
+            <button v-on:click="c_tab = t" v-for="t in tabs" v-bind:class="c_tab === t ? 'active' : ''">{{t}}</button>
+        </header>
 
         <div class="alert info" v-if="!recent.length">
             <i class="i-ed-alert"></i>
             <div>no recent activity</div>
             <small>no recent activity was found in database</small>
         </div>
-
-        <ev class="edfx" v-for="rec in recent" v-bind:rec="rec" v-bind:key="rec._id"></ev>
-
+        <div v-if="c_tab==='flight log'">
+            <ev class="edfx" v-for="rec in recent" v-bind:rec="rec" v-bind:key="rec._id"></ev>
+        </div>
+        <div v-if="c_tab==='data'">
+            <pre>c_system: {{env.system}}</pre>
+        </div>
     </div>
 </template>
 
@@ -21,8 +26,16 @@
 
     export default {
         name: "vass",
+
         components: {Ev},
-        data: () => {return {recent: Data.vass.recent, c_system: Data.vass.c_system}}
+        data: () => {
+            return {
+                c_tab: 'flight log',
+                tabs: ['flight log', 'data'],
+                recent: Data.vass.recent,
+                env: Data.env
+            }
+        }
     }
 
     function push_rec(rec) {
@@ -53,15 +66,10 @@
 <style lang="scss">
     @import "../styles/vars";
     #vass {
-
         .ev {
-            .head { margin: 0 -5px 0.8em -5px; padding: 0.8em 5px 0.4em 5px;
-                background: darken($ui-bg, 2%); }
-
             padding: 1em 0;
-
+            .head { margin: 0 -5px 0.8em -5px; padding: 0.8em 5px 0.4em 5px; background: darken($ui-bg, 2%); }
         }
-
         .main em { color: lighten($ui-text, 15%); font-size: 1.05em; line-height: 1.1em}
         .sub em { font-size: 0.8em; }
 

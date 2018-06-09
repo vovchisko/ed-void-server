@@ -206,9 +206,11 @@ class Universe extends EE3 {
         await  UNI.get_system(cmdr.system_id)
             .then((system) => {
                 if (!system) return;
-                if (cmdr.metrics.curr_ds > system.ds_count)
+                if (cmdr.metrics.curr_ds > system.ds_count) {
                     system.ds_count = cmdr.metrics.curr_ds;
-                return system.save();
+                    this.emit(EV_NET, cmdr.uid, 'c_system', system);
+                    return system.save();
+                }
             });
 
     }
