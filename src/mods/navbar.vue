@@ -46,10 +46,10 @@
 <style lang="scss">
     @import "../styles/vars";
     #navbar {
-        height: calc(2.2em + 2px + 5px);
+        height: 2.2em;
         line-height: 2.2em;
-        margin-top: 0px; margin-bottom: 0;
-        padding-top: 5px; padding-bottom: 0;
+        margin-top: 5px; margin-bottom: 0;
+        padding-top: 0; padding-bottom: 0;
 
         //layout
         .nav-left { float: left; white-space: nowrap; position: relative; z-index: 2; width: 6em; }
@@ -94,14 +94,16 @@
     }
     header {
         @include hcaps();
-        margin: calc(-2.2em - 2px) 1.5em 5px 6em;
-        padding: 0 0 0 10px;
+        margin: -2.2em 1.5em 0.2em 6em;
+        padding: 0 0 0 0.5em;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        line-height: 2.4em;
-        height: calc(2.2em + 2px);
+        line-height: 2.2em;
         color: lighten($ui-text, 15%);
+        border-style: solid;
+        border-width: 1px 0 1px 0;
+        border-color: transparent;
         button { margin: 0 0.4em 0 0; }
         button.link { padding: 0 0.3em }
         button.link i { font-size: 1.1em; margin-right: 0.2em}
