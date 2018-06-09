@@ -125,7 +125,6 @@ class DataStorage {
                 extend(this._null[i], this[i])
             }
         }
-console.log((localStorage.getItem('ui_font_size')));
 
         this.auth.api_key = (localStorage.getItem('api_key')) || this.auth.api_key;
         this.modes.c_mode = (localStorage.getItem('c_mode')) || this.modes.c_mode;
@@ -150,7 +149,6 @@ console.log((localStorage.getItem('ui_font_size')));
     apply_ui_cfg() {
         document.body.style.fontSize = this.cfg.ui_font_size;
         document.body.className = 'edfx-lv-' + this.cfg.ui_fx_level;
-
     }
 }
 

@@ -60,6 +60,7 @@ class Database {
         this.reports = this.db_void.collection('reports');
         this.bodies = this.db_void.collection('bodies');
         this.systems = this.db_void.collection('systems');
+        this.exp_data = this.db_void.collection('exp_data');
 
         //summary logs
         this.market = this.db_journals.collection('_log_market');

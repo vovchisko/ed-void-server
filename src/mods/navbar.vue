@@ -101,9 +101,6 @@
         text-overflow: ellipsis;
         line-height: 2.2em;
         color: lighten($ui-text, 15%);
-        border-style: solid;
-        border-width: 1px 0 1px 0;
-        border-color: transparent;
         button { margin: 0 0.4em 0 0; }
         button.link { padding: 0 0.3em }
         button.link i { font-size: 1.1em; margin-right: 0.2em}

@@ -5,7 +5,7 @@ const dateformat = require('dateformat');
 const EE3 = require('eventemitter3');
 const extend = require('deep-extend');
 const DB = require('./services/database');
-const log = require('../clog');
+const clog = require('../clog');
 const tools = require('./tools');
 const pick = tools.pick;
 const pickx = tools.pickx;
@@ -26,21 +26,17 @@ class Universe extends EE3 {
         this.users = {};
         this.cmdrs = {};
         this.users_api_key = {};
-        this.alive = false;
-        log('UNIVERSE: OK');
+        clog('UNIVERSE: OK');
     }
 
     init() {
-        this.alive = true;
-
         if (GHOST) {
-            log('UNIVERSE IS A GHOST');
+            clog('UNIVERSE IS A GHOST');
         } else {
-            log('UNIVERSE ALIVE & CAN BROADCAST');
-
+            clog('UNIVERSE IS REAL & CAN BROADCAST');
         }
         if (!GHOST)
-            this.autosave = setInterval(() => this.save_cache().catch(err => { log('Autosave failed', err)}), 30000);
+            this.autosave = setInterval(() => this.save_cache().catch(err => { clog('Autosave failed', err)}), 30000);
     }
 
     async save_cache() {
@@ -71,13 +67,11 @@ class Universe extends EE3 {
                 this.emit(EV_NET, user._id, 'cmdr', user._cmdr);
                 this.emit(EV_NET, user._id, 'status', user._cmdr.status);
 
-                if (user.journal()) {
-                    let scans = user.journal()
-                        .find({event: {$in: ['Scan', 'FSDJump']}})
-                        .sort({timestamp: -1})
-                        .limit(16);
-                    scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
-                }
+                let scans = user._cmdr.journal()
+                    .find({event: {$in: ['Scan', 'FSDJump']}})
+                    .sort({timestamp: -1})
+                    .limit(16);
+                scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
 
                 if (user._cmdr.system_id) {
                     let sys = await this.get_system(user._cmdr.system_id);
@@ -93,7 +87,7 @@ class Universe extends EE3 {
 
             })
             .catch((e) => {
-                log(`UNI::refill_user(${uid}) - can't refill user;`, e);
+                clog(`UNI::refill_user(${uid}) - can't refill user;`, e);
             });
     }
 
@@ -139,8 +133,9 @@ class Universe extends EE3 {
 
             this.emit(EV_PIPE, user._id, rec.event, rec);
 
+            if (user._cmdr)
+                await user._cmdr.journal().save(rec);
 
-            await user.journal().save(rec);
         } else if (typeof rec._data !== 'undefined') {
             if (['shipyard', 'market', 'outfitting'].includes(rec._data)) {
                 rec._id = [dateformat(rec.timestamp, 'yymmddHHMMss', true), rec.MarketID, rec.StationName].join('/');
@@ -151,7 +146,6 @@ class Universe extends EE3 {
         await this.process(user._cmdr, rec);
         if (user._cmdr.last_rec < rec.timestamp) user._cmdr.last_rec = rec.timestamp;
     }
-
 
     emitf(ev, uid) {  //force emit
         super.emit(...arguments);
@@ -173,6 +167,7 @@ class Universe extends EE3 {
     process(cmdr, rec) {
         try {
             if (rec.event === 'Scan') return this.proc_Scan(cmdr, rec);
+            if (rec.event === 'SellExplorationData') return this.proc_SellExplorationData(cmdr, rec);
             if (rec.event === 'FSDJump') return this.proc_FSDJump(cmdr, rec);
             if (rec.event === 'Location') return this.proc_Location(cmdr, rec);
             if (rec.event === 'ApproachBody') return this.proc_ApproachBody(cmdr, rec);
@@ -180,9 +175,110 @@ class Universe extends EE3 {
             if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec);
             if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
         } catch (e) {
-            log('UNI.process()', rec.event, e);
+            clog('UNI.process()', rec.event, e);
         }
         return null;
+    }
+
+    async proc_SellExplorationData(cmdr, data) {
+        return cmdr.exp_data_sell(data);
+    }
+
+    async proc_Scan(cmdr, Scan) {
+
+        let body = await this.spawn_body(Scan.BodyName, cmdr.system_id);
+        if (!body) return;
+        body.append(cmdr, Scan);
+
+        await cmdr.exp_data_add(Scan);
+
+        //update cmdr scan data if we waiting for it
+        if (body._id === cmdr.body_id)
+            this.emit(EV_NET, cmdr.uid, 'c_body', body);
+
+    }
+
+    async proc_DiscoveryScan(cmdr, rec) {
+
+        cmdr.metrics.curr_ds += rec.Bodies;
+        cmdr.touch();
+
+        await  UNI.get_system(cmdr.system_id)
+            .then((system) => {
+                if (!system) return;
+                if (cmdr.metrics.curr_ds > system.ds_count)
+                    system.ds_count = cmdr.metrics.curr_ds;
+                return system.save();
+            });
+
+    }
+
+    async proc_NavBeaconScan(cmdr, rec) {
+
+        cmdr.metrics.curr_ds = rec.NumBodies;
+
+        cmdr.touch();
+
+        await UNI.get_system(cmdr.system_id)
+            .then((system) => {
+                if (!system) return;
+                if (cmdr.metrics.curr_ds > system.ds_count)
+                    system.ds_count = cmdr.metrics.curr_ds;
+                return system.save();
+            });
+
+    }
+
+    async proc_LeaveBody(cmdr, LeaveBody) {
+        cmdr.touch({
+            body_id: null,
+        });
+        this.emit(EV_NET, cmdr.uid, 'c_body', null);
+    }
+
+    async proc_ApproachBody(cmdr, ApproachBody) {
+        let body = await this.spawn_body(ApproachBody.Body, cmdr.system_id);
+        cmdr.touch({
+            body_id: body._id
+        });
+        this.emit(EV_NET, cmdr.uid, 'c_body', body);
+    }
+
+    async proc_Location(cmdr, Location) {
+        let sys = await this.spawn_system(Location.StarSystem, Location.StarPos);
+        if (!sys) return;
+        await sys.append(cmdr, Location);
+
+        let td = {
+            system_id: sys._id,
+            starpos: sys.starpos,
+        };
+
+        if (Location.Body && Location.BodyType === 'Planet') {
+            let body = await this.spawn_body(Location.Body, sys._id);
+            td.body_id = body._id;
+        }
+        cmdr.touch(td);
+
+    }
+
+    async proc_FSDJump(cmdr, FSDJump) {
+        let sys = await this.spawn_system(FSDJump.StarSystem, FSDJump.StarPos);
+        if (!sys) return;
+        sys.append(cmdr, FSDJump);
+        cmdr.touch({
+            system_id: sys._id,
+            starpos: sys.starpos,
+            body_id: null,
+            metrics: {curr_ds: 0}
+        });
+
+        this.emit(EV_NET, cmdr.uid, 'c_system', sys);
+    }
+
+    user_data(user, c, data) {
+        if (c === 'repo-submit') return this.repo_submit(user, data);
+        if (c === 'repo-search') return this.repo_search(user, data);
     }
 
     async repo_search(user, query) {
@@ -311,101 +407,6 @@ class Universe extends EE3 {
         this.emit(EV_NET, user._id, 'repo-current', r);
     }
 
-    user_data(user, c, data) {
-        if (c === 'repo-submit') return this.repo_submit(user, data);
-        if (c === 'repo-search') return this.repo_search(user, data);
-    }
-
-    async proc_DiscoveryScan(cmdr, rec) {
-
-        cmdr.metrics.curr_ds += rec.Bodies;
-        cmdr.touch();
-
-        await  UNI.get_system(cmdr.system_id)
-            .then((system) => {
-                if (!system) return;
-                if (cmdr.metrics.curr_ds > system.ds_count)
-                    system.ds_count = cmdr.metrics.curr_ds;
-                return system.save();
-            });
-
-    }
-
-    async proc_NavBeaconScan(cmdr, rec) {
-
-        cmdr.metrics.curr_ds = rec.NumBodies;
-
-        cmdr.touch();
-
-        await UNI.get_system(cmdr.system_id)
-            .then((system) => {
-                if (!system) return;
-                if (cmdr.metrics.curr_ds > system.ds_count)
-                    system.ds_count = cmdr.metrics.curr_ds;
-                return system.save();
-            });
-
-    }
-
-    async proc_LeaveBody(cmdr, LeaveBody) {
-        cmdr.touch({
-            body_id: null,
-        });
-        this.emit(EV_NET, cmdr.uid, 'c_body', null);
-    }
-
-    async proc_ApproachBody(cmdr, ApproachBody) {
-        let body = await this.spawn_body(ApproachBody.Body, cmdr.system_id);
-        cmdr.touch({
-            body_id: body._id
-        });
-        this.emit(EV_NET, cmdr.uid, 'c_body', body);
-    }
-
-    async proc_Location(cmdr, Location) {
-        let sys = await this.spawn_system(Location.StarSystem, Location.StarPos);
-        if (!sys) return;
-        await sys.append(cmdr, Location);
-
-        let td = {
-            system_id: sys._id,
-            starpos: sys.starpos,
-        };
-
-        if (Location.Body && Location.BodyType === 'Planet') {
-            let body = await this.spawn_body(Location.Body, sys._id);
-            td.body_id = body._id;
-        }
-        cmdr.touch(td);
-
-    }
-
-    async proc_FSDJump(cmdr, FSDJump) {
-        let sys = await this.spawn_system(FSDJump.StarSystem, FSDJump.StarPos);
-        if (!sys) return;
-        sys.append(cmdr, FSDJump);
-        cmdr.touch({
-            system_id: sys._id,
-            starpos: sys.starpos,
-            body_id: null,
-            metrics: {curr_ds: 0}
-        });
-
-        this.emit(EV_NET, cmdr.uid, 'c_system', sys);
-    }
-
-    async proc_Scan(cmdr, Scan) {
-
-        let body = await this.spawn_body(Scan.BodyName, cmdr.system_id);
-        if (!body) return;
-        body.append(cmdr, Scan);
-
-        //update cmdr scan data if we waiting for it
-        if (body._id === cmdr.body_id)
-            this.emit(EV_NET, cmdr.uid, 'c_body', body);
-
-    }
-
     /**
      * Get or create body
      * @param body_name
@@ -495,6 +496,7 @@ class Universe extends EE3 {
                     name: name,
                 });
             }
+            await this.cmdrs[cmdr_id].init();
         }
         return this.cmdrs[cmdr_id];
     }
@@ -708,7 +710,7 @@ class SYSTEM {
 
 class USER {
     constructor(data) {
-        this._id = null;
+        this._id = '';
         this._ch = true;
         this.cmdr_name = null;
         this.api_key = null;
@@ -766,7 +768,7 @@ class USER {
         this.cmdr_name = name;
         if (!this.cmdrs.includes(name)) {
             this.cmdrs.push(name);
-            this.journal_index();
+            await this._cmdr.journal_index();
         }
         this._ch = true;
         UNI.emit(EV_NET, this._id, 'user', this);
@@ -790,15 +792,7 @@ class USER {
         this._ch = false;
     }
 
-    journal() {
-        if (this._cmdr)
-            return DB.journal(`[${this._id}] ${this._cmdr.name}`);
-    }
 
-    journal_index(){
-        if (this._cmdr)
-            return DB.journal_index(`[${this._id}] ${this._cmdr.name}`);
-    }
 }
 
 class CMDR {
@@ -813,7 +807,71 @@ class CMDR {
         this.starpos = [0, 0, 0];
         this.metrics = {curr_ds: 0};
         this.status = {};
+        this._exp = null;
         extend(this, cmdr_data);
+    }
+
+    async init() {
+        // do nothing
+        let _exp = await DB.exp_data.findOne({_id: this._id});
+        if (!_exp) {
+            _exp = {
+                _id: this._id,
+                total: 0,
+                data: {},
+            };
+            await DB.exp_data.save(_exp);
+        }
+        this._exp = _exp;
+    }
+
+    async exp_data_add(rec) {
+
+        if (!rec.EstimatedValue || rec.ScanType !== 'Detailed') return;
+
+        //get current system in lower case
+        let sys = this.system_id.split('@')[0];
+        let body = con.LOW_CASE(rec.BodyName);
+
+        if (!this._exp.data[sys]) {
+            this._exp.data[sys] = {};
+        }
+
+        if (!this._exp.data[sys][body]) {
+            this._exp.data[sys][body] = rec.EstimatedValue;
+        }
+
+        this.exp_data_calc();
+
+        await this.save();
+
+    }
+
+    async exp_data_sell(rec) {
+
+        for (let i in rec.Systems) {
+            let sys = con.LOW_CASE(rec.Systems[i]);
+            delete this._exp.data[sys];
+        }
+
+        this.exp_data_calc();
+
+        await this.save();
+    }
+
+    exp_data_calc() {
+        this._exp.total = 0;
+        for (let s in this._exp.data)
+            for (let b in this._exp.data[s])
+                this._exp.total += this._exp.data[s][b];
+    }
+
+    journal() {
+        return DB.journal(`[${this.uid}] ${this.name}`);
+    }
+
+    journal_index() {
+        return DB.journal_index(`[${this.uid}] ${this.name}`);
     }
 
     __reset() {
@@ -822,6 +880,8 @@ class CMDR {
         this.starpos = [0, 0, 0];
         this.metrics.curr_ds = 0;
         this.status = {};
+        this._exp.total = 0;
+        this._exp.data = {}
     }
 
     touch(data = null) {
@@ -831,6 +891,7 @@ class CMDR {
     }
 
     async save() {
+        DB.exp_data.save(this._exp);
         if (!this._ch) return;
         if (!this._id || !this.uid) return;
         let snapshot = {};
