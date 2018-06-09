@@ -78,7 +78,7 @@ class Clients {
 
         this.wss.on('disconnected', async (client) => {
             let user = await UNI.get_user({_id: client.id});
-            //clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] leave`);
+            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] leave`);
             user.online = false;
             user.save();
         });
@@ -92,7 +92,7 @@ class Clients {
 
             let user = await UNI.get_user({_id: client.id});
             if (!user) return client.close();
-            //clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] joined`);
+            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] joined`);
             UNI.refill_user(user._id);
 
             user.online = true;
