@@ -205,7 +205,7 @@
                 span input { border-width: 0 0 1px 0 !important; }
                 span u { }
             }
-            input[type=number] { width: calc(100% - 2.2em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.2em; max-width: 13em; }
+            input[type=number] { width: calc(100% - 2.1em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.2em; max-width: 13em; }
             button { margin-top: 15px}
         }
         .location-data {

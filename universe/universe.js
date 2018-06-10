@@ -49,7 +49,6 @@ class Universe extends EE3 {
             .then(async (user) => {
                 if (!user) throw new Error();
 
-
                 if (user._overload) {
                     user.track_overload();
                     UNI.emitf(EV_NET, user._id, 'overload', true);
@@ -70,7 +69,8 @@ class Universe extends EE3 {
                 let scans = user._cmdr.journal()
                     .find({event: {$in: ['Scan', 'FSDJump']}})
                     .sort({timestamp: -1})
-                    .limit(16);
+                    .limit(32);
+
                 scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
 
                 if (user._cmdr.system_id) {
@@ -82,6 +82,7 @@ class Universe extends EE3 {
                     let body = await this.get_body(user._cmdr.body_id);
                     this.emit(EV_NET, uid, 'c_body', body);
                 }
+                this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.data);
 
                 await this.repo_search(user, {uid: user._id});
 
@@ -95,12 +96,8 @@ class Universe extends EE3 {
 
         user.track_overload(0);
 
-        //this.emit(EV_PIPE, user._id, Status.event, Status);
-
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
-        // user._cmdr.touch not used because we no need unnecessary update.
-        // send only status
         extend(user._cmdr.status, {
             flags: Status.Flags,
             pips: Status.Pips,
@@ -115,7 +112,8 @@ class Universe extends EE3 {
         this.emit(EV_NET, user._id, 'status', user._cmdr.status);
     }
 
-    /* ONLY FOR NEW RECORDS!! */ //todo: I guess this should be in handle_record()
+    //todo: Maybe this should be in handle_record() method.
+    /* ONLY FOR NEW RECORDS!! */
     async record(user, rec, cmdr_name, gv, lng, records_left = 0) {
 
         if (cmdr_name !== user.cmdr_name) await user.set_cmdr(cmdr_name);
@@ -185,17 +183,12 @@ class Universe extends EE3 {
     }
 
     async proc_Scan(cmdr, Scan) {
-
         let body = await this.spawn_body(Scan.BodyName, cmdr.system_id);
         if (!body) return;
         body.append(cmdr, Scan);
-
         await cmdr.exp_data_add(Scan);
-
-        //update cmdr scan data if we waiting for it
         if (body._id === cmdr.body_id)
             this.emit(EV_NET, cmdr.uid, 'c_body', body);
-
     }
 
     async proc_DiscoveryScan(cmdr, rec) {
@@ -424,7 +417,6 @@ class Universe extends EE3 {
         let body_id = Universe.body_id(system_id, body_name);
         let b = await this.get_body(body_id);
 
-        //todo: shoudl we do same cache like with cmdrs or users?
         if (b) return new BODY(b);
         b = new BODY({
             _id: body_id,
@@ -516,7 +508,6 @@ class Universe extends EE3 {
 
         if (s) return new SYSTEM(s);
 
-        //todo: should we do same cache like with cmdrs or users?
         s = new SYSTEM({
             _id: id,
             name: name,
@@ -858,10 +849,12 @@ class CMDR {
 
         this.exp_data_calc();
 
+        UNI.emit(EV_NET, this.uid, 'exp-data', this._exp.data);
+
         await this.save();
     }
 
-    exp_data_calc() {
+    exp_data_calc() { //todo:  need to separate this data from cmdr.
         this._exp.total = 0;
         for (let s in this._exp.data)
             for (let b in this._exp.data[s])

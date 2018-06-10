@@ -6,6 +6,7 @@
                     <h3>{{s.BodyName}}</h3>
                     <h5 class="star" v-show="s.StarType">{{STAR_CLASS[s.StarType]}}</h5>
                     <h5 class="planet" v-show="s.PlanetClass">{{s.PlanetClass}} <span class="landable" v-if="s.Landable">[landable]</span></h5>
+                    <h5 class="date">{{s.timestamp}}</h5>
                 </div>
                 <div class="col-sm">
                     <h5 class="arrival">arrival: <span>{{s.DistanceFromArrivalLS | nn(0)}} ls</span></h5>
@@ -24,6 +25,16 @@
                     <em><b>Rot.Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
                 </div>
                 <div class="col-sm">
+                    <div class="sub">
+                        <h5>Orbit</h5>
+                        <em><b>Semi Major Axis</b><span>{{s.SemiMajorAxis / 149597870700 | nn(4)}} <u>AU</u></span></em>
+                        <em><b>Orbital Period</b><span>{{s.OrbitalPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
+                        <em><b>Rotation Period</b><span>{{s.RotationPeriod / 60 / 60 / 24 | nn(2)}} <u>DAYS</u></span></em>
+                        <em><b>Orbital Eccentricity</b><span>{{s.Eccentricity}}</span></em>
+                        <em><b>Orbital Inclination</b><span>{{s.OrbitalInclination | nn(2,2)}} <u>°</u></span></em>
+                        <em><b>Arg Of Periapsis</b><span>{{s.Periapsis | nn(2,2)}} <u>°</u></span></em>
+                        <em><b>Axial Tilt</b><span>{{s.AxialTilt  * 180 / Math.PI | nn(2,2)}} <u>°</u></span></em>
+                    </div>
                     <div class="sub ring" v-if="s.Rings" v-for="ring in s.Rings">
                         <h5>{{ring.Name}}</h5>
                         <em><b>Class</b><span>{{BELT_CLASS[ring.RingClass]}}</span></em>
@@ -131,6 +142,7 @@
                 &.star { color: $purple-light }
                 &.planet { color: $orange }
                 & .landable { color: $cyan }
+                &.date { color: darken($ui-text,20% )}
                 &.arrival { padding: 0.05em 0;
                     span { color: lighten($ui-text, 20%)}
                 }

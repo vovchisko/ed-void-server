@@ -30,7 +30,7 @@
                 <br>
                 <h3>ED-VOID CLIENT INSTALLATION</h3>
                 <p class="help edfx">
-                    - Download <a href="download/ed-void-client.zip">ED-VOID Client [8.17Mb]</a><br>
+                    - Download <a href="/download/ed-void-client.zip">ED-VOID Client [8.17Mb]</a><br>
                     - Run and follow the instructions.<br>
                     - Come back to ED-VOID
                 </p>

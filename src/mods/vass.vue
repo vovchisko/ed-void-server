@@ -30,7 +30,7 @@
         components: {Ev},
         data: () => {
             return {
-                c_tab: 'flight log',
+                c_tab: 'data',
                 tabs: ['flight log', 'data'],
                 recent: Data.vass.recent,
                 env: Data.env
@@ -59,6 +59,11 @@
             Data.vass.recent.splice(-1, 1);
     }
 
+    function push_exp_data(exp) {
+        console.log(exp)
+    }
+
+    Net.on('uni:exp-data', (data) => { push_exp_data(data)}); // todo: we need UI for it.
     Net.on('pipe:Scan', (rec) => push_rec(rec));
     Net.on('pipe:FSDJump', (rec) => push_rec(rec));
 </script>
@@ -76,6 +81,5 @@
         .scan:last-child { display: none; }
         .scan:first-child { display: block !important; }
         .scan.empty { text-align: center; color: $orange; padding: 100px 0; }
-
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div id="navbar" class="container-fluid clearfix">
+    <div id="navbar" class="container-fluid">
         <div class="nav-right edfx">
             <div v-bind:class="['net', net.error ? 'err':'', net.online]">
                 <i class="i i-wifi" v-if="net.online === 'online'"></i>
@@ -17,7 +17,6 @@
                 <button v-for="(name, mode) in nav.modes" v-bind:class="nav.c_mode === mode ? 'semi-active':''" v-on:click="do_nav(mode)">{{name}}</button>
             </nav>
         </div>
-
         <div id="nav-clickout" v-if="toggle" v-on:click="toggle=false"></div>
     </div>
 </template>
@@ -46,8 +45,8 @@
 <style lang="scss">
     @import "../styles/vars";
     #navbar {
-        height: 2.2em;
-        line-height: 2.2em;
+        line-height: $ui-line-h;
+        height: $ui-line-h;
         margin-top: 5px; margin-bottom: 0;
         padding-top: 0; padding-bottom: 0;
 
@@ -57,7 +56,7 @@
 
         //styles
         button.mode {
-            white-space: nowrap; width: 100%;
+            white-space: nowrap; width: 100%; float: left;
             .caret { font-size: 1.1em; width: 0.7em; display: inline-block; }
             &.active .caret { }
         }
@@ -75,13 +74,13 @@
         .net {
             padding: 0;
             color: darken($ui-text, 15%);
-            font-size: 1.3em;
             text-align: center;
+            line-height: $ui-line-h;
             &.online { color: lighten($ui-fg, 15%); }
             &.offline { color: $purple; }
             &.connecting { color: $purple; }
             &.err { color: darken($red, 15%); }
-            i { margin-top: -2px }
+            i { font-size: 1.3em; display: inline-block }
 
         }
         .nav-header {
@@ -94,15 +93,16 @@
     }
     header {
         @include hcaps();
-        margin: -2.2em 1.5em 0.2em 6em;
+        margin: -$ui-line-h 1.5em 0.2em 6em;
         padding: 0 0 0 0.5em;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        line-height: 2.2em;
+        line-height: $ui-line-h;
+        height: $ui-line-h;
         color: lighten($ui-text, 15%);
         button { margin: 0 0.4em 0 0; }
-        button.link { padding: 0 0.3em }
+        button.link { padding: 0 0.3em 0 0}
         button.link i { font-size: 1.1em; margin-right: 0.2em}
     }
 </style>

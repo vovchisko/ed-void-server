@@ -36,14 +36,16 @@ $ui-text: $gray;
 $ui-err: $red;
 $ui-act-fg: $orange;
 
+$ui-line-h: 2.2em;
+
 $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=button], input:not([type]), select";
 
 @mixin hcaps { font-family: 'euro_capsregular', sans-serif; }
 @mixin ui-basic {
-  display: inline-block;
-  line-height: 2.2em;
+  display: table-cell;
+  line-height: $ui-line-h;
   white-space: nowrap;
-  //height: 2.2em;
+  height: $ui-line-h;
   padding: 0 0.5em;
   background: transparent;
   border: 1px solid darken($ui-fg, 25%);
