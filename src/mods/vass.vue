@@ -33,6 +33,7 @@
                 c_tab: 'data',
                 tabs: ['flight log', 'data'],
                 recent: Data.vass.recent,
+                data: Data.vass.data,
                 env: Data.env
             }
         }
@@ -55,15 +56,20 @@
         });
 
         // cut
-        if (Data.vass.recent.length > 99)
+        if (Data.vass.recent.length > 64)
             Data.vass.recent.splice(-1, 1);
     }
 
     function push_exp_data(exp) {
-        console.log(exp)
+        console.log(exp);
+    }
+
+    function push_exp_summ(summ) {
+        console.log(summ);
     }
 
     Net.on('uni:exp-data', (data) => { push_exp_data(data)}); // todo: we need UI for it.
+    Net.on('uni:exp-summ', (data) => { push_exp_summ(data)}); // todo: we need UI for it.
     Net.on('pipe:Scan', (rec) => push_rec(rec));
     Net.on('pipe:FSDJump', (rec) => push_rec(rec));
 </script>

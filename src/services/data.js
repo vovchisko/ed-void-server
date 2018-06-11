@@ -105,8 +105,18 @@ class DataStorage {
         };
 
         this.vass = {
-            recent: []
+            recent: [],
+            data: {
+                total: 0,
+                summ: {
+                    L: {count: 0, total: 0},
+                    P: {count: 0, total: 0},
+                    S: {count: 0, total: 0},
+                },
+                systems: {}
+            }
         };
+
 
         this.env = {
             system: null,

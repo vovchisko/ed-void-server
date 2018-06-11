@@ -16,6 +16,12 @@ const WSM = require('./universe/services/ws-manager');
 const MailService = require('./universe/services/mailer');
 const app = new NodeStatic.Server('./dist', {cache: 0});
 
+function pause(t) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => { resolve(); }, t)
+    });
+}
+
 function handle_request(req, res, cb) {
     const chunks = [];
     req.on('data', chunk => chunks.push(chunk));
@@ -42,6 +48,7 @@ function parse_json(string) {
 
 server.handle_request = handle_request;
 server.parse_json = parse_json;
+server.pause = pause;
 
 const tools = server.tools = require('./universe/tools');
 const cfg = server.cfg = require('./config');

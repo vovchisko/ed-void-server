@@ -4,6 +4,7 @@ module.exports = {
 
     process: function (rec) {
         if (rec.event === 'Scan') this.Scan(rec);
+        return rec;
     },
 
     _Scan_PlanetK: {
@@ -48,6 +49,8 @@ module.exports = {
             for (let types in this._Scan_StarK) if (types.includes(' ' + rec.StarType + ' ')) k = this._Scan_StarK[types];
             rec.EstimatedValue = k + (rec.StellarMass * k / 66.25);
         }
+
+        if (rec.BodyName === 'Sagittarius A*') { rec.EstimatedValue = 628318; }
 
         if (rec.EstimatedValue) rec.EstimatedValue = Math.floor(rec.EstimatedValue);
     }

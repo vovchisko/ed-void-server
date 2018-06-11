@@ -82,7 +82,8 @@ class Universe extends EE3 {
                     let body = await this.get_body(user._cmdr.body_id);
                     this.emit(EV_NET, uid, 'c_body', body);
                 }
-                this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.data);
+
+                this.emit(EV_NET, user._id, 'exp-summ', user._cmdr._exp.get_summ());
 
                 await this.repo_search(user, {uid: user._id});
 
@@ -138,6 +139,7 @@ class Universe extends EE3 {
             if (['shipyard', 'market', 'outfitting'].includes(rec._data)) {
                 rec._id = [dateformat(rec.timestamp, 'yymmddHHMMss', true), rec.MarketID, rec.StationName].join('/');
                 DB[rec._data].save(rec);
+                DB[rec._data].save(rec);
             }
         }
 
@@ -179,14 +181,19 @@ class Universe extends EE3 {
     }
 
     async proc_SellExplorationData(cmdr, data) {
-        return cmdr.exp_data_sell(data);
+        await  cmdr._exp.exp_data_sell(data);
+        this.emit(EV_NET, cmdr.uid, 'exp-summ', cmdr._exp.get_summ());
     }
 
     async proc_Scan(cmdr, Scan) {
         let body = await this.spawn_body(Scan.BodyName, cmdr.system_id);
         if (!body) return;
         body.append(cmdr, Scan);
-        await cmdr.exp_data_add(Scan);
+
+        //track exploration data
+        await cmdr._exp.exp_data_add(Scan, cmdr.system_id);
+        this.emit(EV_NET, cmdr.uid, 'exp-summ', cmdr._exp.get_summ());
+
         if (body._id === cmdr.body_id)
             this.emit(EV_NET, cmdr.uid, 'c_body', body);
     }
@@ -804,63 +811,6 @@ class CMDR {
         extend(this, cmdr_data);
     }
 
-    async init() {
-        // do nothing
-        let _exp = await DB.exp_data.findOne({_id: this._id});
-        if (!_exp) {
-            _exp = {
-                _id: this._id,
-                total: 0,
-                data: {},
-            };
-            await DB.exp_data.save(_exp);
-        }
-        this._exp = _exp;
-    }
-
-    async exp_data_add(rec) {
-
-        if (!rec.EstimatedValue || rec.ScanType !== 'Detailed') return;
-
-        //get current system in lower case
-        let sys = this.system_id.split('@')[0];
-        let body = con.LOW_CASE(rec.BodyName);
-
-        if (!this._exp.data[sys]) {
-            this._exp.data[sys] = {};
-        }
-
-        if (!this._exp.data[sys][body]) {
-            this._exp.data[sys][body] = rec.EstimatedValue;
-        }
-
-        this.exp_data_calc();
-
-        await this.save();
-
-    }
-
-    async exp_data_sell(rec) {
-
-        for (let i in rec.Systems) {
-            let sys = con.LOW_CASE(rec.Systems[i]);
-            delete this._exp.data[sys];
-        }
-
-        this.exp_data_calc();
-
-        UNI.emit(EV_NET, this.uid, 'exp-data', this._exp.data);
-
-        await this.save();
-    }
-
-    exp_data_calc() { //todo:  need to separate this data from cmdr.
-        this._exp.total = 0;
-        for (let s in this._exp.data)
-            for (let b in this._exp.data[s])
-                this._exp.total += this._exp.data[s][b];
-    }
-
     journal() {
         return DB.journal(`[${this.uid}] ${this.name}`);
     }
@@ -869,14 +819,22 @@ class CMDR {
         return DB.journal_index(`[${this.uid}] ${this.name}`);
     }
 
+    async init() {
+        let exp = await DB.exp_data.findOne({_id: this._id});
+        if (!exp) {
+            this._exp = new EXP_DATA({_id: this._id});
+        } else {
+            this._exp = new EXP_DATA(exp);
+        }
+    }
+
     __reset() {
         this.system_id = null;
         this.body_id = null;
         this.starpos = [0, 0, 0];
         this.metrics.curr_ds = 0;
         this.status = {};
-        this._exp.total = 0;
-        this._exp.data = {}
+        this._exp.reset();
     }
 
     touch(data = null) {
@@ -886,7 +844,7 @@ class CMDR {
     }
 
     async save() {
-        DB.exp_data.save(this._exp);
+        this._exp.save();
         if (!this._ch) return;
         if (!this._id || !this.uid) return;
         let snapshot = {};
@@ -896,6 +854,111 @@ class CMDR {
         this._ch = false;
     }
 }
+
+
+class EXP_DATA {
+    constructor(exp_data) {
+        this._id = null;
+        this._ch = true;
+        this.total = 0;
+        this.summ = {
+            P: {count: 0, total: 0},
+            L: {count: 0, total: 0},
+            S: {count: 0, total: 0},
+        };
+        this.systems = {};
+
+        extend(this, exp_data)
+    }
+
+    reset() {
+        this.total = 0;
+        this.summ = {
+            P: {count: 0, total: 0},
+            L: {count: 0, total: 0},
+            S: {count: 0, total: 0},
+        };
+        this.systems = {};
+        this._ch = true;
+    }
+
+    async exp_data_add(rec, c_sys_id) {
+
+        if (!rec.EstimatedValue || rec.ScanType !== 'Detailed') return;
+
+        //get current system in lower case
+        let sys_name = c_sys_id.split('@')[0];
+        let body_name = con.LOW_CASE(rec.BodyName).replace(sys_name, '').trim();
+        if (!body_name) body_name = '*';
+
+        if (!this.systems[sys_name]) this.systems[sys_name] = {upd: 0, bodies: []};
+        this.systems[sys_name].upd = Date.now();
+        let b = {
+            n: body_name,
+            t: 'C',
+            v: rec.EstimatedValue,
+        };
+
+        if (rec.PlanetClass) b.t = 'P';
+        if (rec.PlanetClass && rec.Landable) b.t = 'L';
+        if (rec.StarType) b.t = 'S';
+
+        this.systems[sys_name].bodies.push(b);
+
+        this.calc();
+
+        this._ch = true;
+    }
+
+    get_summ() {
+        this.calc();
+        return {
+            total: this.total,
+            summ: this.summ
+        }
+    }
+
+    get_scans() {
+        return this.systems;
+    }
+
+    async exp_data_sell(rec) {
+
+        for (let i in rec.Systems) {
+            let sys = con.LOW_CASE(rec.Systems[i]);
+            delete this.systems[sys];
+        }
+
+        this.calc();
+
+        this._ch = true;
+        await this.save();
+    }
+
+    calc() { //todo:  need to separate this data from cmdr.
+        this.total = 0;
+        for (let i in this.summ) {
+            this.summ[i].count = 0;
+            this.summ[i].total = 0;
+        }
+
+        for (let s in this.systems)
+            for (let b = 0; b < this.systems[s].bodies.length; b++) {
+                this.total += this.systems[s].bodies[b].v;
+                this.summ[this.systems[s].bodies[b].t].total += this.systems[s].bodies[b].v;
+                this.summ[this.systems[s].bodies[b].t].count++;
+            }
+    }
+
+    async save() {
+        if (!this._ch) return;
+        let snapshot = {};
+        for (let p in this) if (p[0] !== '_' || p === '_id') snapshot[p] = this[p];
+        await DB.exp_data.save(snapshot);
+        this._ch = false;
+    }
+}
+
 
 const UNI = new Universe();
 module.exports = UNI;

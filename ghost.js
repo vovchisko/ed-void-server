@@ -8,6 +8,7 @@ global.GHOST = true;
 
 exports = module.exports = server;
 
+const pre = server.pre = require('./universe/pre');
 const tools = server.tools = require('./universe/tools');
 const cfg = server.cfg = require('./config');
 const DB = server.DB = require('./universe/services/database');
@@ -30,7 +31,6 @@ async function init() {
     await wipe_stellars();
     await re_index_journals();
     await re_process();
-
 
 
 }
@@ -78,7 +78,7 @@ async function re_process() {
         let per_bar = Math.floor(total_r / 64);
         let recs = 0;
         while (await journal.hasNext()) {
-            await UNI.process(cmdr, await journal.next());
+            await UNI.process(cmdr, pre.process(await journal.next()));
             if (r > per_bar) {
                 process.stdout.write("\u00BB");
                 r = 0;
@@ -88,6 +88,7 @@ async function re_process() {
         await journal.close();
 
         process.stdout.write("\n");
+        await cmdr.save();
         let end_j = new Date().getTime() - start_j;
         console.log(`\u2713 took: ${end_j / 1000}sec; ${recs} records proceed;`);
         console.log('');
