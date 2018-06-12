@@ -424,7 +424,6 @@
         h4 {
             //color: lighten($ui-text, 15%);
             button { margin-left: 1em; font-size: 0.8em; }
-
         }
 
         .title {

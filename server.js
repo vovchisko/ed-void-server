@@ -92,7 +92,7 @@ class Clients {
 
         this.wss.on('message', async (client, c, dat) => {
             let user = await UNI.get_user({_id: client.id});
-            UNI.user_data(user, c, dat);
+            UNI.user_msg(user, c, dat);
         });
 
         this.wss.on('connected', async (client) => {

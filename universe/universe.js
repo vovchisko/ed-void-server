@@ -83,7 +83,7 @@ class Universe extends EE3 {
                     this.emit(EV_NET, uid, 'c_body', body);
                 }
 
-                this.emit(EV_NET, user._id, 'exp-summ', user._cmdr._exp.get_summ());
+                this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(false, user._cmdr.current_system_name()));
 
                 await this.repo_search(user, {uid: user._id});
 
@@ -181,8 +181,8 @@ class Universe extends EE3 {
     }
 
     async proc_SellExplorationData(cmdr, data) {
-        await  cmdr._exp.exp_data_sell(data);
-        this.emit(EV_NET, cmdr.uid, 'exp-summ', cmdr._exp.get_summ());
+        await  cmdr._exp.exp_data_sell(cmdr, data);
+        this.emit(EV_NET, cmdr.uid, 'exp-data', cmdr._exp.get_exp_data(false, cmdr.current_system_name()));
     }
 
     async proc_Scan(cmdr, Scan) {
@@ -192,7 +192,7 @@ class Universe extends EE3 {
 
         //track exploration data
         await cmdr._exp.exp_data_add(Scan, cmdr.system_id);
-        this.emit(EV_NET, cmdr.uid, 'exp-summ', cmdr._exp.get_summ());
+        this.emit(EV_NET, cmdr.uid, 'exp-data', cmdr._exp.get_exp_data(false, cmdr.current_system_name()));
 
         if (body._id === cmdr.body_id)
             this.emit(EV_NET, cmdr.uid, 'c_body', body);
@@ -203,7 +203,7 @@ class Universe extends EE3 {
         cmdr.metrics.curr_ds += rec.Bodies;
         cmdr.touch();
 
-        await  UNI.get_system(cmdr.system_id)
+        await UNI.get_system(cmdr.system_id)
             .then((system) => {
                 if (!system) return;
                 if (cmdr.metrics.curr_ds > system.ds_count) {
@@ -212,7 +212,6 @@ class Universe extends EE3 {
                     return system.save();
                 }
             });
-
     }
 
     async proc_NavBeaconScan(cmdr, rec) {
@@ -278,9 +277,10 @@ class Universe extends EE3 {
         this.emit(EV_NET, cmdr.uid, 'c_system', sys);
     }
 
-    user_data(user, c, data) {
+    user_msg(user, c, data) {
         if (c === 'repo-submit') return this.repo_submit(user, data);
         if (c === 'repo-search') return this.repo_search(user, data);
+        if (c === 'exp-refresh') return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
     }
 
     async repo_search(user, query) {
@@ -552,10 +552,10 @@ class BODY {
     constructor(body) {
         this._id = null;
         this.name = null;
-        this.submited_by = null;
-        this.submited = null;
-        this.last_update = null;
         this.type = null;
+        this.submited = null;
+        this.discovered = null;
+        this.upd = 0;
         extend(this, body);
     }
 
@@ -632,12 +632,8 @@ class BODY {
             }
         }
 
-        if (!this.submited_by /*|| this.submited > rec.timestamp*/) {
-            this.submited_by = cmdr.name;
-            this.submited = rec.timestamp;
-        }
-        if (this.last_update < rec.timestamp)
-            this.last_update = rec.timestamp;
+        if (!this.submited) this.submited = cmdr.name;
+        if (this.upd < rec.timestamp) this.upd = rec.timestamp;
 
         return this.save();
     }
@@ -652,9 +648,8 @@ class SYSTEM {
     constructor(sys) {
         this._id = null;
         this.name = null;
-        this.submited_by = null;
         this.submited = null;
-        this.last_update = null;
+        this.upd = 0;
         this.ds_count = 0;
         extend(this, sys);
     }
@@ -690,12 +685,8 @@ class SYSTEM {
         }
 
 
-        if (!this.submited || this.submited > rec.timestamp) {
-            this.submited = rec.timestamp;
-            this.submited_by = cmdr.name;
-        }
-        if (this.last_update < rec.timestamp)
-            this.last_update = rec.timestamp;
+        if (!this.submited) this.submited = cmdr.name;
+        if (this.upd < rec.timestamp) this.upd = rec.timestamp;
 
         return this.save();
     }
@@ -828,6 +819,11 @@ class CMDR {
         }
     }
 
+    current_system_name() {
+        if (!this.system_id) return 'unknown';
+        return this.system_id.split('@')[0];
+    }
+
     __reset() {
         this.system_id = null;
         this.body_id = null;
@@ -861,6 +857,7 @@ class EXP_DATA {
         this._id = null;
         this._ch = true;
         this.total = 0;
+        this.sys_count = 0;
         this.summ = {
             P: {count: 0, total: 0},
             L: {count: 0, total: 0},
@@ -873,6 +870,7 @@ class EXP_DATA {
 
     reset() {
         this.total = 0;
+        this.sys_count = 0;
         this.summ = {
             P: {count: 0, total: 0},
             L: {count: 0, total: 0},
@@ -910,24 +908,36 @@ class EXP_DATA {
         this._ch = true;
     }
 
-    get_summ() {
+    get_exp_data(detailed = false, curr_system_name = undefined) {
         this.calc();
+
         return {
             total: this.total,
-            summ: this.summ
+            sys_count: this.sys_count,
+            summ: this.summ,
+            systems: detailed ? this.systems : undefined,
+            curr_system: curr_system_name ? this.systems[curr_system_name] : undefined
         }
     }
 
-    get_scans() {
-        return this.systems;
-    }
-
-    async exp_data_sell(rec) {
+    async exp_data_sell(cmdr, rec) {
 
         for (let i in rec.Systems) {
             let sys = con.LOW_CASE(rec.Systems[i]);
             delete this.systems[sys];
         }
+
+        if (rec.Discovered) {
+            for (let i = 0; i < rec.Discovered.length; i++) {
+                let body = await DB.bodies.findOne({name: rec.Discovered[i]});
+                if (body) {
+                    body.discovered = cmdr.name;
+                    await DB.bodies.save(body);
+                }
+                //todo: what else? cmdr stat?
+            }
+        }
+
 
         this.calc();
 
@@ -937,17 +947,22 @@ class EXP_DATA {
 
     calc() { //todo:  need to separate this data from cmdr.
         this.total = 0;
+        this.sys_count = 0;
+
         for (let i in this.summ) {
             this.summ[i].count = 0;
             this.summ[i].total = 0;
         }
 
-        for (let s in this.systems)
+        for (let s in this.systems) {
+            this.sys_count++;
             for (let b = 0; b < this.systems[s].bodies.length; b++) {
                 this.total += this.systems[s].bodies[b].v;
                 this.summ[this.systems[s].bodies[b].t].total += this.systems[s].bodies[b].v;
                 this.summ[this.systems[s].bodies[b].t].count++;
             }
+        }
+
     }
 
     async save() {

@@ -33,6 +33,9 @@ async function init() {
     await re_process();
 
 
+    console.log('COMPLETE!');
+    process.exit(0);
+
 }
 
 async function wipe_stellars() {
