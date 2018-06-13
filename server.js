@@ -13,7 +13,7 @@ exports = module.exports = server;
 const NodeStatic = require('node-static');
 const WSM = require('./universe/services/ws-manager');
 const MailService = require('./universe/services/mailer');
-const app = new NodeStatic.Server('./dist', {cache: 0});
+const app = new NodeStatic.Server('./dist', /*{cache: 0}*/);
 
 function pause(t) {
     return new Promise((resolve, reject) => {

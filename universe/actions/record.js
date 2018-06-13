@@ -20,17 +20,23 @@ module.exports = function (req, res) {
             let head = req.headers;
 
             let user = await UNI.get_user({api_key: head.api_key});
+
+
             if (user) {
-                log += `${user._id} [CMDR ${head.cmdr}] ${records.length > 1 ? records.length : records[0].event} / `;
+                if (head.cmdr) {
+                    log += `${user._id} [CMDR ${head.cmdr}] ${records.length > 1 ? records.length : records[0].event} / `;
 
-                for (let i = 0; i < records.length; i++) {
-                    await UNI.record(user, records[i], head.cmdr, head.gv, head.lng, records.length - (i + 1));
-                    if (records[i].event === 'Status') log = ''; //don't log status
+                    for (let i = 0; i < records.length; i++) {
+                        await UNI.record(user, records[i], head.cmdr, head.gv, head.lng, records.length - (i + 1));
+                        if (records[i].event === 'Status') log = ''; //don't log status
+                    }
+                    res.statusCode = 200;
+                    res_text = records.length > 1 ? records.length + ' rec. proceed' : 'proceed';
+                    res_text += ' / ' + (new Date().getTime() - start) + 'ms';
+                } else {
+                    res_text = 'ignored (no cmdr specified)';
+                    log += res_text;
                 }
-                res.statusCode = 200;
-                res_text = records.length > 1 ? records.length + ' rec. proceed' : 'proceed';
-                res_text += ' / ' + (new Date().getTime() - start) + 'ms';
-
             } else {
                 res.statusCode = 498;
                 res_text = 'invalid api-key';

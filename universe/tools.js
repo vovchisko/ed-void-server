@@ -154,12 +154,22 @@ function est_planet(type, mass, terra) {
     if (bonusval > 0)
         value += bonusval + (3 * bonusval * Math.pow(mass, 0.199977) / 5.3);
 
-    console.log(`${type} > ${mass} > T:${terra} = ${Math.floor(value)}`);
+    //console.log(`${type} > ${mass} > T:${terra} = ${Math.floor(value)}`);
 
     return Math.floor(value);
 }
 
+function scan_obj_type(Scan) {
+    if (Scan.ScanType === 'Detailed') {
+        if (Scan.StarType) return 'star';
+        if (Scan.PlanetClass) return 'planet';
+    } else if (Scan.ScanType === 'Basic') {
+        if (Scan.Parents && Scan.Parents[0] && Scan.Parents[0].Ring) return 'cluster';
+    }
+    return null;
+}
 
+module.exports.scan_obj_type = scan_obj_type;
 module.exports.recout = recout;
 module.exports.est_star = est_star;
 module.exports.est_planet = est_planet;

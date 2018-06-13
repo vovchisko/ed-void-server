@@ -17,33 +17,18 @@
             <div class="row summary">
                 <div class="col-sm edfx">
                     <h2 class="main">
-                        <span>approximated data value</span>
+                        <span>estimated data value</span>
                         <b>{{exp.total | nn()}} <u>Cr</u></b>
                         <small>* discovery bonus not included</small>
                     </h2>
                 </div>
                 <div class="col-sm edfx">
                     <div class="counters justified">
-                        <em>
-                            <b>data collected in</b>
-                            <span>{{exp.sys_count}} <u>systems</u></span>
-                        </em>
-                        <em>
-                            <b>stars: {{exp.summ.S.count}}</b>
-                            <span>{{exp.summ.S.total| nn()}} <u>Cr</u></span>
-                        </em>
-                        <em>
-                            <b>planets: {{exp.summ.P.count}} </b>
-                            <span>{{exp.summ.P.total| nn()}} <u>Cr</u></span>
-                        </em>
-                        <em>
-                            <b>landable: {{exp.summ.L.count}} </b>
-                            <span>{{exp.summ.L.total| nn()}} <u>Cr</u></span>
-                        </em>
-                        <em>
-                            <b>clusters: {{exp.summ.C.count}} </b>
-                            <span>{{exp.summ.C.total| nn()}} <u>Cr</u></span>
-                        </em>
+                        <em><b>data collected in</b> <span>{{exp.sys_count}} <u>systems</u></span></em>
+                        <em><b>stars</b> <span>{{exp.summ.s}}</span></em>
+                        <em><b>planets</b> <span>{{exp.summ.p}}</span></em>
+                        <em><b>clusters</b> <span>{{exp.summ.c}}</span></em>
+
                     </div>
                 </div>
             </div>
@@ -53,10 +38,10 @@
                         <h3>current: {{env.system.name}} </h3>
                     </div>
                     <div class="col-sm">
-                        <h3>scanned: <span>{{exp.curr_system.scanned}} / {{exp.curr_system.total | nn()}} Cr</span></h3>
+                        <h3>scanned: <span>{{exp.curr_system.scanned}} / {{env.system.ds_count}} ({{exp.curr_system.total | nn()}} Cr)</span></h3>
                     </div>
                 </div>
-                <div v-if="exp.curr_system" class="justified">
+                <div v-if="exp.curr_system">
                     <em v-for="(b,k) in exp.curr_system.bodies"><b>{{env.system.name}} {{k}}</b><span>{{b.v | nn()}} <u>Cr</u></span></em>
                 </div>
 
@@ -211,18 +196,18 @@
 
         .curr-system {
             padding-top: 1em;
-            font-size: 0.9em;
+            font-size: 1.08em;
             h3 { padding: 0.4em 0;
                 span { color: $cyan; }
             }
             em b { text-transform: uppercase; color: darken($ui-text, 20%)}
-            em span { padding-left: 10px;
-                u { color: darken($ui-text, 20%); }
+            em span { padding-left: 10px; color: lighten($ui-text, 20%); font-weight: bold;
+                u { color: darken($ui-text, 10%); }
             }
         }
 
         .systems {
-            font-size: 0.9em;
+           // font-size: 0.9em;
             padding-top: 2em;
             .sys {
                 margin: 0.6em 0 0 0; padding: 0.6em 0 0 0; border-top: 2px solid $dark;

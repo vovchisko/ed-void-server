@@ -109,12 +109,7 @@ class DataStorage {
             exp: {
                 total: 0,
                 sys_count: 0,
-                summ: {
-                    L: {count: 0, total: 0},
-                    P: {count: 0, total: 0},
-                    S: {count: 0, total: 0},
-                    C: {count: 0, total: 0},
-                },
+                summ: {s: 0, p: 0, c: 0},
                 curr_system: {scanned: 0, total: 0, bodies: {}},
                 systems: []
             }

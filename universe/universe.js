@@ -13,7 +13,6 @@ const con = tools.convert;
 const checksum = tools.checksum;
 
 
-
 global.EV_PIPE = 'uni-pipe';
 global.EV_NET = 'uni-data';
 global.SEP_SYSTEM = '@';
@@ -71,7 +70,6 @@ class Universe extends EE3 {
                     .find({event: {$in: ['Scan', 'FSDJump']}})
                     .sort({timestamp: -1})
                     .limit(32);
-
 
 
                 scans.forEach((rec) => { this.emit(EV_PIPE, user._id, rec.event, rec) });
@@ -571,10 +569,7 @@ class BODY {
 
     append(cmdr, rec) {
 
-        this.type = 'cluster';
-
-        if (rec.StarType) this.type = 'star';
-        if (rec.PlanetClass) this.type = 'planet';
+        this.type = tools.scan_obj_type(rec);
 
         pickx(rec, this,
             ['BodyName', 'name', con.LOW_CASE],
@@ -867,12 +862,7 @@ class EXP_DATA {
         this._ch = true;
         this.total = 0;
         this.sys_count = 0;
-        this.summ = {
-            P: {count: 0, total: 0},
-            L: {count: 0, total: 0},
-            S: {count: 0, total: 0},
-            C: {count: 0, total: 0},
-        };
+        this.summ = {p: 0, s: 0, c: 0,};
         this.systems = {};
 
         extend(this, exp_data)
@@ -881,19 +871,16 @@ class EXP_DATA {
     reset() {
         this.total = 0;
         this.sys_count = 0;
-        this.summ = {
-            P: {count: 0, total: 0},
-            L: {count: 0, total: 0},
-            S: {count: 0, total: 0},
-            C: {count: 0, total: 0},
-        };
+        this.summ = {p: 0, s: 0, c: 0,};
         this.systems = {};
         this._ch = true;
     }
 
     async exp_data_add(rec, c_sys_id) {
 
-        if (rec.ScanType !== 'Detailed') return;
+        let scan_type = tools.scan_obj_type(rec);
+
+        if (!scan_type) return;
 
         //get current system in lower case
         let sys_name = c_sys_id.split('@')[0];
@@ -902,13 +889,8 @@ class EXP_DATA {
 
         if (!this.systems[sys_name]) this.systems[sys_name] = {upd: 0, bodies: {}};
         this.systems[sys_name].upd = Date.now();
-        let b = {t: 'C', v: tools.estimate_scan(rec)};
 
-        if (rec.PlanetClass) b.t = 'P';
-        if (rec.PlanetClass && rec.Landable) b.t = 'L';
-        if (rec.StarType) b.t = 'S';
-
-        this.systems[sys_name].bodies[body_name] = b;
+        this.systems[sys_name].bodies[body_name] = {t: scan_type[0], v: tools.estimate_scan(rec)};
 
         this.calc();
 
@@ -951,16 +933,14 @@ class EXP_DATA {
         this.sys_count = 0;
 
         for (let i in this.summ) {
-            this.summ[i].count = 0;
-            this.summ[i].total = 0;
+            this.summ[i] = 0;
         }
 
         for (let s in this.systems) {
             this.sys_count++;
             for (let b in this.systems[s].bodies) {
                 this.total += this.systems[s].bodies[b].v;
-                this.summ[this.systems[s].bodies[b].t].total += this.systems[s].bodies[b].v;
-                this.summ[this.systems[s].bodies[b].t].count++;
+                this.summ[this.systems[s].bodies[b].t]++;
             }
         }
     }

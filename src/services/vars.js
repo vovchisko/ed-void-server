@@ -101,5 +101,19 @@ export default {
         "eRingClass_MetalRich": "Metal-rich",
         "eRingClass_Rocky": "Rocky",
         "eRingClass_Icy": "Icy",
+    },
+    ATMOSPHERE_TYPE: {
+        "CarbonDioxide": "Carbon dioxide",
+        "ArgonRich": "Argon-rich",
+        "SulphurDioxide": "Sulfur dioxide",
+        "MethaneRich": "Methane-rich",
+        "CarbonDioxidRich": "Carbon dioxide-rich",
+        "SilicateVapour": "Silicate vapour",
+        "WaterRich": "Water-rich",
+        "NeonRich": "Neon-rich",
+        "AmmoniaRich": "Ammonia-rich",
+        "AmmoniaOxygen": "Ammonia and oxygen",
+        "MetallicVapour": "Metallic vapour",
+        "EarthLike": "Earth-like",
     }
 }

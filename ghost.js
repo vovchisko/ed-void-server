@@ -30,7 +30,7 @@ async function init() {
     await re_index_journals();
     await remove_estimated_values();
 
-//    await re_process();
+    await re_process();
 
     console.log('COMPLETE!');
     process.exit(0);
@@ -95,7 +95,7 @@ async function re_process() {
             let rec = await journal.next();
             await UNI.process(cmdr, rec);
             if (r > per_bar) {
-                //process.stdout.write("\u00BB");
+                process.stdout.write("\u00BB");
                 r = 0;
             } else {++r;}
             recs++;
