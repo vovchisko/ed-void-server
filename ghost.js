@@ -27,9 +27,8 @@ async function init() {
     UNI.init();
 
 
-    await rename_collections();
-
-    process.exit(0);
+    /*await rename_collections();
+    process.exit(0);*/
 
     await wipe_stellars();
     await re_index_journals();
@@ -46,7 +45,7 @@ async function wipe_stellars() {
     await DB.db_void.collection('bodies').deleteMany({});
     await DB.db_void.collection('systems').deleteMany({});
 }
-
+/*
 async function rename_collections(cb) {
     let count = await DB.cmdrs.count({});
     console.log(`\n>> RENAMING ${count} JOURNALS...`);
@@ -58,7 +57,7 @@ async function rename_collections(cb) {
         } catch (e) { console.log('FUCK!', `[${c.uid}] ${c.name}`, `${c.uid}/${DB.shash(c.name)}`)}
     }
 }
-
+*/
 
 async function remove_estimated_values(cb) {
     let count = await DB.cmdrs.count({});
