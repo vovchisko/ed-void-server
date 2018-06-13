@@ -53,7 +53,7 @@ async function rename_collections(cb) {
     let cmdrs = DB.cmdrs.find();
     while (await cmdrs.hasNext()) {
         const c = await cmdrs.next();
-        await DB.db_journals.collection(`[${c.uid}] ${c.name}`).rename(`${c.uid}/${DB.shash(c.name)}`);
+        await DB.db_journals.collection(`[${c.uid}] ${c.name}`).rename(`${c.uid}/${DB.shash(c.name)}`).catch((e)=>{console.log('GOTCHA!', c, e)});
     }
 }
 
