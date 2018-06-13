@@ -5,7 +5,7 @@ const shortid = require('shortid');
 const crypto = require('crypto');
 const extend = require('deep-extend');
 const clog = require('../../clog');
-
+const sh = require("shorthash");
 class Database {
     constructor() {
         //databases links
@@ -41,6 +41,10 @@ class Database {
                 clog('DB::connect() Failed!', err);
                 process.exit(-1);
             });
+    }
+
+    shash(string){
+       return sh.unique(string);
     }
 
     gen_id() {

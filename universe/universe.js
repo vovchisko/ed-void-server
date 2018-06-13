@@ -807,11 +807,11 @@ class CMDR {
     }
 
     journal() {
-        return DB.journal(`[${this.uid}] ${this.name}`);
+        return DB.journal(`${this.uid}/${DB.shash(this.name)}`);
     }
 
     journal_index() {
-        return DB.journal_index(`[${this.uid}] ${this.name}`);
+        return DB.journal_index(`${this.uid}/${DB.shash(this.name)}`);
     }
 
     async init() {
