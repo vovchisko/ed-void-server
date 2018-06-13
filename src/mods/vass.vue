@@ -200,7 +200,7 @@
             h3 { padding: 0.4em 0;
                 span { color: $cyan; }
             }
-            em b { text-transform: uppercase; color: darken($ui-text, 20%)}
+            em b { text-transform: uppercase; color: $ui-text;}
             em span { padding-left: 10px; color: lighten($ui-text, 20%); font-weight: bold;
                 u { color: darken($ui-text, 10%); }
             }
