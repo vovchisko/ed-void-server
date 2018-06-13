@@ -61,6 +61,7 @@ class Database {
         this.bodies = this.db_void.collection('bodies');
         this.systems = this.db_void.collection('systems');
         this.exp_data = this.db_void.collection('exp_data');
+        this.exp_discovered = this.db_void.collection('exp_discovered');
 
         //summary logs
         this.market = this.db_journals.collection('_log_market');

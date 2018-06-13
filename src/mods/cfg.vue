@@ -7,6 +7,7 @@
         <div class="row">
             <div class="col-sm">
                 <h2>ui settings </h2>
+                <small>This options applied only for this device.</small>
 
                 <div class="ui short">
                     <select v-model="cfg.ui_font_size" @change="cgf_apply()">
@@ -22,10 +23,6 @@
                     <label>ui effects</label>
                 </div>
 
-                <small>This options applied only for this device.</small>
-
-
-                <br>
                 <br>
                 <br>
                 <h3>ED-VOID CLIENT INSTALLATION</h3>
@@ -51,6 +48,19 @@
             </div>
 
             <div class="col-sm ">
+                <h2 v-if="data.vass.exp.total">modules settings</h2>
+                <div v-if="data.vass.exp.total" class="tip-box" style="margin: 0;">
+                    <div class="icon"><i class="i-warning"></i></div>
+                    <div>
+                        <h5>Warning!</h5>
+                        <small>This action reset counters and summary log for SCAN module. Use it if your module work incorrectly.</small>
+                        <br>
+                        <button v-on:click="reset_exp()"><i class="i-cross"></i> reset exploration stats</button>
+
+                    </div>
+                </div>
+                <br>
+                <br>
                 <h2>account details</h2>
                 <div class="tip-box email edfx">
                     <div class="icon">
@@ -117,7 +127,6 @@
                     </div>
                 </div>
 
-
             </div>
         </div>
     </div>
@@ -132,6 +141,7 @@
         name: 'cfg',
         data: () => {
             return {
+                data: Data,
                 cfg: Data.cfg,
                 user: Data.user,
                 re_everify_result: {result: 0, type: '', text: ''},
@@ -195,6 +205,12 @@
                 Data.apply_ui_cfg();
                 Data.save();
             },
+            reset_exp: function () {
+                if (confirm('Do you really want to reset your exploration report?')) {
+                    Net.send('exp-reset');
+                    this.data.nav.c_mode = 'scan';
+                }
+            }
 
         }
     }

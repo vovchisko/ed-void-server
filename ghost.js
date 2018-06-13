@@ -81,7 +81,9 @@ async function re_process() {
         let per_bar = Math.floor(total_r / 64);
         let recs = 0;
         while (await journal.hasNext()) {
-            await UNI.process(cmdr, pre.process(await journal.next()));
+            let rec = await journal.next()
+            pre.process(rec);
+            await UNI.process(cmdr, pre.process(rec));
             if (r > per_bar) {
                 process.stdout.write("\u00BB");
                 r = 0;

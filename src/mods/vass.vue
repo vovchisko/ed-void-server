@@ -15,14 +15,14 @@
 
         <div v-if="c_tab==='data'" class="exp-data">
             <div class="row summary">
-                <div class="col-md edfx">
+                <div class="col-sm edfx">
                     <h2 class="main">
                         <span>approximated data value</span>
                         <b>{{exp.total | nn()}} <u>Cr</u></b>
                         <small>* discovery bonus not included</small>
                     </h2>
                 </div>
-                <div class="col-md edfx">
+                <div class="col-sm edfx">
                     <div class="counters justified">
                         <em>
                             <b>data collected in</b>
@@ -40,22 +40,29 @@
                             <b>landable: {{exp.summ.L.count}} </b>
                             <span>{{exp.summ.L.total| nn()}} <u>Cr</u></span>
                         </em>
+                        <em>
+                            <b>clusters: {{exp.summ.C.count}} </b>
+                            <span>{{exp.summ.C.total| nn()}} <u>Cr</u></span>
+                        </em>
                     </div>
                 </div>
             </div>
             <div class="curr-system edfx edfx-delay-3" v-if="env.system">
-                <h3>
-                    current: {{env.system.name}}
-                    <small>scanned: {{exp.curr_system.bodies.length}} / {{env.system.ds_count}} ({{exp.curr_system.total | nn()}} Cr)</small>
-                </h3>
-
+                <div class="row">
+                    <div class="col-sm">
+                        <h3>current: {{env.system.name}} </h3>
+                    </div>
+                    <div class="col-sm">
+                        <h3>scanned: <span>{{exp.curr_system.scanned}} / {{exp.curr_system.total | nn()}} Cr</span></h3>
+                    </div>
+                </div>
                 <div v-if="exp.curr_system">
-                    <em v-for="b in exp.curr_system.bodies"><b>{{env.system.name}} {{b.n}}</b><span>{{b.v}} <u>Cr</u></span></em>
+                    <em v-for="(b,k) in exp.curr_system.bodies"><b>{{env.system.name}} {{k}}</b><span>{{b.v}} <u>Cr</u></span></em>
                 </div>
 
             </div>
             <div class="systems">
-                <h4 class="edfx edfx-delay-3">
+                <h4 class="edfx edfx-delay-3" v-if="exp.total">
                     <button class="link" v-on:click="refresh_exp()"><i class="i-sync"></i> load full data log</button>
                 </h4>
                 <div class="sys edfx" v-for="s in exp.systems">
@@ -64,7 +71,7 @@
                             <h5>{{s.name}}<br><span>{{s.val | nn()}} Cr</span></h5>
                         </div>
                         <div class="col-sm">
-                            <em v-for="b in s.bodies"><b>{{b.n}}</b><span>{{b.v}} <u>Cr</u></span></em>
+                            <em v-for="(b,k) in s.bodies"><b>{{s.name}} {{k}}</b><span>{{b.v}} <u>Cr</u></span></em>
                         </div>
                     </div>
                 </div>
@@ -74,7 +81,7 @@
 </template>
 
 <script>
-
+    import Vue from 'vue';
     import Net from '../services/network';
     import Data from '../services/data';
     import Ev from '../components/ev';
@@ -96,7 +103,9 @@
             refresh_exp: function () {
                 this.exp.systems.splice(0, this.exp.systems.length);
                 Net.send('exp-refresh');
-            }
+            },
+
+
         }
     }
 
@@ -126,17 +135,16 @@
     function push_exp_summ(dat) {
         let exp = Data.vass.exp;
 
-        console.log(dat);
-
         exp.total = dat.total;
         exp.sys_count = dat.sys_count;
-        exp.curr_system.bodies.splice(0, exp.curr_system.bodies.length);
+        Vue.set(exp.curr_system, 'bodies', {});
         exp.curr_system.total = 0;
+        exp.curr_system.scanned = 0;
 
         if (dat.curr_system) {
-            exp.curr_system.bodies.push(...dat.curr_system.bodies);
-            for (let i = 0; i < exp.curr_system.bodies.length; i++) {
-                console.log(exp.curr_system.bodies[i])
+            exp.curr_system.bodies = dat.curr_system.bodies;
+            for (let i in exp.curr_system.bodies) {
+                exp.curr_system.scanned++;
                 exp.curr_system.total += exp.curr_system.bodies[i].v;
             }
         }
@@ -153,7 +161,7 @@
                     upd: dat.systems[s].upd,
                     bodies: dat.systems[s].bodies
                 };
-                for (let i = 0; i < s_data.bodies.length; i++) s_data.val += s_data.bodies[i].v;
+                for (let i in s_data.bodies) s_data.val += s_data.bodies[i].v;
                 exp.systems.push(s_data);
             }
 
@@ -165,7 +173,7 @@
         }
     }
 
-    Net.on('uni:exp-data', (data) => { push_exp_summ(data)}); // todo: we need UI for it.
+    Net.on('uni:exp-data', (data) => { push_exp_summ(data)});
     Net.on('pipe:Scan', (rec) => push_rec(rec));
     Net.on('pipe:FSDJump', (rec) => push_rec(rec));
 </script>
@@ -195,7 +203,7 @@
                     small { color: darken($ui-text, 30%); font-size: 0.4em;}
                 }
                 .counters em {
-                    &:first-child { border-bottom: 1px $dark-deep solid; padding-bottom: 0.1em; margin-bottom: 0.1em;}
+                    &:first-child { padding-bottom: 0.1em; margin-bottom: 0.1em;}
                     &:first-child, &:first-child b { font-weight: bold; }
                     font-size: 1.1em; line-height: 1.2em;
                     b { @include hcaps(); }
@@ -206,12 +214,19 @@
         }
 
         .curr-system {
-            h3 small { display: block; color: $cyan }
+            padding-top: 1em;
+            font-size: 0.9em;
+            h3 { padding: 0.4em 0;
+                span { color: $cyan; }
+            }
             em b { text-transform: uppercase; color: darken($ui-text, 20%)}
-            em span u { color: darken($ui-text, 20%); }
+            em span { padding-left: 10px;
+                u { color: darken($ui-text, 20%); }
+            }
         }
 
         .systems {
+            font-size: 0.9em;
             padding-top: 2em;
             .sys {
                 margin: 0.6em 0 0 0; padding: 0.6em 0 0 0; border-top: 2px solid $dark;
@@ -219,8 +234,10 @@
                     span { color: darken($ui-text, 20%) }
                 }
                 em { line-height: 1.1em;
-                    b { text-transform: uppercase; color: darken($ui-text, 10%) }
-                    span u { color: darken($ui-text, 15%)}
+                    b { text-transform: uppercase; color: darken($ui-text, 10%); width: 70%; }
+                    span {width: 30%;
+                        u { color: darken($ui-text, 15%); }
+                    }
                 }
             }
         }

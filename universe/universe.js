@@ -113,7 +113,6 @@ class Universe extends EE3 {
         this.emit(EV_NET, user._id, 'status', user._cmdr.status);
     }
 
-    //todo: Maybe this should be in handle_record() method.
     /* ONLY FOR NEW RECORDS!! */
     async record(user, rec, cmdr_name, gv, lng, records_left = 0) {
 
@@ -132,14 +131,12 @@ class Universe extends EE3 {
 
             this.emit(EV_PIPE, user._id, rec.event, rec);
 
-            if (user._cmdr)
-                await user._cmdr.journal().save(rec);
+            if (user._cmdr) await user._cmdr.journal().save(rec);
 
         } else if (typeof rec._data !== 'undefined') {
             if (['shipyard', 'market', 'outfitting'].includes(rec._data)) {
                 rec._id = [dateformat(rec.timestamp, 'yymmddHHMMss', true), rec.MarketID, rec.StationName].join('/');
-                DB[rec._data].save(rec);
-                DB[rec._data].save(rec);
+                await DB[rec._data].save(rec);
             }
         }
 
@@ -188,7 +185,7 @@ class Universe extends EE3 {
     async proc_Scan(cmdr, Scan) {
         let body = await this.spawn_body(Scan.BodyName, cmdr.system_id);
         if (!body) return;
-        body.append(cmdr, Scan);
+        await body.append(cmdr, Scan);
 
         //track exploration data
         await cmdr._exp.exp_data_add(Scan, cmdr.system_id);
@@ -257,6 +254,7 @@ class Universe extends EE3 {
 
         if (Location.Body && Location.BodyType === 'Planet') {
             let body = await this.spawn_body(Location.Body, sys._id);
+            body.append(cmdr, {});
             td.body_id = body._id;
         }
         cmdr.touch(td);
@@ -267,6 +265,8 @@ class Universe extends EE3 {
         let sys = await this.spawn_system(FSDJump.StarSystem, FSDJump.StarPos);
         if (!sys) return;
         sys.append(cmdr, FSDJump);
+
+
         cmdr.touch({
             system_id: sys._id,
             starpos: sys.starpos,
@@ -275,12 +275,19 @@ class Universe extends EE3 {
         });
 
         this.emit(EV_NET, cmdr.uid, 'c_system', sys);
+
+        return this.emit(EV_NET, cmdr.uid, 'exp-data', cmdr._exp.get_exp_data(false, cmdr.current_system_name()));
+
     }
 
     user_msg(user, c, data) {
         if (c === 'repo-submit') return this.repo_submit(user, data);
         if (c === 'repo-search') return this.repo_search(user, data);
         if (c === 'exp-refresh') return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
+        if (c === 'exp-reset') {
+            user._cmdr._exp.reset();
+            this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
+        }
     }
 
     async repo_search(user, query) {
@@ -862,6 +869,7 @@ class EXP_DATA {
             P: {count: 0, total: 0},
             L: {count: 0, total: 0},
             S: {count: 0, total: 0},
+            C: {count: 0, total: 0},
         };
         this.systems = {};
 
@@ -875,6 +883,7 @@ class EXP_DATA {
             P: {count: 0, total: 0},
             L: {count: 0, total: 0},
             S: {count: 0, total: 0},
+            C: {count: 0, total: 0},
         };
         this.systems = {};
         this._ch = true;
@@ -889,19 +898,15 @@ class EXP_DATA {
         let body_name = con.LOW_CASE(rec.BodyName).replace(sys_name, '').trim();
         if (!body_name) body_name = '*';
 
-        if (!this.systems[sys_name]) this.systems[sys_name] = {upd: 0, bodies: []};
+        if (!this.systems[sys_name]) this.systems[sys_name] = {upd: 0, bodies: {}};
         this.systems[sys_name].upd = Date.now();
-        let b = {
-            n: body_name,
-            t: 'C',
-            v: rec.EstimatedValue,
-        };
+        let b = {t: 'C', v: rec.EstimatedValue};
 
         if (rec.PlanetClass) b.t = 'P';
         if (rec.PlanetClass && rec.Landable) b.t = 'L';
         if (rec.StarType) b.t = 'S';
 
-        this.systems[sys_name].bodies.push(b);
+        this.systems[sys_name].bodies[body_name] = b;
 
         this.calc();
 
@@ -927,17 +932,11 @@ class EXP_DATA {
             delete this.systems[sys];
         }
 
-        if (rec.Discovered) {
+        if (rec.Discovered)
             for (let i = 0; i < rec.Discovered.length; i++) {
-                let body = await DB.bodies.findOne({name: rec.Discovered[i]});
-                if (body) {
-                    body.discovered = cmdr.name;
-                    await DB.bodies.save(body);
-                }
-                //todo: what else? cmdr stat?
+                let b_name = con.LOW_CASE(rec.Discovered[i]);
+                await DB.exp_discovered.save({_id: b_name, cmdr: cmdr.name});
             }
-        }
-
 
         this.calc();
 
@@ -945,7 +944,7 @@ class EXP_DATA {
         await this.save();
     }
 
-    calc() { //todo:  need to separate this data from cmdr.
+    calc() {
         this.total = 0;
         this.sys_count = 0;
 
@@ -956,7 +955,7 @@ class EXP_DATA {
 
         for (let s in this.systems) {
             this.sys_count++;
-            for (let b = 0; b < this.systems[s].bodies.length; b++) {
+            for (let b in this.systems[s].bodies) {
                 this.total += this.systems[s].bodies[b].v;
                 this.summ[this.systems[s].bodies[b].t].total += this.systems[s].bodies[b].v;
                 this.summ[this.systems[s].bodies[b].t].count++;

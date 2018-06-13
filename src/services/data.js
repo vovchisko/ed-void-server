@@ -113,8 +113,9 @@ class DataStorage {
                     L: {count: 0, total: 0},
                     P: {count: 0, total: 0},
                     S: {count: 0, total: 0},
+                    C: {count: 0, total: 0},
                 },
-                curr_system: {total: 0, bodies: []},
+                curr_system: {scanned: 0, total: 0, bodies: {}},
                 systems: []
             }
         };

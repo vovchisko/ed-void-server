@@ -56,25 +56,25 @@ $speed-full: 320;
 $speed-medium: 220;
 $speed-low: 180;
 
-body.edfx-lv-full { //todo make it optinal. maybe also we need simplified animation.
+body.edfx-lv-full {
   .edfx, .ui { opacity: 0; animation: edfx-animation-full #{$speed-full}ms steps(2) forwards; }
-  @for $i from 1 to 32 {
+  @for $i from 1 to 16 {
     .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-full * 0.7}ms; }
     .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-full * .3}ms; }
     .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed-full * 0.7}ms !important; }
   }
 }
-body.edfx-lv-medium { //todo make it optinal. maybe also we need simplified animation.
+body.edfx-lv-medium {
   .edfx, .ui { opacity: 0; animation: edfx-animation-medium #{$speed-medium}ms steps(3) forwards; }
-  @for $i from 1 to 32 {
+  @for $i from 1 to 16 {
     .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-medium * 0.7}ms; }
     .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-medium * .3}ms; }
     .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed-medium * 0.7}ms !important; }
   }
 }
-body.edfx-lv-low { //todo make it optinal. maybe also we need simplified animation.
-  .edfx, .ui { opacity: 0; animation: edfx-animation-low #{$speed-low}ms  steps(3) forwards; }
-  @for $i from 1 to 32 {
+body.edfx-lv-low {
+  .edfx, .ui { opacity: 0; animation: edfx-animation-low #{$speed-low}ms steps(3) forwards; }
+  @for $i from 1 to 16 {
     .edfx:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-low * 0.7}ms; }
     .edfx.edfx-fast:nth-of-type(#{$i}), .ui:nth-of-type(#{$i}) { animation-delay: #{$i * $speed-low * .3}ms; }
     .edfx.edfx-delay-#{$i} { animation-delay: #{$i * $speed-low * 0.7}ms !important; }

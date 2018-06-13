@@ -34,7 +34,10 @@ module.exports = {
         // Estimate Body Value
         // starts : k + (m * k / 66.25)
         // worlds : k + ( 3 * k * m0.199977 / 5.3 )
-        if ((rec.ScanType !== 'Detailed' && rec.ScanType !== 'NavBeaconDetail') || (!rec.PlanetClass && !rec.StarType)) return;
+        if (rec.ScanType !== 'Detailed' || (!rec.PlanetClass && !rec.StarType)) {
+            rec.EstimatedValue = 0;
+            return;
+        }
 
         if (rec.PlanetClass) {
             let k = this._Scan_PlanetK[rec.PlanetClass] || 720;
