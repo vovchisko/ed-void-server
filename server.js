@@ -10,7 +10,6 @@ global.PIPE_EVENTS = [
 global.GHOST = false;
 
 exports = module.exports = server;
-const clog = require('./clog');
 const NodeStatic = require('node-static');
 const WSM = require('./universe/services/ws-manager');
 const MailService = require('./universe/services/mailer');
@@ -55,7 +54,7 @@ const cfg = server.cfg = require('./config');
 const EML = server.EML = new MailService(server.cfg.email);
 const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
-const log = server.log = require('./clog');
+const clog = server.clog = require('./clog');
 
 const action_signup = require('./universe/actions/signup');
 const action_signin = require('./universe/actions/signin');
@@ -231,7 +230,7 @@ function init() {
 
 
     UNI.on(EV_PIPE, (uid, rec_event, rec) => {
-        CLS.send_to(uid, 'pipe:' + rec_event, rec);
+        CLS.send_to(uid, 'pipe:' + rec_event, tools.recout(rec));
     });
 
     UNI.on(EV_NET, (uid, uni_event, data) => {

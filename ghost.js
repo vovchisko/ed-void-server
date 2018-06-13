@@ -8,8 +8,6 @@ global.GHOST = true;
 
 exports = module.exports = server;
 
-const pre = server.pre = require('./universe/pre');
-const tools = server.tools = require('./universe/tools');
 const cfg = server.cfg = require('./config');
 const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
@@ -30,8 +28,9 @@ async function init() {
 
     await wipe_stellars();
     await re_index_journals();
-    await re_process();
+    await remove_estimated_values();
 
+//    await re_process();
 
     console.log('COMPLETE!');
     process.exit(0);
@@ -43,9 +42,21 @@ async function wipe_stellars() {
     await DB.db_void.collection('systems').deleteMany({});
 }
 
+async function remove_estimated_values(cb) {
+    let count = await DB.cmdrs.count({});
+    console.log(`\n>> UPDATING_JOURNALS ${count} CMDRS...`);
+    let cmdrs = DB.cmdrs.find();
+    while (await cmdrs.hasNext()) {
+        const c = await cmdrs.next();
+        let cmdr = await UNI.get_cmdr(c.uid, c.name);
+        let r = await cmdr.journal().update({event: 'Scan'}, {$unset: {EstimatedValue: 1}}, {multi: true});
+        console.log(r.result.n, 'scanned;', r.result.nModified, 'modified');
+    }
+}
+
 async function re_index_journals(cb) {
     let count = await DB.cmdrs.count({});
-    console.log(`\n>> RE_INDEXING ${count} JOURNALS...`);
+    console.log(`\n>> RE_INDEXING ${count} CMDRS...`);
     let cmdrs = DB.cmdrs.find();
     while (await cmdrs.hasNext()) {
         const c = await cmdrs.next();
@@ -81,11 +92,10 @@ async function re_process() {
         let per_bar = Math.floor(total_r / 64);
         let recs = 0;
         while (await journal.hasNext()) {
-            let rec = await journal.next()
-            pre.process(rec);
-            await UNI.process(cmdr, pre.process(rec));
+            let rec = await journal.next();
+            await UNI.process(cmdr, rec);
             if (r > per_bar) {
-                process.stdout.write("\u00BB");
+                //process.stdout.write("\u00BB");
                 r = 0;
             } else {++r;}
             recs++;

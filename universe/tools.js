@@ -87,7 +87,83 @@ function is_valid_email(email) {
     return re.test(email);
 }
 
+function recout(rec) {
+    //delete rec._id; << don't remove it! we use it!
+    delete rec._lng;
+    delete rec._gv;
+    if (rec.event === 'Scan') recout_Scan(rec);
+    return rec;
+}
 
+function recout_Scan(rec) {
+    if (rec.ScanType === 'Detailed') rec._est = estimate_scan(rec);
+}
+
+
+function estimate_scan(scan) {
+    if (scan.StarType) return est_star(scan.StarType, scan.StellarMass);
+    if (scan.PlanetClass) return est_planet(scan.PlanetClass, scan.MassEM, !!scan.TerraformState);
+    return 0;
+}
+
+const STAR_DWARVES = " D DA DAB DAO DAZ DAV DB DBZ DBV DO DOV DQ DC DCV DX  White Dwarf ";
+const STAR_DENSE = " D DA DAB DAO DAZ DAV DB DBZ DBV DO DOV DQ DC DCV DX  White Dwarf ";
+const SAG_A_TYPE = "SupermassiveBlackHole";
+
+function est_star(type, mass) {
+    let baseval = 2880;
+    if (STAR_DWARVES.includes(' ' + type + ' ')) baseval = 33737;
+    if (STAR_DENSE.includes(' ' + type + ' ')) baseval = 54309;
+    if (SAG_A_TYPE === type) return 628318;
+    return Math.floor(baseval + (mass * baseval / 66.25));
+}
+
+function est_planet(type, mass, terra) {
+    let baseval = 0;
+    let bonusval = 0;
+    switch (type.toLowerCase()) {
+        case 'metal rich body':
+            baseval = 52292;
+            break;
+        case 'high metal content body':
+        case 'sudarsky class ii gas giant':
+            baseval = 23168;
+            if (terra) bonusval = 241607;
+            break;
+        case 'earthlike body':
+        case 'earth-like world':
+            baseval = 155581;
+            bonusval = 279088;
+            break;
+        case 'water world':
+            baseval = 155581;
+            if (terra) bonusval = 279088;
+            break;
+        case 'ammonia world':
+            baseval = 232619;
+            break;
+        case 'sudarsky class i gas giant':
+            baseval = 3974;
+            break;
+        default:
+            baseval = 720;
+            if (terra) bonusval = 223971;
+            break;
+    }
+    let value = baseval + (3 * baseval * Math.pow(mass, 0.199977) / 5.3);
+    if (bonusval > 0)
+        value += bonusval + (3 * bonusval * Math.pow(mass, 0.199977) / 5.3);
+
+    console.log(`${type} > ${mass} > T:${terra} = ${Math.floor(value)}`);
+
+    return Math.floor(value);
+}
+
+
+module.exports.recout = recout;
+module.exports.est_star = est_star;
+module.exports.est_planet = est_planet;
+module.exports.estimate_scan = estimate_scan;
 module.exports.is_valid_email = is_valid_email;
 module.exports.pick = pick;
 module.exports.pickx = pickx;

@@ -6,7 +6,6 @@
 
 const server = require('../../server');
 const UNI = require('../universe');
-const pre = require('../pre');
 const clog = require('../../clog');
 
 module.exports = function (req, res) {
@@ -25,7 +24,6 @@ module.exports = function (req, res) {
                 log += `${user._id} [CMDR ${head.cmdr}] ${records.length > 1 ? records.length : records[0].event} / `;
 
                 for (let i = 0; i < records.length; i++) {
-                    pre.process(records[i]);
                     await UNI.record(user, records[i], head.cmdr, head.gv, head.lng, records.length - (i + 1));
                     if (records[i].event === 'Status') log = ''; //don't log status
                 }

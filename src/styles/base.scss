@@ -35,6 +35,7 @@ h3 { @include hcaps(); font-size: 1.3em; padding: 0.7em 0 0.4em 0; margin: 0;}
 h4 { @include hcaps(); font-size: 1.2em; padding: 0.6em 0 0.3em 0; margin: 0; }
 h5 { @include hcaps(); font-size: 1.1em; padding: 0.6em 0 0.3em 0; margin: 0; }
 .caps { @include hcaps(); }
+select, button, navbar, header, .compass { user-select: none}
 //
 u { text-decoration: none;}
 //

@@ -56,8 +56,8 @@
                         <h3>scanned: <span>{{exp.curr_system.scanned}} / {{exp.curr_system.total | nn()}} Cr</span></h3>
                     </div>
                 </div>
-                <div v-if="exp.curr_system">
-                    <em v-for="(b,k) in exp.curr_system.bodies"><b>{{env.system.name}} {{k}}</b><span>{{b.v}} <u>Cr</u></span></em>
+                <div v-if="exp.curr_system" class="justified">
+                    <em v-for="(b,k) in exp.curr_system.bodies"><b>{{env.system.name}} {{k}}</b><span>{{b.v | nn()}} <u>Cr</u></span></em>
                 </div>
 
             </div>
@@ -70,8 +70,8 @@
                         <div class="col-sm">
                             <h5>{{s.name}}<br><span>{{s.val | nn()}} Cr</span></h5>
                         </div>
-                        <div class="col-sm">
-                            <em v-for="(b,k) in s.bodies"><b>{{s.name}} {{k}}</b><span>{{b.v}} <u>Cr</u></span></em>
+                        <div class="col-sm justified">
+                            <em v-for="(b,k) in s.bodies"><b>{{s.name}} {{k}}</b><span>{{b.v | nn()}} <u>Cr</u></span></em>
                         </div>
                     </div>
                 </div>
@@ -88,7 +88,6 @@
 
     export default {
         name: "vass",
-
         components: {Ev},
         data: () => {
             return {
@@ -104,14 +103,11 @@
                 this.exp.systems.splice(0, this.exp.systems.length);
                 Net.send('exp-refresh');
             },
-
-
         }
     }
 
     function push_rec(rec) {
         let recent = Data.vass.recent;
-
         for (let i = 0; i < recent.length; i++) {
             if (rec._id === recent[i]._id) {
                 return;

@@ -10,7 +10,7 @@
                 </div>
                 <div class="col-sm">
                     <h5 class="arrival">arrival: <span>{{s.DistanceFromArrivalLS | nn(0)}} ls</span></h5>
-                    <h5 class="value" v-if="s.EstimatedValue">est.value: <span>{{s.EstimatedValue | nn(0)}} cr</span></h5>
+                    <h5 class="value" v-if="s._est">est.value: <span>{{s._est | nn(0)}} cr</span></h5>
                 </div>
             </div>
         </div>

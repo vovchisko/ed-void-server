@@ -11,7 +11,8 @@ const pick = tools.pick;
 const pickx = tools.pickx;
 const con = tools.convert;
 const checksum = tools.checksum;
-const pre = require('./pre');
+
+
 
 global.EV_PIPE = 'uni-pipe';
 global.EV_NET = 'uni-data';
@@ -71,7 +72,9 @@ class Universe extends EE3 {
                     .sort({timestamp: -1})
                     .limit(32);
 
-                scans.forEach((rec) => this.emit(EV_PIPE, user._id, rec.event, rec));
+
+
+                scans.forEach((rec) => { this.emit(EV_PIPE, user._id, rec.event, rec) });
 
                 if (user._cmdr.system_id) {
                     let sys = await this.get_system(user._cmdr.system_id);
@@ -612,8 +615,7 @@ class BODY {
             ['AxialTilt', 'rot_axial_tilt'],
             ['TidalLock', 'rot_tidal_lock'],
 
-            //estimate added by pre.process
-            ['EstimatedValue', 'estimated_value'],
+            //['_est', ??? ],
         );
 
         if (rec.AtmosphereComposition) {
@@ -891,7 +893,7 @@ class EXP_DATA {
 
     async exp_data_add(rec, c_sys_id) {
 
-        if (!rec.EstimatedValue || rec.ScanType !== 'Detailed') return;
+        if (rec.ScanType !== 'Detailed') return;
 
         //get current system in lower case
         let sys_name = c_sys_id.split('@')[0];
@@ -900,7 +902,7 @@ class EXP_DATA {
 
         if (!this.systems[sys_name]) this.systems[sys_name] = {upd: 0, bodies: {}};
         this.systems[sys_name].upd = Date.now();
-        let b = {t: 'C', v: rec.EstimatedValue};
+        let b = {t: 'C', v: tools.estimate_scan(rec)};
 
         if (rec.PlanetClass) b.t = 'P';
         if (rec.PlanetClass && rec.Landable) b.t = 'L';
@@ -961,7 +963,6 @@ class EXP_DATA {
                 this.summ[this.systems[s].bodies[b].t].count++;
             }
         }
-
     }
 
     async save() {
