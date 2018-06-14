@@ -4,12 +4,28 @@
             <button v-on:click="c_tab = t" v-for="t in tabs" v-bind:class="c_tab === t ? 'active' : ''">{{t}}</button>
         </header>
 
-        <div v-if="c_tab==='flight log'">
+        <div v-if="c_tab==='flight log'" class="flight-log">
             <div class="alert info" v-if="!recent.length">
                 <i class="i-ed-alert"></i>
                 <div>no recent activity</div>
                 <small>no recent activity was found in database</small>
             </div>
+
+            <div class="row curr-sys-summ" v-if="env.system">
+                <div class="col-sm">
+                    <h3>
+                        <small>current system:</small>
+                        {{env.system.name}}
+                    </h3>
+                </div>
+                <div class="col-sm">
+                    <h3>
+                        <small>scanned bodies:</small>
+                        <span><u>{{exp.curr_system.scanned}}/{{env.system.ds_count}}</u>  {{exp.curr_system.total | nn()}} Cr </span>
+                    </h3>
+                </div>
+            </div>
+
             <ev class="edfx" v-for="rec in recent" v-bind:rec="rec" v-bind:key="rec._id"></ev>
         </div>
 
@@ -33,14 +49,21 @@
                 </div>
             </div>
             <div class="curr-system edfx edfx-delay-3" v-if="env.system">
-                <div class="row">
+                <div class="row curr-sys-summ">
                     <div class="col-sm">
-                        <h3>current: {{env.system.name}} </h3>
+                        <h3>
+                            <small>current system:</small>
+                            {{env.system.name}}
+                        </h3>
                     </div>
                     <div class="col-sm">
-                        <h3>scanned: <span>{{exp.curr_system.scanned}} / {{env.system.ds_count}} ({{exp.curr_system.total | nn()}} Cr)</span></h3>
+                        <h3>
+                            <small>scanned bodies:</small>
+                            <span><u>{{exp.curr_system.scanned}}/{{env.system.ds_count}}</u>  {{exp.curr_system.total | nn()}} Cr </span>
+                        </h3>
                     </div>
                 </div>
+                <br>
                 <div v-if="exp.curr_system">
                     <em v-for="(b,k) in exp.curr_system.bodies"><b>{{env.system.name}} {{k}}</b><span>{{b.v | nn()}} <u>Cr</u></span></em>
                 </div>
@@ -76,7 +99,7 @@
         components: {Ev},
         data: () => {
             return {
-                c_tab: 'data',
+                c_tab: 'flight log',
                 tabs: ['flight log', 'data'],
                 recent: Data.vass.recent,
                 exp: Data.vass.exp,
@@ -99,7 +122,6 @@
             }
         }
 
-        //sort by timestamp
         recent.push(rec);
         recent.sort((a, b) => {
             //new on top
@@ -162,16 +184,30 @@
 <style lang="scss">
     @import "../styles/vars";
     #vass {
-        .ev {
-            padding: 1em 0;
-            .head { margin: 0 -5px 0.8em -5px; padding: 0.8em 5px 0.4em 5px; background: darken($ui-bg, 2%); }
+        .curr-sys-summ {
+            h3 {
+                padding: 0.5em 0 0 0;
+                font-size: 1.3em; color: lighten($ui-text, 20%);
+                small { display: block; color: darken($ui-text, 15%); }
+                span { color: $ui-text;
+                    u { color: $cyan; padding-right: 0.4em }
+                }
+            }
         }
-        .main em { color: lighten($ui-text, 15%); font-size: 1.05em; line-height: 1.1em}
-        .sub em { font-size: 0.8em; }
 
-        .scan:last-child { display: none; }
-        .scan:first-child { display: block !important; }
-        .scan.empty { text-align: center; color: $orange; padding: 100px 0; }
+        .flight-log {
+
+            .ev {
+                padding: 1em 0;
+                .head { margin: 0 -5px 0.8em -5px; padding: 0.8em 5px 0.4em 5px; background: darken($ui-bg, 2%); }
+            }
+            .main em { color: lighten($ui-text, 15%); font-size: 1.05em; line-height: 1.1em}
+            .sub em { font-size: 0.8em; }
+
+            .scan:last-child { display: none; }
+            .scan:first-child { display: block !important; }
+            .scan.empty { text-align: center; color: $orange; padding: 100px 0; }
+        }
 
         .exp-data {
             .summary {
@@ -197,9 +233,6 @@
         .curr-system {
             padding-top: 1em;
             font-size: 1.08em;
-            h3 { padding: 0.4em 0;
-                span { color: $cyan; }
-            }
             em b { text-transform: uppercase; color: $ui-text;}
             em span { padding-left: 10px; color: lighten($ui-text, 20%); font-weight: bold;
                 u { color: darken($ui-text, 10%); }
@@ -207,7 +240,6 @@
         }
 
         .systems {
-           // font-size: 0.9em;
             padding-top: 2em;
             .sys {
                 margin: 0.6em 0 0 0; padding: 0.6em 0 0 0; border-top: 2px solid $dark;

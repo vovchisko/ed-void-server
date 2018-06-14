@@ -26,13 +26,8 @@ async function init() {
 
     UNI.init();
 
-
-    /*await rename_collections();
-    process.exit(0);*/
-
     await wipe_stellars();
     await re_index_journals();
-    await remove_estimated_values();
 
     await re_process();
 
@@ -44,31 +39,6 @@ async function init() {
 async function wipe_stellars() {
     await DB.db_void.collection('bodies').deleteMany({});
     await DB.db_void.collection('systems').deleteMany({});
-}
-/*
-async function rename_collections(cb) {
-    let count = await DB.cmdrs.count({});
-    console.log(`\n>> RENAMING ${count} JOURNALS...`);
-    let cmdrs = DB.cmdrs.find();
-    while (await cmdrs.hasNext()) {
-        const c = await cmdrs.next();
-        try {
-            await DB.db_journals.collection(`[${c.uid}] ${c.name}`).rename(`${c.uid}/${DB.shash(c.name)}`).catch((e) => {console.log('CAN`T!', `[${c.uid}] ${c.name}`, `${c.uid}/${DB.shash(c.name)}`)});
-        } catch (e) { console.log('FUCK!', `[${c.uid}] ${c.name}`, `${c.uid}/${DB.shash(c.name)}`)}
-    }
-}
-*/
-
-async function remove_estimated_values(cb) {
-    let count = await DB.cmdrs.count({});
-    console.log(`\n>> UPDATING_JOURNALS ${count} CMDRS...`);
-    let cmdrs = DB.cmdrs.find();
-    while (await cmdrs.hasNext()) {
-        const c = await cmdrs.next();
-        let cmdr = await UNI.get_cmdr(c.uid, c.name);
-        let r = await cmdr.journal().update({event: 'Scan'}, {$unset: {EstimatedValue: 1}}, {multi: true});
-        console.log(r.result.n, 'scanned;', r.result.nModified, 'modified');
-    }
 }
 
 async function re_index_journals(cb) {
