@@ -804,6 +804,7 @@ class CMDR {
         this.status = {};
         this._exp = null;
         extend(this, cmdr_data);
+        this.journal_id = `${this.uid}/${DB.shash(this.name)}`;
     }
 
     journal() {
