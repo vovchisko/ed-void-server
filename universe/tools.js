@@ -106,9 +106,10 @@ function estimate_scan(scan) {
     return 0;
 }
 
-const STAR_DWARVES = " D DA DAB DAO DAZ DAV DB DBZ DBV DO DOV DQ DC DCV DX  White Dwarf ";
-const STAR_DENSE = " D DA DAB DAO DAZ DAV DB DBZ DBV DO DOV DQ DC DCV DX  White Dwarf ";
-const SAG_A_TYPE = "SupermassiveBlackHole";
+const STAR_DWARVES = " D DA DAB DAO DAZ DAV DB DBZ DBV DO DOV DQ DC DCV DX "; //33737
+const STAR_DENSE = " N  H "; //54309
+const SAG_A_TYPE = "SupermassiveBlackHole"; //special price
+
 
 function est_star(type, mass) {
     let baseval = 2880;
@@ -153,8 +154,6 @@ function est_planet(type, mass, terra) {
     let value = baseval + (3 * baseval * Math.pow(mass, 0.199977) / 5.3);
     if (bonusval > 0)
         value += bonusval + (3 * bonusval * Math.pow(mass, 0.199977) / 5.3);
-
-    //console.log(`${type} > ${mass} > T:${terra} = ${Math.floor(value)}`);
 
     return Math.floor(value);
 }
