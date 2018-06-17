@@ -54,6 +54,7 @@ const cfg = server.cfg = require('./config');
 const EML = server.EML = new MailService(server.cfg.email);
 const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
+const race = server.race = require('./universe/race');
 const clog = server.clog = require('./clog');
 
 const action_signup = require('./universe/actions/signup');

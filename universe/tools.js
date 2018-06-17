@@ -168,6 +168,42 @@ function scan_obj_type(Scan) {
     return null;
 }
 
+/**
+ * Check if line intersect with a circle
+ *
+ * @param x0 {number} circle center X
+ * @param y0 {number} curcle center Y
+ * @param r {number} curcle radius
+ * @param x1 {number} point A X
+ * @param y1 {number} point A Y
+ * @param x2 {number} point B X
+ * @param y2 {number} point B Y
+ *
+ * @returns {boolean}
+ */
+function circle_intersect(x0, y0, r, // center and radius of circle
+                          x1, y1,    // point A
+                          x2, y2     // point B
+) {
+    let q = x0 * x0 + y0 * y0 - r * r;
+    let k = -2.0 * x0;
+    let l = -2.0 * y0;
+
+    let z = x1 * y2 - x2 * y1;
+    let p = y1 - y2;
+    let s = x1 - x2;
+
+    let A = s * s + p * p;
+    let B = s * s * k + 2.0 * z * p + s * l * p;
+    let C = q * s * s + z * z + s * l * z;
+
+    let D = B * B - 4.0 * A * C;
+
+    return D >= 0.0;
+
+}
+
+module.exports.circle_intersect = circle_intersect;
 module.exports.scan_obj_type = scan_obj_type;
 module.exports.recout = recout;
 module.exports.est_star = est_star;
