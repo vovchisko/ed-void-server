@@ -22,6 +22,7 @@ function pause(t) {
 }
 
 function handle_request(req, res, cb) {
+
     const chunks = [];
     req.on('data', chunk => chunks.push(chunk));
     req.on('end', () => {
@@ -30,9 +31,11 @@ function handle_request(req, res, cb) {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Credentials', true);
         res.setHeader('Access-Control-Allow-Methods', 'POST');
-        res.setHeader('Access-Control-Allow-Headers', '*');
+        if (req.method === 'OPTIONS') {
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, client,  cmdr, lng, gv, api_key');
+            return res.end();
+        }
         res.setHeader('Content-Type', 'application/json');
-
         cb(req, res, data);
     });
 }

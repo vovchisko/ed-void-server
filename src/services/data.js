@@ -1,8 +1,6 @@
 //import Net from './network';
 
 import extend from 'deep-extend';
-import Net from './network';
-import Vue from 'vue';
 
 class DataStorage {
     constructor() {
