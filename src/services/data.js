@@ -96,7 +96,7 @@ class DataStorage {
             },
             dest: {
                 enabled: false,
-                lat: 0, lon: 0, azi: 0, dist: 0,
+                lat: 0, lon: 0, head: 0, dist: 0,
                 align: ''
             },
             body: {name: null, radius: 0, gravity: 0, c_radius_km: 0}

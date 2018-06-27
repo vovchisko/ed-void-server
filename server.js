@@ -241,6 +241,7 @@ function init() {
         CLS.send_to(uid, 'uni:' + uni_event, data);
     });
 
+
     CLS.init(cfg.main.ws_user);
     JCL.init(cfg.main.ws_journals);
     UNI.init();

@@ -14,7 +14,7 @@
                 <div class="ruler" v-bind:style="navi.style_ruler">
                     <b class="head">{{navi.pos.head}}</b>
                 </div>
-                <div class="dest" v-bind:style="navi.style_dest" v-if="navi.dest.enabled">
+                <div class="dest" v-bind:style="navi.style_dest" v-if="dest_on">
                     <b class="head" v-bind:class="navi.dest.align">{{navi.dest.head}}</b>
                 </div>
             </div>
@@ -27,7 +27,7 @@
                             <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <u>°</u></span></em>
                             <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <u>KM</u></span></em>
                         </div>
-                        <div v-if="navi.dest.enabled" class="edfx">
+                        <div v-if="dest_on" class="edfx">
                             <br>
                             <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0)}} <u>°</u></span></em>
                             <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3)}} <u>KM</u></span></em>
@@ -35,66 +35,87 @@
                     </div>
                     <div class="col-6 cords justified">
                         <h5>DESTINATION</h5>
-                        <div v-if="navi.dest.enabled" class="edfx">
+                        <div v-if="dest_on" class="edfx">
                             <em class="editable">
                                 <b>LAT</b>
-                                <span><input type="number" min="-90" max="90" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lat"><u>°</u></span>
+                                <span><input type="number" min="-90" max="90" @focus="$event.target.select()" v-model="navi.dest.lat"><u>°</u></span>
                             </em>
                             <em class="editable">
                                 <b>LON</b>
-                                <span><input type="number" min="-180" max="180" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.dest.lon"><u>°</u></span>
+                                <span><input type="number" min="-180" max="180" @focus="$event.target.select()" v-model="navi.dest.lon"><u>°</u></span>
                             </em>
                             <em class="editable" v-if="!env.body">
                                 <b>RADIUS</b>
-                                <span><input type="number" @focus="$event.target.select()" @change="recalc_dest()" v-model="navi.body.c_radius_km"><u>KM</u></span>
+                                <span><input type="number" @focus="$event.target.select()" v-model="navi.body.c_radius_km"><u>KM</u></span>
                             </em>
                         </div>
-                        <button class="edfx" v-bind:class="navi.dest.enabled?'semi-active':''"
-                                v-on:click="navi.dest.enabled = !navi.dest.enabled; recalc_dest()">
-                            <i v-if="!navi.dest.enabled " class="i-aim"></i>
-                            <i v-if="navi.dest.enabled " class="i-chevron-up"></i>
-                            {{ !navi.dest.enabled ? 'SET COURSE' : 'DISMISS' }}
-                        </button>
+                        <button class="edfx" v-if="!dest_on" v-on:click="dest_on = true"><i class="i-aim"></i> SET DESTINATION</button>
+                        <button class="edfx" v-if="dest_on" v-on:click="dest_apply()"><i class="i-aim"></i> APPLY DESTINATION</button>
+                        <button class="edfx" v-if="dest_on" v-on:click="dest_dismiss()"><i class="i-cross"></i> DISMISS</button>
+
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="container-fluid location-data edfx">
-            <div class="centered">
-                <div class="alert warn " v-if="navi.body.name !== null && !navi.body.radius">
-                    <i class="i-ed-alert"></i>
-                    <div>No scan data in database</div>
-                    <small>Scan body to identify radius and gravity correctly</small>
-                </div>
-                <div>
-                    <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
-                    <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
-                    <em><b>BODY</b> <span>{{navi.body.name || 'N / A'}}</span></em>
-                    <em><b>RADIUS</b> <span>{{navi.body.radius / 1000 || null | nn(3,3, 'N / A') }} <u>KM</u></span></em>
-                    <em><b>GRAVITY</b> <span>{{navi.body.gravity | nn(3,3, 'N / A')}} <u>G</u></span></em>
+            <pre>{{navi}}</pre>
+            <div class="container-fluid location-data edfx">
+                <div class="centered">
+                    <div class="alert warn " v-if="!env.body || !env.body.radius">
+                        <i class="i-ed-alert"></i>
+                        <div>No scan data in database</div>
+                        <small>Scan body to identify radius and gravity correctly</small>
+                    </div>
+                    <div>
+                        <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
+                        <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
+                        <div v-if="env.body">
+                            <em><b>BODY</b> <span>{{env.body.name || 'N / A'}}</span></em>
+                            <em><b>RADIUS</b> <span>{{env.body.radius / 1000 || null | nn(3,3, 'N / A') }} <u>KM</u></span></em>
+                            <em><b>GRAVITY</b> <span>{{env.body.gravity | nn(3,3, 'N / A')}} <u>G</u></span></em>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
-        <!-- <pre>{{env.body}}</pre> -->
     </div>
 </template>
 
 <script>
     import Data from '../services/data'
     import Net from '../services/network'
+    import extend from 'deep-extend'
 
     export default {
         name: "navi",
         data: () => {
-            return {navi: Data.navi, env: Data.env}
+            return {dest_on: false, navi: Data.navi, env: Data.env}
         },
-        methods: {recalc_dest: () => recalc_dest()}
+        methods: {
+            dest_apply: function () {
+                Net.send('dest-apply', {
+                    //todo: you can specify "r" manually
+                    system: null,
+                    body: null,
+                    lat: this.navi.dest.lat,
+                    lon: this.navi.dest.lon,
+                })
+            },
+            dest_dismiss: function () {
+                Net.send('dest-dismiss');
+                this.dest_on = false;
+            },
+        }
     }
 
     const _navi = Data.navi;
 
-    Net.on('uni:status', (stat) => update_dest(stat));
+    Net.on('uni:status', (stat) => {
+        _navi.pos.alt = stat.alt;
+        _navi.pos.head = stat.head;
+        _navi.pos.lat = stat.lat;
+        _navi.pos.lon = stat.lon;
+    });
+    Net.on('uni:dest', (dest) => update_dest(dest));
 
     Net.on('uni:c_body', (body) => {
         _navi.body.name = (body) ? body.short_name : null;
@@ -103,37 +124,8 @@
     });
 
 
-    function update_dest(stat) {
-
-        _navi.pos.alt = stat.alt;
-        _navi.pos.head = stat.head;
-        _navi.pos.lat = stat.lat;
-        _navi.pos.lon = stat.lon;
-
-        if (_navi.pos.alt === null) return;
-        recalc_dest();
-    }
-
-    function recalc_dest() {
-
-        if (!Data.env.body) {
-            _navi.body.radius = _navi.body.c_radius_km * 1000;
-        }
-
-        if (_navi.dest.enabled) {
-            let latStart = _navi.pos.lat * Math.PI / 180;
-            let lonStart = _navi.pos.lon * Math.PI / 180;
-            let latDest = _navi.dest.lat * Math.PI / 180;
-            let lonDest = _navi.dest.lon * Math.PI / 180;
-            let deltaLon = lonDest - lonStart;
-            let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
-            let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
-            if (initialBearing < 0) initialBearing = 360 + initialBearing;
-            _navi.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (_navi.body.radius);
-            _navi.dest.head = Math.floor(initialBearing);
-            isNaN(_navi.dest.head) ? _navi.dest.head = 'ERR' : null;
-        }
-
+    function update_dest(dest) {
+        extend(_navi.dest, dest);
         let rw = window.innerWidth;
         let offset = (rw / 2) - _navi.pos.head * 4;
         _navi.style_ruler['background-position-x'] = offset + 'px';
@@ -152,6 +144,8 @@
                 if (alg <= 3) _navi.dest.align = 'alg0';
                 if (alg > 3) _navi.dest.align = 'alg1';
                 if (alg > 10) _navi.dest.align = 'alg2';
+
+
             }
 
         }
@@ -193,9 +187,7 @@
                 .head.err { animation: glitched_text 2.5s infinite; color: $red; border-color: $red; }
                 .head.err:after { border-bottom-color: $red; }
                 .head.err:before { content: 'destination data invalid'; color: $red }
-
             }
-
         }
         .cords {
             .editable {

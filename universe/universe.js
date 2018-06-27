@@ -86,6 +86,8 @@ class Universe extends EE3 {
 
                 this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(false, user._cmdr.current_system_name()));
 
+                user._cmdr.dest_calc();
+
                 await this.repo_search(user, {uid: user._id});
 
             })
@@ -96,7 +98,7 @@ class Universe extends EE3 {
 
     async upd_status(user, Status, cmdr_name, gv, lng) {
 
-        user.track_overload(0);
+        //user.track_overload(0);
 
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
@@ -104,13 +106,15 @@ class Universe extends EE3 {
             flags: Status.Flags,
             pips: Status.Pips,
             fgroup: Status.FireGroup || 0,
-            lat: typeof Status.Latitude !== 'undefined' ? Status.Latitude : null,
-            lon: typeof Status.Longitude !== 'undefined' ? Status.Longitude : null,
-            alt: typeof Status.Altitude !== 'undefined' ? Status.Altitude : null,
-            head: typeof Status.Heading !== 'undefined' ? Status.Heading : null,
+            lat: typeof Status.Latitude !== 'undefined' ? parseFloat(Status.Latitude) : null,
+            lon: typeof Status.Longitude !== 'undefined' ? parseFloat(Status.Longitude) : null,
+            alt: typeof Status.Altitude !== 'undefined' ? parseFloat(Status.Altitude) : null,
+            head: typeof Status.Heading !== 'undefined' ? parseFloat(Status.Heading) : null,
             _upd: new Date(Status.timestamp)
         });
         user._cmdr._ch = true; // but mark as changed
+        if (user._cmdr.dest.enabled) user._cmdr.dest_calc();
+
         this.emit(EV_NET, user._id, 'status', user._cmdr.status);
     }
 
@@ -282,13 +286,16 @@ class Universe extends EE3 {
     }
 
     user_msg(user, c, data) {
+        if (c === 'dest-apply') { return user._cmdr ? user._cmdr.dest_apply(data) : false; }
+        if (c === 'dest-dismiss') {return user._cmdr ? user._cmdr.dest_dismiss() : false;}
         if (c === 'repo-submit') return this.repo_submit(user, data);
         if (c === 'repo-search') return this.repo_search(user, data);
         if (c === 'exp-refresh') return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
         if (c === 'exp-reset') {
             user._cmdr._exp.reset();
-            this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
+            return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
         }
+
     }
 
     async repo_search(user, query) {
@@ -801,10 +808,86 @@ class CMDR {
         this.body_id = null;
         this.starpos = [0, 0, 0];
         this.metrics = {curr_ds: 0};
-        this.status = {};
+        this.status = {
+            flags: 0,
+            pips: [0, 0, 0],
+            fgroup: 0,
+            lat: null,
+            lon: null,
+            alt: null,
+            head: null,
+            _upd: null
+        };
+        this.dest = {
+            enabled: false,
+            sys_id: null,
+            body_id: null,
+            lat: 0,
+            lon: 0,
+            r: 1000,
+            head: null,
+        };
         this._exp = null;
         extend(this, cmdr_data);
         this.journal_id = `${this.uid}/${DB.shash(this.name)}`;
+    }
+
+    async dest_apply(d) {
+
+        //todo: add Station_ID when it comes around
+
+        if (!d) {
+            this.dest.enabled = false;
+            return;
+        } else {
+            this.dest.enabled = true;
+        }
+
+        if (d.sys_id) {
+            let sys = await UNI.get_system(d.sys_id);
+            this.dest.sys_id = sys ? sys._id : null;
+        }
+
+        if (d.body_id) {
+            let body = await UNI.get_body(d.body_id);
+            if (body) {
+                this.dest.body_id = body._id;
+                this.dest.sys_id = body.sys_id;
+                this.dest.r = body.radius;
+            } else {
+                this.dest.body_id = null;
+                this.dest.sys_id = null;
+                this.dest.r = d.r || 1000;
+            }
+        }
+
+        this.dest.lat = parseFloat(d.lat);
+        this.dest.lon = parseFloat(d.lon);
+
+        this.dest_calc();
+
+    }
+
+    dest_calc() {
+        if (this.dest.enabled) {
+            if (this.status.alt === null) return;
+            let latStart = this.status.lat * Math.PI / 180;
+            let lonStart = this.status.lon * Math.PI / 180;
+            let latDest = this.dest.lat * Math.PI / 180;
+            let lonDest = this.dest.lon * Math.PI / 180;
+            let deltaLon = lonDest - lonStart;
+            let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
+            let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
+            if (initialBearing < 0) initialBearing = 360 + initialBearing;
+            this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
+            this.dest.head = Math.floor(initialBearing);
+            if (isNaN(this.dest.head)) this.dest.head = 'ERR';
+            UNI.emitf(EV_NET, this.uid, 'dest', this.dest);
+        }
+    }
+
+    dest_dismiss() {
+        this.dest.enabled = false;
     }
 
     journal() {
@@ -855,7 +938,6 @@ class CMDR {
         this._ch = false;
     }
 }
-
 
 class EXP_DATA {
     constructor(exp_data) {
@@ -954,7 +1036,6 @@ class EXP_DATA {
         this._ch = false;
     }
 }
-
 
 const UNI = new Universe();
 module.exports = UNI;
