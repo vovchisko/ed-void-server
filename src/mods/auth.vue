@@ -97,9 +97,10 @@
 </template>
 
 <script>
-    import Net from '../services/network';
-    import Data from '../services/data';
-    import Route from '../services/router';
+    import Net from '../ctrl/network';
+    import Data from '../ctrl/data';
+    import Route from '../ctrl/router';
+    import CFG from '../ctrl/cfg';
 
     const WELCOME_IN = 'welcome back commander';
     const WELCOME_UP = 'welcome in the void commander';
@@ -124,9 +125,9 @@
                     Net.api('everify', {secret: this.secret})
                         .then((result) => {
                             if (result.result) {
-                                Data.auth.api_key = result.api_key;
-                                Data.c_mode = 'cfg';
-                                Data.save();
+                                CFG.api_key = result.api_key;
+                                CFG.c_mode = 'cfg';
+                                CFG.save();
                                 Route.reset_route();
                             } else {
                                 alert('invalid verification link\n' + result.type + ': ' + result.text);
@@ -141,7 +142,7 @@
                     return this.sign('reset');
                 }
 
-                if (this.auth.api_key) return this.connect();
+                if (CFG.api_key) return this.connect();
 
                 this.sign('in');
             },
@@ -175,8 +176,8 @@
                 Net.api('passrst', {secret: this.secret, pass: this.reset.new_pass})
                     .then((result) => {
                         if (result.result) {
-                            Data.auth.api_key = result.api_key;
-                            Data.save();
+                            CFG.api_key = result.api_key;
+                            CFG.save();
                             Route.reset_route();
                         } else {
                             this.reset.text = result.text;
@@ -225,7 +226,7 @@
                             this.msg.text = dat.text;
                             return;
                         }
-                        this.auth.api_key = dat.user.api_key;
+                        CFG.api_key = dat.user.api_key;
                         this.auth.pass = '';
                         this.connect();
                     })
@@ -236,7 +237,7 @@
             },
             connect: function () {
                 this.auth.is_logged = true;
-                Net.init(this.auth.api_key);
+                Net.init();
                 Data.save();
             }
         }
@@ -244,7 +245,7 @@
 
     Net.on('_close', (code, reason) => {
         if (reason === 'unauthorized') {
-            Data.auth.api_key = '';
+            CFG.api_key = '';
             Data.auth.is_logged = false;
             Data.save();
         }

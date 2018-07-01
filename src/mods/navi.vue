@@ -81,8 +81,8 @@
 </template>
 
 <script>
-    import Data from '../services/data'
-    import Net from '../services/network'
+    import Data from '../ctrl/data'
+    import Net from '../ctrl/network'
     import extend from 'deep-extend'
 
     export default {

@@ -1,4 +1,5 @@
 import EventEmitter3 from 'eventemitter3';
+import CFG from './cfg';
 
 const NS_OFFLINE = 'offline';
 const NS_CONNECTING = 'connecting';
@@ -10,21 +11,19 @@ class Network extends EventEmitter3 {
         super();
         this.warn_unlistened = false;
         this.ws = null;
-        this.api_key = null;
         this.stat = {online: NS_OFFLINE, error: false};
         this.timer = null;
 
     }
 
-    init(api_key = null) {
+    init() {
         const _net = this;
         this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
         this.stat.online = NS_CONNECTING;
-        this.api_key = api_key;
 
         this.ws.onopen = function () {
 
-            _net.send('auth', _net.api_key);
+            _net.send('auth', CFG.api_key);
             _net.stat.online = NS_ONLINE;
             _net.stat.error = false;
         };
@@ -41,7 +40,7 @@ class Network extends EventEmitter3 {
             _net.stat.online = NS_OFFLINE;
             if (e.reason) return;
             _net.stat.error = true;
-            _net.timer = setTimeout(() => _net.init(_net.api_key), 2000);
+            _net.timer = setTimeout(() => _net.init(CFG.api_key), 2000);
         };
 
         this.ws.onerror = function (err) {
@@ -66,7 +65,7 @@ class Network extends EventEmitter3 {
         return fetch('http://' + window.location.hostname + /*(location.port ? ':' + 4200 : '') +*/ '/api/' + method, {
             method: 'POST',
             body: JSON.stringify(data),
-            headers: {api_key: this.api_key || 'none' }
+            headers: {api_key: CFG.api_key || 'none' }
         })
             .then((res) => {
                 return res.json().then((obj) => {

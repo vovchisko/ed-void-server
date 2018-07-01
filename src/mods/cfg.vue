@@ -10,15 +10,15 @@
                 <small>This options applied only for this device.</small>
 
                 <div class="ui short">
-                    <select v-model="cfg.ui_font_size" @change="cgf_apply()">
-                        <option v-for="i in cfg._font_size_vars" v-model="cfg._font_size_vars[i]">{{i}}</option>
+                    <select v-model="CFG.ui_font_size" @change="cgf_apply()">
+                        <option v-for="i in variant_font_size" v-model="variant_font_size[i]">{{i}}</option>
                     </select>
                     <label>font size</label>
                 </div>
 
                 <div class="ui short">
-                    <select v-model="cfg.ui_fx_level" @change="cgf_apply()">
-                        <option v-for="i in cfg._fx_level_vars" v-model="cfg._fx_level_vars[i]">{{i}}</option>
+                    <select v-model="CFG.ui_fx_level" @change="cgf_apply()">
+                        <option v-for="i in variant_fx_level" v-model="variant_fx_level[i]">{{i}}</option>
                     </select>
                     <label>ui effects</label>
                 </div>
@@ -90,7 +90,7 @@
                             API-KEY &nbsp;
                             <button type="button" class="link" v-on:click="apikey_reset()"><i class="i-cross"></i> reset</button>
                         </h5>
-                        <p>{{user.api_key}}</p>
+                        <p>{{CFG.api_key}}</p>
                     </div>
                 </div>
 
@@ -133,16 +133,19 @@
 </template>
 
 <script>
-    import Data from '../services/data';
-    import Net from '../services/network';
+    import Data from '../ctrl/data';
+    import Net from '../ctrl/network';
     import Vue from 'vue';
+    import CFG from '../ctrl/cfg';
 
     export default {
         name: 'cfg',
         data: () => {
             return {
+                variant_font_size: new Array(17).fill(0).map((x, i) => {return i * 10 + 40 + '%'}),
+                variant_fx_level: ['full', 'medium', 'low', 'disabled'],
                 data: Data,
-                cfg: Data.cfg,
+                CFG: CFG,
                 user: Data.user,
                 re_everify_result: {result: 0, type: '', text: ''},
                 pass_ch: {toggle: false, c: '', n: '', nc: '', result: {result: 0, text: '', type: ''}}
@@ -185,7 +188,6 @@
                             this.re_everify_result.result = result.result;
                             this.re_everify_result.text = result.text;
                             this.re_everify_result.type = result.type;
-                            Data.save();
                         } else {
                             alert(result.type + ': ' + result.text);
                         }
@@ -197,13 +199,12 @@
             signout: function () {
                 Net.disconnect();
                 Data.auth.is_logged = false;
-                Data.auth.api_key = '';
-                Data.save();
-                Data.nullify('auth');
+                CFG.api_key = '';
+                CFG.save();
             },
             cgf_apply: function () {
-                Data.apply_ui_cfg();
-                Data.save();
+                CFG.apply_ui_cfg();
+                CFG.save();
             },
             reset_exp: function () {
                 if (confirm('Do you really want to reset your exploration report?')) {
@@ -219,7 +220,6 @@
         Data.user.api_key = user.api_key;
         Data.user.valid = user.valid;
         Data.user.dev = user.dev;
-
         if (user.dev) {
             // user in dev mode
             Vue.set(Data.modes.modes, 'dev', 'dev');

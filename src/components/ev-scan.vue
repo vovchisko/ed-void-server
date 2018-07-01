@@ -112,7 +112,7 @@
 </template>
 
 <script>
-    import VARS from '../services/vars';
+    import VARS from '../ctrl/vars';
 
     export default {
         name: "ev-scan",

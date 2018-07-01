@@ -23,8 +23,8 @@
 
     import Auth from './mods/auth.vue'
     import Navbar from './mods/navbar.vue'
-    import Data from './services/data'
-    import Net from './services/network';
+    import Data from './ctrl/data'
+    import Net from './ctrl/network';
     import Vue from 'vue';
     import moment from 'moment';
 

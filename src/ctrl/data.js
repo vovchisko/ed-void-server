@@ -13,8 +13,7 @@ class DataStorage {
         this.cfg = {
             ui_font_size: '100%',
             ui_fx_level: 'full',
-            _font_size_vars: new Array(17).fill(0).map((x, i) => {return i * 10 + 40 + '%'}),
-            _fx_level_vars: ['full', 'medium', 'low', 'disabled']
+
         };
 
         this.modes = {
@@ -69,7 +68,6 @@ class DataStorage {
             is_logged: false,
             email: '',
             pass: '',
-            api_key: ''
         };
 
         this.cmdr = {
@@ -132,30 +130,12 @@ class DataStorage {
             }
         }
 
-        this.auth.api_key = (localStorage.getItem('api_key')) || this.auth.api_key;
-        this.modes.c_mode = (localStorage.getItem('c_mode')) || this.modes.c_mode;
-        this.cfg.ui_font_size = (localStorage.getItem('ui_font_size')) || this.cfg.ui_font_size;
-        this.cfg.ui_fx_level = (localStorage.getItem('ui_fx_level')) || this.cfg.ui_fx_level;
-
-        this.apply_ui_cfg();
-    }
-
-    save() {
-        //save some data to locastorage
-        localStorage.setItem('api_key', this.auth.api_key);
-        localStorage.setItem('c_mode', this.modes.c_mode);
-        localStorage.setItem('ui_font_size', this.cfg.ui_font_size);
-        localStorage.setItem('ui_fx_level', this.cfg.ui_fx_level);
     }
 
     nullify(section) {
         if (section === 'repo.curr') extend(this.repo.curr, this._null.repo.curr);
     }
 
-    apply_ui_cfg() {
-        document.body.style.fontSize = this.cfg.ui_font_size;
-        document.body.className = 'edfx-lv-' + this.cfg.ui_fx_level;
-    }
 }
 
 const Data = new DataStorage();

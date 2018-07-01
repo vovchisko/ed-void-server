@@ -268,9 +268,9 @@
 
 <script>
 
-    import Data from '../services/data';
-    import Vars from '../services/vars';
-    import Net from '../services/network';
+    import Data from '../ctrl/data';
+    import Vars from '../ctrl/vars';
+    import Net from '../ctrl/network';
     import Vue from 'vue';
     import extend from 'deep-extend';
 
