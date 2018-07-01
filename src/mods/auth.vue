@@ -142,6 +142,9 @@
                     return this.sign('reset');
                 }
 
+
+                console.log('>>', CFG.api_key);
+
                 if (CFG.api_key) return this.connect();
 
                 this.sign('in');
@@ -238,7 +241,6 @@
             connect: function () {
                 this.auth.is_logged = true;
                 Net.init();
-                Data.save();
             }
         }
     }

@@ -4,6 +4,7 @@ class CFG_Browser {
         this.c_mode = 'cfg';
         this.ui_font_size = '100%';
         this.ui_fx_level = 'full';
+        this.load();
     }
 
     load() {
@@ -27,5 +28,6 @@ class CFG_Browser {
 }
 
 const CFG = new CFG_Browser();
+
 
 export default CFG;
