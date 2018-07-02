@@ -1,32 +1,42 @@
 <template>
     <div id="app">
-        <auth v-if="!data.auth.is_logged"></auth>
-        <navbar v-if="data.auth.is_logged"/>
+        <alert></alert>
+        <auth></auth>
 
-        <div class="container-fluid" v-if="data.auth.is_logged">
-            <cmdr v-if=" data.modes.c_mode === 'cmdr'"></cmdr>
-            <vass v-if="data.modes.c_mode === 'vass'"></vass>
-            <navi v-if="data.modes.c_mode === 'navi'"></navi>
-            <repo v-if="data.modes.c_mode === 'repo'"></repo>
-            <cfg v-if="data.modes.c_mode === 'cfg'"></cfg>
-            <dev v-if="data.modes.c_mode === 'dev'"></dev>
+        <navbar v-if="MODE.is_ready"/>
+
+        <div class="container-fluid" v-if="MODE.is_ready">
+            <cmdr v-if="MODE.c_mode === 'cmdr'"></cmdr>
+            <vass v-if="MODE.c_mode === 'vass'"></vass>
+            <navi v-if="MODE.c_mode === 'navi'"></navi>
+            <repo v-if="MODE.c_mode === 'repo'"></repo>
+            <cfg v-if="MODE.c_mode === 'cfg'"></cfg>
+            <dev v-if="MODE.c_mode === 'dev'"></dev>
         </div>
 
-        <div class="alert info modal progress" v-show="data.app.overload">
-            <i class="i-ed-alert"></i>
-            <div>recieving new data</div>
-            <small>please wait</small>
+        <div class="row">
+            <div class="col-sm">
+                <pre>{{MODE}}</pre>
+            </div>
+            <div class="col-sm">
+                <pre>{{CFG}}</pre>
+            </div>
+            <div class="col-sm">
+                <pre>{{A}}</pre>
+            </div>
         </div>
     </div>
 </template>
 <script>
+    import moment from 'moment';
+    import Vue from 'vue';
 
+    import Alert, {A} from './components/alert'
     import Auth from './mods/auth.vue'
     import Navbar from './mods/navbar.vue'
-    import Data from './ctrl/data'
-    import Net from './ctrl/network';
-    import Vue from 'vue';
-    import moment from 'moment';
+    import CFG from './ctrl/cfg';
+    import NET from './ctrl/network';
+    import MODE from './ctrl/mode';
 
     import Cmdr from './mods/cmdr.vue'
     import Navi from './mods/navi.vue'
@@ -37,14 +47,22 @@
 
     export default {
         name: 'app',
-        data: () => {return {data: Data}},
+        data: () => {return {MODE: MODE, CFG: CFG, A: A}},
         components: {
-            Navbar, Auth, Cmdr, Navi, Vass, Repo, Cfg, Dev
+            Alert, Navbar, Auth, Cmdr, Navi, Vass, Repo, Cfg, Dev
         },
     }
 
-    Net.on('uni:overload', (is_overload) => {
-        Data.app.overload = is_overload;
+    NET.on('uni:overload', (is_overload) => {
+        if (is_overload) {
+            A.lock({
+                type: 'info progress',
+                text: 'processing new data',
+                desc: 'plase wait...',
+            });
+        } else {
+            A.release();
+        }
     });
 
     Vue.filter('nn', function (num, frac = 3, min_frac = 0, err = 'ERR!') {
@@ -65,7 +83,7 @@
         return value ? value : 'FALSE';
     });
 
-    Vue.filter('date', function(value) {
+    Vue.filter('date', function (value) {
         if (value) {
             return moment(String(value)).format('MM/DD/YYYY hh:mm')
         }
@@ -77,6 +95,6 @@
     @import '~bootstrap/dist/css/bootstrap-reboot.css';
     @import '~bootstrap/dist/css/bootstrap-grid.css';
     @import 'styles/fonts';
-    @import 'styles/vars';
     @import 'styles/base';
+    @import 'styles/fx';
 </style>

@@ -90,7 +90,7 @@
 
 <script>
     import Vue from 'vue';
-    import Net from '../ctrl/network';
+    import NET from '../ctrl/network';
     import Data from '../ctrl/data';
     import Ev from '../components/ev';
 
@@ -109,7 +109,7 @@
         methods: {
             refresh_exp: function () {
                 this.exp.systems.splice(0, this.exp.systems.length);
-                Net.send('exp-refresh');
+                NET.send('exp-refresh');
             },
         }
     }
@@ -176,9 +176,9 @@
         }
     }
 
-    Net.on('uni:exp-data', (data) => { push_exp_summ(data)});
-    Net.on('pipe:Scan', (rec) => push_rec(rec));
-    Net.on('pipe:FSDJump', (rec) => push_rec(rec));
+    NET.on('uni:exp-data', (data) => { push_exp_summ(data)});
+    NET.on('pipe:Scan', (rec) => push_rec(rec));
+    NET.on('pipe:FSDJump', (rec) => push_rec(rec));
 </script>
 
 <style lang="scss">

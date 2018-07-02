@@ -1,9 +1,11 @@
 import EventEmitter3 from 'eventemitter3';
 import CFG from './cfg';
+import MODE from './mode';
+import Vue from "vue";
 
-const NS_OFFLINE = 'offline';
-const NS_CONNECTING = 'connecting';
-const NS_ONLINE = 'online';
+const NS_OFFLINE = false;
+const NS_CONNECTING = null;
+const NS_ONLINE = true;
 
 class Network extends EventEmitter3 {
 
@@ -11,43 +13,33 @@ class Network extends EventEmitter3 {
         super();
         this.warn_unlistened = false;
         this.ws = null;
-        this.stat = {online: NS_OFFLINE, error: false};
         this.timer = null;
-
+        MODE.is_ready = NS_OFFLINE;
+        MODE.is_in = !!CFG.api_key;
     }
 
     init() {
-        const _net = this;
         this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
-        this.stat.online = NS_CONNECTING;
-
-        this.ws.onopen = function () {
-
-            _net.send('auth', CFG.api_key);
-            _net.stat.online = NS_ONLINE;
-            _net.stat.error = false;
+        this.ws.onopen = () => {
+            this.send('auth', CFG.api_key);
         };
-
-        this.ws.onmessage = function (msg) {
+        this.ws.onmessage = (msg) => {
             let m = JSON.parse(msg.data);
-            if (this.warn_unlistened && !_net._events[m.c]) console.warn('master::no_listeners', m.c, m.dat);
-            _net.emit(m.c, m.dat);
-            _net.emit('net:any', m.c, m.dat);
+            if (this.warn_unlistened && !this._events[m.c]) console.warn('master::no_listeners', m.c, m.dat);
+            this.emit(m.c, m.dat);
+            this.emit('net:any', m.c, m.dat);
         };
-
-        this.ws.onclose = function (e) {
-            _net.emit('_close', e.code, e.reason);
-            _net.stat.online = NS_OFFLINE;
-            if (e.reason) return;
-            _net.stat.error = true;
-            _net.timer = setTimeout(() => _net.init(CFG.api_key), 2000);
+        this.ws.onclose = (e) => {
+            MODE.is_ready = NS_OFFLINE;
+            this.emit('_close', e.code, e.reason);
+            if (e.reason) return console.log('ws:ouch!', e.reason);
+            this.timer = setTimeout(() => this.init(), 2000);
         };
-
-        this.ws.onerror = function (err) {
-            _net.stat.error = true;
-            _net.emit('_error', err);
-            _net.ws = null;
-        }
+        this.ws.onerror = (err) => {
+            this.emit('_error', err);
+            this.ws = null;
+        };
+        MODE.is_ready = NS_CONNECTING;
     };
 
     disconnect() {
@@ -65,7 +57,7 @@ class Network extends EventEmitter3 {
         return fetch('http://' + window.location.hostname + /*(location.port ? ':' + 4200 : '') +*/ '/api/' + method, {
             method: 'POST',
             body: JSON.stringify(data),
-            headers: {api_key: CFG.api_key || 'none' }
+            headers: {api_key: CFG.api_key || 'none'}
         })
             .then((res) => {
                 return res.json().then((obj) => {
@@ -79,6 +71,25 @@ class Network extends EventEmitter3 {
 
 }
 
-const Net = new Network();
+const NET = new Network();
 
-export default Net;
+NET.on('uni:user', (user) => {
+    CFG.email = user.email;
+    CFG.api_key = user.api_key;
+    CFG.valid = user.valid;
+    CFG.dev = user.dev;
+    MODE.is_in = true;
+    MODE.is_ready = NS_ONLINE;
+    if (user.dev)
+        Vue.set(MODE.list, 'dev', 'dev');
+
+});
+
+NET.on('_close', (code, reason) => {
+    if (reason === 'unauthorized') {
+        CFG.api_key = '';
+        CFG.save();
+    }
+});
+
+export default NET;

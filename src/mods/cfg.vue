@@ -64,16 +64,16 @@
                 <h2>account details</h2>
                 <div class="tip-box email edfx">
                     <div class="icon">
-                        <i class="i-shield-check valid" v-if="user.valid"></i>
-                        <i class="i-shield-alert not-valid" v-if="!user.valid"></i>
+                        <i class="i-shield-check valid" v-if="CFG.valid"></i>
+                        <i class="i-shield-alert not-valid" v-if="!CFG.valid"></i>
                     </div>
                     <div>
                         <h5>
-                            {{user.email}}
-                            <button type="button" class="link" v-if="!user.valid && re_everify_result.result===0" v-on:click="re_everify()">request new link</button>
+                            {{CFG.email}}
+                            <button type="button" class="link" v-if="!CFG.valid && re_everify_result.result===0" v-on:click="re_everify()">request new link</button>
                         </h5>
-                        <p v-if="user.valid">Email Verified</p>
-                        <p v-if="!re_everify_result.text && !user.valid">We send you email with a link. Check your mail box.</p>
+                        <p v-if="CFG.valid">Email Verified</p>
+                        <p v-if="!re_everify_result.text && !CFG.valid">We send you email with a link. Check your mail box.</p>
                         <p v-if="re_everify_result.text">
                             {{re_everify_result.text}}
                         </p>
@@ -134,9 +134,9 @@
 
 <script>
     import Data from '../ctrl/data';
-    import Net from '../ctrl/network';
-    import Vue from 'vue';
+    import NET from '../ctrl/network';
     import CFG from '../ctrl/cfg';
+    import MODE from '../ctrl/mode';
 
     export default {
         name: 'cfg',
@@ -146,7 +146,6 @@
                 variant_fx_level: ['full', 'medium', 'low', 'disabled'],
                 data: Data,
                 CFG: CFG,
-                user: Data.user,
                 re_everify_result: {result: 0, type: '', text: ''},
                 pass_ch: {toggle: false, c: '', n: '', nc: '', result: {result: 0, text: '', type: ''}}
             }
@@ -154,7 +153,7 @@
         mounted: function () { this.cgf_apply(); },
         methods: {
             change_pass() {
-                Net.api('passch', {curr_pass: this.pass_ch.c, new_pass: this.pass_ch.n})
+                NET.api('passch', {curr_pass: this.pass_ch.c, new_pass: this.pass_ch.n})
                     .then((res) => {
                         this.pass_ch.result.type = res.type;
                         this.pass_ch.result.text = res.text;
@@ -169,7 +168,7 @@
             },
             apikey_reset: function () {
                 if (!confirm(`This operation will disconnect all your devices and ED-VOID client and ask to re-login.\nAre you sure that you want to reset API-KEY?`)) return;
-                Net.api('apirst', {})
+                NET.api('apirst', {})
                     .then((result) => {
                         if (result.result) {
                             location.reload();
@@ -182,7 +181,7 @@
                     });
             },
             re_everify: function () {
-                Net.api('everify', {email: this.user.email})
+                NET.api('everify', {email: this.CFG.email})
                     .then((result) => {
                         if (result.result) {
                             this.re_everify_result.result = result.result;
@@ -197,10 +196,11 @@
                     });
             },
             signout: function () {
-                Net.disconnect();
-                Data.auth.is_logged = false;
+                NET.disconnect();
                 CFG.api_key = '';
                 CFG.save();
+                MODE.is_in = false;
+                MODE.is_ready = false;
             },
             cgf_apply: function () {
                 CFG.apply_ui_cfg();
@@ -208,24 +208,13 @@
             },
             reset_exp: function () {
                 if (confirm('Do you really want to reset your exploration report?')) {
-                    Net.send('exp-reset');
-                    this.data.nav.c_mode = 'scan';
+                    NET.send('exp-reset');
+                    MODE.c_mode = 'scan';
                 }
             }
 
         }
     }
-    Net.on('uni:user', (user) => {
-        Data.user.email = user.email;
-        Data.user.api_key = user.api_key;
-        Data.user.valid = user.valid;
-        Data.user.dev = user.dev;
-        if (user.dev) {
-            // user in dev mode
-            Vue.set(Data.modes.modes, 'dev', 'dev');
-        }
-    });
-
 
 </script>
 

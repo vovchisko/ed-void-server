@@ -29,14 +29,13 @@
         </div>
 
         <div id="repo-edit" v-if="c_tab==='edit'" class="container-fluid">
-
+            <h4 class="title edfx" v-if="repo.curr._id">
+                <span class="date">{{repo.curr.submited | date}}</span>
+                <span class="id">{{repo.curr._id}}</span>
+                <span class="type">{{report_types[repo.curr.type]}}</span>
+            </h4>
             <div class="row">
                 <div class="col-sm curr-entry">
-                    <h4 class="title edfx" v-if="repo.curr._id">
-                        <span class="date">{{repo.curr.submited | date}}</span>
-                        <span class="id">{{repo.curr._id}}</span>
-                        <span class="type">{{report_types[repo.curr.type]}}</span>
-                    </h4>
 
                     <h4 class="title edfx" v-if="!repo.curr._id">NEW REPORT</h4>
                     <br>
@@ -267,10 +266,8 @@
 </template>
 
 <script>
-
-    import Data from '../ctrl/data';
     import Vars from '../ctrl/vars';
-    import Net from '../ctrl/network';
+    import NET from '../ctrl/network';
     import Vue from 'vue';
     import extend from 'deep-extend';
 
@@ -285,16 +282,60 @@
         complete: false,
     };
 
+    const _REPO_NULL = {};
+    const REPO = {
+
+        curr: {
+            _id: null,
+
+            //user can edit
+            type: 'NA',
+            sub_type: null,
+            subject: '',
+            description: '',
+            links: [],
+            screens: {
+                cockpit: '',
+                sys_map: ''
+            }, //required
+
+            system: null,
+            body: null,
+            lat: null,
+            lon: null,
+            reporter: null,
+            pub: false, //other peopl can find it
+            locked: false, //report confirmed nad locked
+
+            //user can't edit
+            parent_id: null, //for a few reports in the same place
+            starpos: [0, 0, 0],
+            system_id: null,
+            body_id: null,
+            reported: null,
+            updated: null,
+
+        },
+        reports_count: null,
+        reports: [],
+    };
+
+    extend(_REPO_NULL, REPO);
+
+    function reset_report(){
+        extend(REPO.curr, _REPO_NULL);
+    }
+
     export default {
         name: "rep",
         data: () => {
             return {
                 c_tab: 'home',
                 tabs: ['home', 'view', 'edit'],
-                repo: Data.repo,
-                navi: Data.navi,
-                env: Data.env,
-                cmdr: Data.cmdr,
+                repo: REPO.repo,
+                navi: REPO.navi,
+                env: REPO.env,
+                cmdr: REPO.cmdr,
                 state: state,
                 report_types: Vars.REPORT_TYPES,
                 report_sub_types: Vars.REPORT_SUB_TYPES,
@@ -303,12 +344,12 @@
         methods: {
             go_home() {
                 this.state.alert.show = false;
-                Data.nullify('repo.curr');
+                reset_report();
                 this.c_tab = 'home';
                 this.get_recent();
             },
             go_create() {
-                Data.nullify('repo.curr');
+                reset_report();
                 this.c_tab = 'edit';
             },
             go_edit() {
@@ -325,7 +366,7 @@
                 this.state.alert.type = 'info';
                 this.repo.reports.splice(0, this.repo.reports.length);
                 setTimeout(() => {
-                    Net.send('repo-search', {});
+                    NET.send('repo-search', {});
                 }, 500);
             },
             curr_location: function () {
@@ -357,11 +398,11 @@
                 this.state.alert.type = 'info';
                 this.state.complete = false;
                 setTimeout(() => {
-                    Net.send('repo-submit', this.repo.curr);
+                    NET.send('repo-submit', this.repo.curr);
                 }, 500);
             },
             curr_reset: function () {
-                Data.nullify('repo.curr');
+                reset_report();
                 this.c_tab = 'home'
             },
             select_report: function (r) {
@@ -371,12 +412,12 @@
         }
     }
 
-    Net.on('uni:repo-current', (report) => {
+    NET.on('uni:repo-current', (report) => {
         state.loading = false;
-        Vue.set(Data.repo, 'curr', report);
+        Vue.set(REPO, 'curr', report);
     });
 
-    Net.on('uni:repo-submition', (dat) => {
+    NET.on('uni:repo-submition', (dat) => {
         state.loading = false;
         state.alert.show = true;
         state.alert.text = dat.text;
@@ -387,14 +428,14 @@
         state.complete = true;
     });
 
-    Net.on('uni:repo-search', (reports) => {
-        let list = Data.repo.reports;
+    NET.on('uni:repo-search', (reports) => {
+        let list = REPO.reports;
 
         list.splice(0, list.length);
         for (let i = 0; i < reports.length; i++) {
             list.push(reports[i]);
         }
-        Data.repo.reports_count = reports.length;
+        REPO.reports_count = reports.length;
         state.loading = false;
         state.alert.show = false;
     });

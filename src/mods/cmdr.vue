@@ -19,7 +19,7 @@
 
 <script>
     import Data from '../ctrl/data';
-    import Net from '../ctrl/network';
+    import NET from '../ctrl/network';
     import Vue from 'vue';
     import extend from 'deep-extend';
 
@@ -30,20 +30,20 @@
     }
 
 
-    Net.on('uni:status', (status) => {
+    NET.on('uni:status', (status) => {
         if (!status) return false;
         extend(Data.cmdr.status, status);
     });
 
-    Net.on('uni:cmdr', (cmdr) => {
+    NET.on('uni:cmdr', (cmdr) => {
         if (!cmdr) return false;
         extend(Data.cmdr, cmdr);
     });
 
 
 
-    Net.on('uni:c_system', (system) => Vue.set(Data.env, 'system', system));
-    Net.on('uni:c_body', (body) => Vue.set(Data.env, 'body', body));
+    NET.on('uni:c_system', (system) => Vue.set(Data.env, 'system', system));
+    NET.on('uni:c_body', (body) => Vue.set(Data.env, 'body', body));
 
 </script>
 

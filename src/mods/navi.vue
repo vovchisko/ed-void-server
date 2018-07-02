@@ -56,7 +56,7 @@
                     </div>
                 </div>
             </div>
-            <pre>{{navi}}</pre>
+            <!--pre>{{navi}}</pre-->
             <div class="container-fluid location-data edfx">
                 <div class="centered">
                     <div class="alert warn " v-if="!env.body || !env.body.radius">
@@ -82,7 +82,7 @@
 
 <script>
     import Data from '../ctrl/data'
-    import Net from '../ctrl/network'
+    import NET from '../ctrl/network'
     import extend from 'deep-extend'
 
     export default {
@@ -92,7 +92,7 @@
         },
         methods: {
             dest_apply: function () {
-                Net.send('dest-apply', {
+                NET.send('dest-apply', {
                     //todo: you can specify "r" manually
                     system: null,
                     body: null,
@@ -101,7 +101,7 @@
                 })
             },
             dest_dismiss: function () {
-                Net.send('dest-dismiss');
+                NET.send('dest-dismiss');
                 this.dest_on = false;
             },
         }
@@ -109,15 +109,15 @@
 
     const _navi = Data.navi;
 
-    Net.on('uni:status', (stat) => {
+    NET.on('uni:status', (stat) => {
         _navi.pos.alt = stat.alt;
         _navi.pos.head = stat.head;
         _navi.pos.lat = stat.lat;
         _navi.pos.lon = stat.lon;
     });
-    Net.on('uni:dest', (dest) => update_dest(dest));
+    NET.on('uni:dest', (dest) => update_dest(dest));
 
-    Net.on('uni:c_body', (body) => {
+    NET.on('uni:c_body', (body) => {
         _navi.body.name = (body) ? body.short_name : null;
         _navi.body.radius = (body && body.radius) ? body.radius : 0;
         _navi.body.gravity = (body) ? body.surf_gravity : null;

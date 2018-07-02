@@ -1,5 +1,5 @@
 <template>
-    <div id="auth">
+    <div id="auth" v-if="!MODE.is_in && !MODE.is_ready">
         <form v-if="sign_==='in'">
 
             <h2>ed-void login</h2>
@@ -98,22 +98,25 @@
 
 <script>
     import Net from '../ctrl/network';
-    import Data from '../ctrl/data';
     import Route from '../ctrl/router';
     import CFG from '../ctrl/cfg';
+    import MODE from '../ctrl/mode';
+    import {A} from '../components/alert';
 
     const WELCOME_IN = 'welcome back commander';
     const WELCOME_UP = 'welcome in the void commander';
+
 
     export default {
         name: "auth",
         data: () => {
             return {
+                MODE: MODE,
                 route: Route,
+                auth: {email: '', pass: ''},
                 sign_: 'in', msg: {type: '', text: WELCOME_IN},
                 secret: '',
                 reset: {result: 0, type: '', text: '', new_pass: '', new_pass_c: ''},
-                auth: Data.auth,
                 pass_c: '',
             }
         },
@@ -130,11 +133,14 @@
                                 CFG.save();
                                 Route.reset_route();
                             } else {
-                                alert('invalid verification link\n' + result.type + ': ' + result.text);
+                                throw result;
                             }
                         })
                         .catch((err) => {
-                            console.log('email validation failed', err);
+                            A.error({
+                                text: 'email validation failed',
+                                desc: 'invalid validation link',
+                            }, true);
                         });
                 }
                 if (Route.action === 'reset' && Route.params[0]) {
@@ -142,10 +148,7 @@
                     return this.sign('reset');
                 }
 
-
-                console.log('>>', CFG.api_key);
-
-                if (CFG.api_key) return this.connect();
+                if (MODE.is_in) return Net.init();
 
                 this.sign('in');
             },
@@ -231,25 +234,22 @@
                         }
                         CFG.api_key = dat.user.api_key;
                         this.auth.pass = '';
-                        this.connect();
+                        Net.init();
                     })
                     .catch((e) => {
                         this.msg.type = 'error';
                         this.msg.text = 'undable to complete request. please try again later';
                     });
             },
-            connect: function () {
-                this.auth.is_logged = true;
-                Net.init();
-            }
         }
     }
 
     Net.on('_close', (code, reason) => {
         if (reason === 'unauthorized') {
+            MODE.is_ready = false;
+            MODE.is_in = false;
             CFG.api_key = '';
-            Data.auth.is_logged = false;
-            Data.save();
+            CFG.save();
         }
     });
 

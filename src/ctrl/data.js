@@ -1,74 +1,13 @@
-//import Net from './network';
-
 import extend from 'deep-extend';
 
 class DataStorage {
     constructor() {
-        this._null = {};
+
 
         this.app = {
             overload: false,
         };
 
-        this.cfg = {
-            ui_font_size: '100%',
-            ui_fx_level: 'full',
-
-        };
-
-        this.modes = {
-            modes: {
-                'cmdr': 'cmdr',
-                'navi': 'nav',
-                'vass': 'scan',
-                'repo': 'poi',
-                'cfg': 'cfg',
-            },
-            c_mode: 'cmdr'
-        };
-
-        this.repo = {
-            curr: {
-                _id: null,
-
-                //user can edit
-                type: 'NA',
-                sub_type: null,
-                subject: '',
-                description: '',
-                links: [],
-                screens: {
-                    cockpit: '',
-                    sys_map: ''
-                }, //required
-
-                system: null,
-                body: null,
-                lat: null,
-                lon: null,
-                reporter: null,
-                pub: false, //other peopl can find it
-                locked: false, //report confirmed nad locked
-
-                //user can't edit
-                parent_id: null, //for a few reports in the same place
-                starpos: [0, 0, 0],
-                system_id: null,
-                body_id: null,
-                reported: null,
-                updated: null,
-
-            },
-            reports_count: null,
-            reports: [],
-
-        };
-
-        this.auth = {
-            is_logged: false,
-            email: '',
-            pass: '',
-        };
 
         this.cmdr = {
             name: null,
@@ -77,13 +16,6 @@ class DataStorage {
             starpos: [0, 0, 0],
             last_rec: null,
             status: {}
-        };
-
-        this.user = {
-            email: 'n/a',
-            api_key: 'n/a',
-            valid: null,
-            dev: false,
         };
 
         this.navi = {
@@ -123,17 +55,7 @@ class DataStorage {
 
     init() {
 
-        for (let i in this) {
-            if (i[0] !== '_') {
-                this._null[i] = {};
-                extend(this._null[i], this[i])
-            }
-        }
 
-    }
-
-    nullify(section) {
-        if (section === 'repo.curr') extend(this.repo.curr, this._null.repo.curr);
     }
 
 }

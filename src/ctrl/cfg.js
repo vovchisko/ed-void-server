@@ -4,6 +4,9 @@ class CFG_Browser {
         this.c_mode = 'cfg';
         this.ui_font_size = '100%';
         this.ui_fx_level = 'full';
+        this.email = '';
+        this.is_valid = false;
+        this.dev = false;
         this.load();
     }
 
@@ -12,6 +15,8 @@ class CFG_Browser {
         this.c_mode = (localStorage.getItem('c_mode')) || this.c_mode;
         this.ui_font_size = (localStorage.getItem('ui_font_size')) || this.ui_font_size;
         this.ui_fx_level = (localStorage.getItem('ui_fx_level')) || this.ui_fx_level;
+        this.apply_ui_cfg();
+
     }
 
     save() {
@@ -28,6 +33,5 @@ class CFG_Browser {
 }
 
 const CFG = new CFG_Browser();
-
 
 export default CFG;

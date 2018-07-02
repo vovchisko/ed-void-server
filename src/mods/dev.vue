@@ -15,7 +15,7 @@
 
 <script>
     import Data from '../ctrl/data'
-    import Net from '../ctrl/network'
+    import NET from '../ctrl/network'
 
     const dev = {
         stat: Data.cmdr.status,
@@ -39,7 +39,7 @@
         }
     }
 
-    Net.on('ping', (dat) => {
+    NET.on('ping', (dat) => {
         let log = dev.log;
         let lag = 0;
 
@@ -49,7 +49,7 @@
         if (log.length > 32) log.splice(log.length - 1, 1)
     });
 
-    Net.on('net:any', (c, dat) => {
+    NET.on('net:any', (c, dat) => {
         let p = c.split(':')[0];
         if (p === 'uni') {
             dev.uni.unshift({c: c, dat: dat});

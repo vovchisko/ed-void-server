@@ -145,30 +145,23 @@ hr {
 //
 .alert {
   color: $ui-text; text-align: center; margin: 1em;
-  & > i { font-size: 2em; display: block; margin-bottom: 1em; }
-  & > div { @include hcaps(); }
-  & > small { font-size: 0.8em; margin-top: 0.3em; display: block; text-transform: lowercase; }
+  i { font-size: 2em; display: block; margin-bottom: 1em; }
+  h4 { @include hcaps(); }
+  p { color: darken($ui-text, 10%); font-size: 0.9em; margin-top: 0.3em; display: block; text-transform: lowercase; }
+
   &.info { color: $info;
-    & > small { color: darken($info, 10%) }
+    & p { color: darken($info, 10%) }
+    & button { border-color: $info !important; color: $info}
   }
   &.warn { color: $orange;
-    & > small {color: darken($orange, 10%)}
+    & p {color: darken($orange, 10%)}
+
   }
   &.error { color: $red;
-    & > small {color: darken($red, 10%)}
-  }
-  &.modal {
-    position: fixed;
-    left: 0; top: 0; right: 0; bottom: 0;
-    z-index: 9999;
-    background: rgba(0, 0, 0, .7);
-    margin: 0; padding: 20vh 0;
-    font-size: 1.2em;
+    & p {color: darken($red, 10%)}
+    & button { border-color: $red !important; color: $red}
   }
   &.progress { animation: glitched_text 2s infinite;}
-  .ui { margin-top: 1em; text-align: center;
-    button { margin: 1em auto; padding: 0em 2em; width: auto; line-height: 2.0em; font-size: 1.1em; display: block }
-  }
 }
 .ui { padding-bottom: 1em; position: relative; padding-top: 1em;
   label { position: absolute; top: 0; left: 0; right: 0; line-height: 1em;
@@ -194,4 +187,3 @@ hr {
     small { display: block; font-size: 0.9em; line-height: 1.2em }
   }
 }
-@import 'fx';

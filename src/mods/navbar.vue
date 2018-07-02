@@ -1,20 +1,20 @@
 <template>
     <div id="navbar" class="container-fluid">
         <div class="nav-right edfx">
-            <div v-bind:class="['net', net.error ? 'err':'', net.online]">
-                <i class="i i-wifi" v-if="net.online === 'online'"></i>
-                <i class="i i-wifi-alert" v-if="net.online === 'offline'"></i>
-                <i class="i i-wifi-low" v-if="net.online === 'connecting'"></i>
+            <div v-bind:class="['net', !nav.is_ready ? 'err':'']">
+                <i class="i i-wifi" v-if="nav.is_ready === true"></i>
+                <i class="i i-wifi-alert" v-if="nav.is_ready === false"></i>
+                <i class="i i-wifi-low" v-if="nav.is_ready === null"></i>
             </div>
         </div>
 
         <div class="nav-left">
-            <button v-on:click="m_toggle()" class=" mode" v-bind:class=" toggle? 'active': ''">
-                <i class="i-menu"></i> {{nav.modes[nav.c_mode]}}<i class="caret i-chevron-down"></i>
+            <button v-on:click="toggle=!toggle" class=" mode" v-bind:class=" toggle? 'active': ''">
+                <i class="i-menu"></i> {{nav.list[nav.c_mode]}}<i class="caret i-chevron-down"></i>
             </button>
 
             <nav v-if="toggle" class="edfx edfx-fast">
-                <button v-for="(name, mode) in nav.modes" v-bind:class="nav.c_mode === mode ? 'semi-active':''" v-on:click="do_nav(mode)">{{name}}</button>
+                <button v-for="(name, mode) in nav.list" v-bind:class="nav.c_mode === mode ? 'semi-active':''" v-on:click="nav.go(mode); toggle=false">{{name}}</button>
             </nav>
         </div>
         <div id="nav-clickout" v-if="toggle" v-on:click="toggle=false"></div>
@@ -22,23 +22,12 @@
 </template>
 
 <script>
-    import Data from '../ctrl/data';
-    import Net from '../ctrl/network';
+    import MODE from '../ctrl/mode';
+    import NET from '../ctrl/network';
 
     export default {
         name: 'navbar',
-        data: () => {return {nav: Data.modes, net: Net.stat, toggle: false} },
-        methods: {
-            do_nav: function (t) {
-                this.nav.c_mode = t;
-                this.m_toggle(false);
-                Data.save();
-            },
-            m_toggle: function (t = null) {
-                if (t === null) return this.toggle = !this.toggle;
-                this.toggle = t;
-            }
-        }
+        data: () => {return {nav: MODE, net: NET.stat, toggle: false} },
     }
 </script>
 
