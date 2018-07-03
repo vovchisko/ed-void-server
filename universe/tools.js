@@ -73,6 +73,7 @@ function pick(A, a, B, b, func = null, even_undef = false) {
     } else {
         B[b] = A[a];
     }
+    return B;
 }
 
 function pickx(A, B) {
@@ -80,6 +81,7 @@ function pickx(A, B) {
     for (let i in fields) {
         pick(A, fields[i][0], B, fields[i][1], fields[i][2], fields[i][3]);
     }
+    return B;
 }
 
 function is_valid_email(email) {

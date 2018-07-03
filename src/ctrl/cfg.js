@@ -4,9 +4,9 @@ class CFG_Browser {
         this.c_mode = 'cfg';
         this.ui_font_size = '100%';
         this.ui_fx_level = 'full';
-        this.email = '';
-        this.is_valid = false;
         this.dev = false;
+        this.email = '';
+        this.valid = false;
         this.load();
     }
 

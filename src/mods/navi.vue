@@ -1,21 +1,21 @@
 <template>
     <div id="navi">
 
-        <header class="edfx">{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{navi.body.name ? ' / ' + navi.body.name.replace(env.system.name,'') : '' }}</header>
+        <header class="edfx">{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}</header>
 
-        <div class="alert info edfx" v-if="navi.pos.alt===null">
+        <div class="alert info edfx" v-if="navi.status.alt===null">
             <i class="i-ed-alert"></i>
             <div>Approach to the body<br/>NAV-Module will engage automatically</div>
             <small>Scan body Before approaching to identify radius and gravity correctly</small>
         </div>
 
-        <div class="navi-surf" v-if="navi.pos.alt!==null">
+        <div class="navi-surf" v-if="navi.status.alt!==null">
             <div class="compass edfx">
                 <div class="ruler" v-bind:style="navi.style_ruler">
-                    <b class="head">{{navi.pos.head}}</b>
+                    <b class="head">{{navi.status.head}}</b>
                 </div>
                 <div class="dest" v-bind:style="navi.style_dest" v-if="dest_on">
-                    <b class="head" v-bind:class="navi.dest.align">{{navi.dest.head}}</b>
+                    <b class="head" v-bind:class="navi.dest_align">{{navi.dest.head}}</b>
                 </div>
             </div>
             <div class="container-fluid">
@@ -23,9 +23,9 @@
                     <div class="col-6 cords justified">
                         <div class="edfx">
                             <h5>CURR. POSITION</h5>
-                            <em><b>LAT</b><span>{{navi.pos.lat | nn(4,4)}} <u>°</u></span></em>
-                            <em><b>LON</b><span>{{navi.pos.lon | nn(4,4)}} <u>°</u></span></em>
-                            <em><b>ALT</b><span>{{navi.pos.alt / 1000}} <u>KM</u></span></em>
+                            <em><b>LAT</b><span>{{navi.status.lat | nn(4,4)}} <u>°</u></span></em>
+                            <em><b>LON</b><span>{{navi.status.lon | nn(4,4)}} <u>°</u></span></em>
+                            <em><b>ALT</b><span>{{navi.status.alt / 1000}} <u>KM</u></span></em>
                         </div>
                         <div v-if="dest_on" class="edfx">
                             <br>
@@ -38,15 +38,15 @@
                         <div v-if="dest_on" class="edfx">
                             <em class="editable">
                                 <b>LAT</b>
-                                <span><input type="number" min="-90" max="90" @focus="$event.target.select()" v-model="navi.dest.lat"><u>°</u></span>
+                                <span><input type="number" min="-90" max="90" step="any" @focus="$event.target.select()" v-model="navi.dest.lat"><u>°</u></span>
                             </em>
                             <em class="editable">
                                 <b>LON</b>
-                                <span><input type="number" min="-180" max="180" @focus="$event.target.select()" v-model="navi.dest.lon"><u>°</u></span>
+                                <span><input type="number" min="-180" max="180" step="any" @focus="$event.target.select()" v-model="navi.dest.lon"><u>°</u></span>
                             </em>
-                            <em class="editable" v-if="!env.body">
+                            <em class="editable" v-if="env.body, !env.body.radius">
                                 <b>RADIUS</b>
-                                <span><input type="number" @focus="$event.target.select()" v-model="navi.body.c_radius_km"><u>KM</u></span>
+                                <span><input type="number" @focus="$event.target.select()" v-model="navi.c_radius_km"><u>KM</u></span>
                             </em>
                         </div>
                         <button class="edfx" v-if="!dest_on" v-on:click="dest_on = true"><i class="i-aim"></i> SET DESTINATION</button>
@@ -56,7 +56,7 @@
                     </div>
                 </div>
             </div>
-            <!--pre>{{navi}}</pre-->
+            <pre>{{navi}}</pre>
             <div class="container-fluid location-data edfx">
                 <div class="centered">
                     <div class="alert warn " v-if="!env.body || !env.body.radius">
@@ -68,9 +68,9 @@
                         <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
                         <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
                         <div v-if="env.body">
-                            <em><b>BODY</b> <span>{{env.body.name || 'N / A'}}</span></em>
-                            <em><b>RADIUS</b> <span>{{env.body.radius / 1000 || null | nn(3,3, 'N / A') }} <u>KM</u></span></em>
-                            <em><b>GRAVITY</b> <span>{{env.body.gravity | nn(3,3, 'N / A')}} <u>G</u></span></em>
+                            <em><b>BODY</b> <span>{{env.body.name || 'N/A'}}</span></em>
+                            <em><b>RADIUS</b> <span>{{env.body.radius / 1000 || null | nn(3,3, 'N/A') }} <u>KM</u></span></em>
+                            <em><b>GRAVITY</b> <span>{{env.body.gravity | nn(3,3, 'N/A')}} <u>G</u></span></em>
                         </div>
                     </div>
                 </div>
@@ -81,14 +81,26 @@
 </template>
 
 <script>
-    import Data from '../ctrl/data'
     import NET from '../ctrl/network'
-    import extend from 'deep-extend'
+    import PILOT from '../ctrl/pilot'
+
+    const _navi = {
+        style_ruler: {'background-position-x': 0},
+        style_dest: {'background-position-x': 0},
+        status: PILOT.status,
+        dest: PILOT.dest,
+        c_radius_km: 1001,
+        dest_align: '',
+    };
 
     export default {
         name: "navi",
         data: () => {
-            return {dest_on: false, navi: Data.navi, env: Data.env}
+            return {
+                dest_on: false,
+                navi: _navi,
+                env: PILOT.env
+            }
         },
         methods: {
             dest_apply: function () {
@@ -98,6 +110,7 @@
                     body: null,
                     lat: this.navi.dest.lat,
                     lon: this.navi.dest.lon,
+                    r: this.env.body.radius || _navi.c_radius_km
                 })
             },
             dest_dismiss: function () {
@@ -107,47 +120,24 @@
         }
     }
 
-    const _navi = Data.navi;
 
-    NET.on('uni:status', (stat) => {
-        _navi.pos.alt = stat.alt;
-        _navi.pos.head = stat.head;
-        _navi.pos.lat = stat.lat;
-        _navi.pos.lon = stat.lon;
-    });
-    NET.on('uni:dest', (dest) => update_dest(dest));
+    NET.on('uni:dest', (dest) => update_dest());
 
-    NET.on('uni:c_body', (body) => {
-        _navi.body.name = (body) ? body.short_name : null;
-        _navi.body.radius = (body && body.radius) ? body.radius : 0;
-        _navi.body.gravity = (body) ? body.surf_gravity : null;
-    });
-
-
-    function update_dest(dest) {
-        extend(_navi.dest, dest);
+    function update_dest() {
         let rw = window.innerWidth;
-        let offset = (rw / 2) - _navi.pos.head * 4;
+        let offset = (rw / 2) - _navi.status.head * 4;
         _navi.style_ruler['background-position-x'] = offset + 'px';
-
         if (_navi.dest.enabled) {
-
             if (isNaN(_navi.dest.head)) {
                 _navi.style_dest['background-position-x'] = '0px';
-                _navi.dest.align = 'err';
+                _navi.dest_align = 'err';
             } else {
-
-                _navi.style_dest['background-position-x'] = (rw / 2) - ((_navi.pos.head - _navi.dest.head) * 4) + 'px';
-
-                let alg = Math.abs(_navi.dest.head - _navi.pos.head);
-
-                if (alg <= 3) _navi.dest.align = 'alg0';
-                if (alg > 3) _navi.dest.align = 'alg1';
-                if (alg > 10) _navi.dest.align = 'alg2';
-
-
+                _navi.style_dest['background-position-x'] = (rw / 2) - ((_navi.status.head - _navi.dest.head) * 4) + 'px';
+                let alg = Math.abs(_navi.dest.head - _navi.status.head);
+                if (alg <= 3) _navi.dest_align = 'alg0';
+                if (alg > 3) _navi.dest_align = 'alg1';
+                if (alg > 10) _navi.dest_align = 'alg2';
             }
-
         }
     }
 

@@ -54,16 +54,11 @@ class Universe extends EE3 {
                     UNI.emitf(EV_NET, user._id, 'overload', true);
                 }
 
-                this.emit(EV_NET, user._id, 'user', {
-                    email: user.email,
-                    api_key: user.api_key,
-                    valid: user.valid,
-                    dev: user.dev,
-                });
+                this.emit(EV_NET, user._id, 'user', user.data());
 
                 if (!user._cmdr) return;
 
-                this.emit(EV_NET, user._id, 'cmdr', user._cmdr);
+                this.emit(EV_NET, user._id, 'cmdr', user._cmdr.data());
                 this.emit(EV_NET, user._id, 'status', user._cmdr.status);
 
                 let scans = user._cmdr.journal()
@@ -110,7 +105,6 @@ class Universe extends EE3 {
             lon: typeof Status.Longitude !== 'undefined' ? parseFloat(Status.Longitude) : null,
             alt: typeof Status.Altitude !== 'undefined' ? parseFloat(Status.Altitude) : null,
             head: typeof Status.Heading !== 'undefined' ? parseFloat(Status.Heading) : null,
-            _upd: new Date(Status.timestamp)
         });
         user._cmdr._ch = true; // but mark as changed
         if (user._cmdr.dest.enabled) user._cmdr.dest_calc();
@@ -714,8 +708,9 @@ class USER {
     constructor(data) {
         this._id = '';
         this._ch = true;
-        this.cmdr_name = null;
-        this.api_key = null;
+        this.email = '';
+        this.api_key = '';
+        this.cmdr_name = '';
         this.last_rec = new Date(0);
         this.cmdrs = [];
         this.online = false;
@@ -725,6 +720,7 @@ class USER {
         this._overload = false;
         this._overtimeout = null;
         this._cmdr = null;
+        this._data = {};
         extend(this, data);
     }
 
@@ -773,13 +769,25 @@ class USER {
             await this._cmdr.journal_index();
         }
         this._ch = true;
-        UNI.emit(EV_NET, this._id, 'user', this);
-        UNI.emit(EV_NET, this._id, 'cmdr', this);
+        UNI.emit(EV_NET, this._id, 'user', this.data());
+        UNI.emit(EV_NET, this._id, 'cmdr', this._cmdr.data());
     }
 
     touch(data = null) {
         if (data) extend(this, data);
         this._ch = true;
+    }
+
+    data() {
+        return pickx(this, this._data,
+            ['email', 'email'],
+            ['api_key', 'api_key'],
+            ['last_rec', 'last_rec'],
+            ['cmdrs', 'cmdrs'],
+            ['online', 'online'],
+            ['dev', 'dev'],
+            ['valid', 'valid'],
+        );
     }
 
     async save() {
@@ -816,7 +824,6 @@ class CMDR {
             lon: null,
             alt: null,
             head: null,
-            _upd: null
         };
         this.dest = {
             enabled: false,
@@ -828,6 +835,8 @@ class CMDR {
             head: null,
         };
         this._exp = null;
+        this._data = {};
+
         extend(this, cmdr_data);
         this.journal_id = `${this.uid}/${DB.shash(this.name)}`;
     }
@@ -854,11 +863,12 @@ class CMDR {
                 this.dest.body_id = body._id;
                 this.dest.sys_id = body.sys_id;
                 this.dest.r = body.radius;
-            } else {
-                this.dest.body_id = null;
-                this.dest.sys_id = null;
-                this.dest.r = d.r || 1000;
             }
+        } else {
+            //todo: get radius from body by body name if it possible
+            this.dest.body_id = null;
+            this.dest.sys_id = null;
+            this.dest.r = d.r || 1000;
         }
 
         this.dest.lat = parseFloat(d.lat);
@@ -924,7 +934,18 @@ class CMDR {
     touch(data = null) {
         if (data) extend(this, data);
         this._ch = true;
-        if (this.uid) UNI.emit(EV_NET, this.uid, 'cmdr', this);
+        if (this.uid) UNI.emit(EV_NET, this.uid, 'cmdr', this.data());
+    }
+
+    data() {
+        return pickx(this, this._data,
+            ['name', 'name'],
+            ['last_rec', 'last_rec'],
+            ['system_id', 'system_id'],
+            ['body_id', 'body_id'],
+            ['starpos', 'starpos'],
+            ['metrics', 'metrics'],
+        );
     }
 
     async save() {
