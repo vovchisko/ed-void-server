@@ -18,6 +18,7 @@ const PILOT = {
         lon: null,
         alt: null,
         head: null,
+        focus: null,
     },
     dest: {
         enabled: false,

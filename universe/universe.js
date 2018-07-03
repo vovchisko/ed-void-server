@@ -98,6 +98,7 @@ class Universe extends EE3 {
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
         extend(user._cmdr.status, {
+            focus: Status.GuiFocus || null,
             flags: Status.Flags,
             pips: Status.Pips,
             fgroup: Status.FireGroup || 0,

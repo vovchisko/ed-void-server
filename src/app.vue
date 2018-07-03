@@ -14,15 +14,20 @@
             <dev v-if="MODE.c_mode === 'dev'"></dev>
         </div>
 
-        <div class="row">
-            <div class="col-sm">
-                <pre>{{MODE}}</pre>
-            </div>
-            <div class="col-sm">
-                <pre>{{CFG}}</pre>
-            </div>
-            <div class="col-sm">
-                <pre>{{A}}</pre>
+        <div class="container-fluid">
+            <hr>
+
+            <div class="row">
+                <div class="col-sm">
+                    <pre>PILOT:STAT {{PILOT.status}}</pre>
+                </div>
+                <div class="col-sm">
+                    <pre>PILOT:DEST {{PILOT.dest}}</pre>
+                </div>
+                <div class="col-sm">
+                    <pre>CFG: {{CFG}}</pre>
+                </div>
+
             </div>
         </div>
     </div>
@@ -34,9 +39,11 @@
     import Alert, {A} from './components/alert'
     import Auth from './mods/auth.vue'
     import Navbar from './mods/navbar.vue'
+
     import CFG from './ctrl/cfg';
     import NET from './ctrl/network';
     import MODE from './ctrl/mode';
+    import PILOT from './ctrl/pilot';
 
     import Cmdr from './mods/cmdr.vue'
     import Navi from './mods/navi.vue'
@@ -47,7 +54,7 @@
 
     export default {
         name: 'app',
-        data: () => {return {MODE: MODE, CFG: CFG, A: A}},
+        data: () => {return {MODE: MODE, CFG: CFG, A: A, PILOT: PILOT}},
         components: {
             Alert, Navbar, Auth, Cmdr, Navi, Vass, Repo, Cfg, Dev
         },

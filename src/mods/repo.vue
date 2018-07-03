@@ -332,7 +332,7 @@
             return {
                 c_tab: 'home',
                 tabs: ['home', 'view', 'edit'],
-                repo: REPO.repo,
+                repo: REPO,
                 navi: REPO.navi,
                 env: REPO.env,
                 cmdr: REPO.cmdr,
