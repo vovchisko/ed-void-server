@@ -137,6 +137,7 @@
     import NET from '../ctrl/network';
     import CFG from '../ctrl/cfg';
     import MODE from '../ctrl/mode';
+    import {A} from '../components/alert';
 
     export default {
         name: 'cfg',
@@ -160,6 +161,10 @@
                         this.pass_ch.result.result = res.result;
                         if (res.result) {
                             this.pass_ch.toggle = false;
+                            A.info({
+                                text: 'password chnaged',
+                                desc: 'you can use new password next time'
+                            });
                         }
                     })
                     .catch((e) => {
@@ -167,32 +172,33 @@
                     });
             },
             apikey_reset: function () {
-                if (!confirm(`This operation will disconnect all your devices and ED-VOID client and ask to re-login.\nAre you sure that you want to reset API-KEY?`)) return;
-                NET.api('apirst', {})
-                    .then((result) => {
-                        if (result.result) {
-                            location.reload();
-                        } else {
-                            alert("Unable to reset api-key\n" + result.text);
-                        }
-                    })
-                    .catch((err) => {
-                        console.log('email validation failed', err);
-                    });
+                A.warn({
+                    text: 'are you sure that you want to reset API-KEY?',
+                    desc: 'This operation will disconnect all your devices from ED-VOID and ask to re-login.',
+                    acts: {
+                        'yes, reset api-key': () => {
+                            NET.api('apirst', {})
+                                .then((result) => {
+                                    if (result.result) {
+                                        A.info({text: "api-key changed successfully", desc: result.text});
+                                    } else {
+                                        A.error({text: "Unable to reset api-key", desc: result.text});
+                                    }
+                                })
+                                .catch((err) => {
+                                    A.error({text: "operation failed", desc: err.code});
+                                });
+                        }, cancel: null
+                    }
+                });
             },
             re_everify: function () {
                 NET.api('everify', {email: this.CFG.email})
                     .then((result) => {
-                        if (result.result) {
-                            this.re_everify_result.result = result.result;
-                            this.re_everify_result.text = result.text;
-                            this.re_everify_result.type = result.type;
-                        } else {
-                            alert(result.type + ': ' + result.text);
-                        }
+                        A.add(result);
                     })
                     .catch((err) => {
-                        console.log('email validation failed', err);
+                        A.error({text: 'email validation failed', desc: err.code});
                     });
             },
             signout: function () {
@@ -207,10 +213,17 @@
                 CFG.save();
             },
             reset_exp: function () {
-                if (confirm('Do you really want to reset your exploration report?')) {
-                    NET.send('exp-reset');
-                    MODE.c_mode = 'scan';
-                }
+                A.warn({
+                    text: 'Reset exploration data summary',
+                    desc: 'Do you really want to reset your exploration report counters and summary value?',
+                    acts: {
+                        'yes, reset my counters': () => {
+                            NET.send('exp-reset');
+                            A.info({text: 'exploration data report clear', desc: 'you summary exploration value is clear now'});
+                        }, cancel: null
+                    }
+                });
+
             }
 
         }

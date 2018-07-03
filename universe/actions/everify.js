@@ -23,6 +23,7 @@ module.exports = function (req, res) {
                 let user = await UNI.get_user({secret: dat.secret});
 
                 if (user) {
+                    log += `[${user.email}] `;
                     user.touch({
                         valid: true,
                         secret: server.DB.some_hash(), //reset secret so old can't be used anymore for pass reset
@@ -40,6 +41,9 @@ module.exports = function (req, res) {
                 if (dat.email && head.api_key) {
 
                     dat.email = dat.email.toLowerCase();
+
+                    log += `[${dat.email}] `;
+
 
                     let user = await UNI.get_user({api_key: head.api_key});
                     if (user && user.email === dat.email) {
