@@ -280,10 +280,14 @@ class Universe extends EE3 {
 
     }
 
+    async find_bodies(str) {
+        // something like this... pay attention at '""' << it means just the same as with google
+        DB.bodies.find({$text: {$search: '"blu thua "'}}).limit(10);
+    }
+
     user_msg(user, c, data) {
         if (c === 'dest-apply') { return user._cmdr ? user._cmdr.dest_apply(data) : false; }
         if (c === 'dest-dismiss') {return user._cmdr ? user._cmdr.dest_dismiss() : false;}
-        if (c === 'repo-submit') return this.repo_submit(user, data);
         if (c === 'repo-search') return this.repo_search(user, data);
         if (c === 'exp-refresh') return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
         if (c === 'exp-reset') {
@@ -300,123 +304,6 @@ class Universe extends EE3 {
             .sort({submited: -1})
             .toArray()
             .then(list => this.emit(EV_NET, user._id, 'repo-search', list));
-    }
-
-    async repo_submit(user, report) {
-        //Buffer.from('hello world', 'utf8').toString('hex');
-
-        let r = {
-            _id: null,
-            type: 'NA',
-            system: '',
-            body: '',
-            subject: '',
-            description: '',
-            links: [],
-            pub: false, //other peopl can find it
-            locked: false, //report confirmed nad locked
-            lat: '',
-            lon: '',
-            reporter: null,
-            screens: {
-                cockpit: '',
-                sys_map: ''
-            },
-
-            //user can't edit
-            parent_id: null, //for a few reports in the same place
-            starpos: [0, 0, 0], // get automatically from the system
-            system_id: null, // get automatically from
-            body_id: null,
-        };
-
-
-        if (report._id) {
-            r = await DB.reports.findOne({_id: report._id});
-            if (r.locked || user._id !== r.uid) {
-                //you can't edit locked reports or reports from other players
-                return this.emit(EV_NET, user._id, 'repo-submition', {
-                    result: 0,
-                    type: 'warn',
-                    text: 'Report has been locked!',
-                    desc: 'This has been verified and locked, and can`t be edited.'
-                })
-            }
-        } else {
-            r._id = DB.gen_id();
-            r.uid = user._id;
-            r.submited = new Date(Date.now());
-        }
-
-        if (!report.subject) {
-            return this.emit(EV_NET, user._id, 'repo-submition', {
-                result: 0,
-                type: 'error',
-                text: 'Report Subject not specified!',
-                desc: 'This field is required for htis type or reports'
-            })
-        }
-
-        //todo: a lot of validation job!
-        if (!report.system) {
-            return this.emit(EV_NET, user._id, 'repo-submition', {
-                result: 0,
-                type: 'error',
-                text: 'System not specified!',
-                desc: 'Location section should contain valid system name'
-            })
-        }
-
-        if (!report.reporter) {
-            return this.emit(EV_NET, user._id, 'repo-submition', {
-                result: 0,
-                type: 'error',
-                text: 'Reporter CMDR name is requierd',
-                desc: 'You can\'t submit report anonymously'
-            })
-        }
-
-        if (!report.reporter) {
-            return this.emit(EV_NET, user._id, 'repo-submition', {
-                result: 0,
-                type: 'error',
-                text: 'Reporter CMDR name is requierd',
-                desc: 'You can\'t submit report anonymously'
-            })
-        }
-
-        r.type = report.type;
-        r.sub_type = report.sub_type;
-        r.subject = report.subject;
-        r.system = report.system;
-        r.body = report.body;
-        r.description = report.description;
-        r.pub = report.pub;
-        r.lat = report.lat;
-        r.lon = report.lon;
-        r.reporter = report.reporter;
-
-        r.links = report.links;
-
-        r.screens.cockpit = report.screens.cockpit;
-        r.screens.sys_map = report.screens.sys_map;
-
-        //user can't edit
-        r.starpos = report.starpos;
-        r.system_id = report.system_id;
-        r.body_id = report.body_id;
-        r.updated = new Date(Date.now());
-
-        await DB.reports.save(r);
-
-        this.emit(EV_NET, user._id, 'repo-submition', {
-            result: 1,
-            type: '',
-            text: 'report submited successfully',
-            desc: 'report has been saved to your reports database'
-        });
-
-        this.emit(EV_NET, user._id, 'repo-current', r);
     }
 
     /**

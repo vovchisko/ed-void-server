@@ -67,6 +67,7 @@ const action_passch = require('./universe/actions/passch');
 const action_everify = require('./universe/actions/everify');
 const action_passrst = require('./universe/actions/passrst');
 const action_apirst = require('./universe/actions/apirst');
+const action_poirep = require('./universe/actions/poirep');
 
 
 class Clients {
@@ -199,6 +200,10 @@ require('http').createServer(function (request, response) {
 
     if (route_url === '/api/apirst')
         return action_apirst(request, response);
+
+    if (route_url === '/api/poirep')
+        return action_poirep(request, response);
+
 
     if (route_url === '/app') // APP
         return app.serveFile('/index.html', 200, {}, request, response);

@@ -18,7 +18,7 @@ export default {
             'G-NA': 'Not identified',
             'G-MNT': 'Extreme Mountains',
             'G-CAN': 'Extreme Canyons',
-            'G-TER': 'Extteme Terrain',
+            'G-TER': 'Extreme Terrain',
             'G-CRT': 'Crater Structure',
             'G-OTR': 'Other',
         },
@@ -115,5 +115,15 @@ export default {
         "AmmoniaOxygen": "Ammonia and oxygen",
         "MetallicVapour": "Metallic vapour",
         "EarthLike": "Earth-like",
+    },
+    API_PROCESSING_MSG: {
+        apirst: 'reseting api-key',
+        everify: 'email verification in progress',
+        passch: 'updating password',
+        passrst: 'reseting password',
+        poirep: 'report submission',
+        record: 'journal data sync',
+        signin: 'logging in',
+        signup: 'creating new profile',
     }
 }

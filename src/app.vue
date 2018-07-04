@@ -14,22 +14,6 @@
             <dev v-if="MODE.c_mode === 'dev'"></dev>
         </div>
 
-        <div class="container-fluid">
-            <hr>
-
-            <div class="row">
-                <div class="col-sm">
-                    <pre>PILOT:STAT {{PILOT.status}}</pre>
-                </div>
-                <div class="col-sm">
-                    <pre>PILOT:DEST {{PILOT.dest}}</pre>
-                </div>
-                <div class="col-sm">
-                    <pre>CFG: {{CFG}}</pre>
-                </div>
-
-            </div>
-        </div>
     </div>
 </template>
 <script>

@@ -1,20 +1,20 @@
 <template>
     <div id="navbar" class="container-fluid">
         <div class="nav-right edfx">
-            <div v-bind:class="['net', !NAV.is_ready ? 'err':'']">
-                <i class="i i-wifi" v-if="NAV.is_ready === true"></i>
-                <i class="i i-wifi-alert" v-if="NAV.is_ready === false"></i>
-                <i class="i i-wifi-low" v-if="NAV.is_ready === null"></i>
+            <div v-bind:class="['net', !MODE.is_ready ? 'err':'']">
+                <i class="i i-wifi" v-if="MODE.is_ready === true"></i>
+                <i class="i i-wifi-alert" v-if="MODE.is_ready === false"></i>
+                <i class="i i-wifi-low" v-if="MODE.is_ready === null"></i>
             </div>
         </div>
 
         <div class="nav-left">
             <button v-on:click="toggle=!toggle" class=" mode" v-bind:class=" toggle? 'active': ''">
-                <i class="i-menu"></i> {{NAV.list[NAV.c_mode]}}<i class="caret i-chevron-down"></i>
+                <i class="i-menu"></i> {{MODE.list[MODE.c_mode]}}<i class="caret i-chevron-down"></i>
             </button>
 
             <nav v-if="toggle" class="edfx edfx-fast">
-                <button v-for="(name, mode) in NAV.list" v-bind:class="NAV.c_mode === mode ? 'semi-active':''" v-on:click="NAV.go(mode); toggle=false">{{name}}</button>
+                <button v-for="(name, mode) in MODE.list" v-bind:class="MODE.c_mode === mode ? 'semi-active':''" v-on:click="MODE.go(mode); toggle=false">{{name}}</button>
             </nav>
         </div>
         <div id="nav-clickout" v-if="toggle" v-on:click="toggle=false"></div>
@@ -27,7 +27,7 @@
 
     export default {
         name: 'navbar',
-        data: () => {return {NAV: MODE, net: NET.stat, toggle: false} },
+        data: () => {return {MODE: MODE, net: NET.stat, toggle: false} },
     }
 </script>
 

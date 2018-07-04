@@ -1,9 +1,11 @@
 <template>
     <div>
         <div v-bind:class="['alert', 'modal', A.busy.type]" v-if="A.busy.show">
-            <i class="i-ed-alert"></i>
-            <h4 v-if="A.busy.text">{{A.busy.text}}</h4>
-            <p v-if="A.busy.desc">{{A.busy.desc}}</p>
+            <div class="edfx">
+                <i class="i-ed-alert"></i>
+                <h4 v-if="A.busy.text">{{A.busy.text}}</h4>
+                <p v-if="A.busy.desc">{{A.busy.desc}}</p>
+            </div>
         </div>
         <div v-if="A.stack.length && !A.busy.show" v-bind:class="['alert', 'modal', A.stack[0].type]">
             <div class="edfx">
@@ -50,19 +52,19 @@
             this.add(opt, the_only);
         },
         error: function (opt, the_only = false) {
+            console.log(opt);
             opt.type = 'error';
             this.add(opt, the_only);
         },
-        lock: function (opt) {
+        lock: function (opt = {}) {
             this.busy.show = true;
-            this.busy.text = opt.text || 'please wait';
+            this.busy.text = opt.text || 'processing, please wait';
             this.busy.desc = opt.desc || '';
-            this.busy.type = opt.type || 'warn';
-
-
+            this.busy.type = opt.type || 'info';
         },
         release: function () {
             this.busy.show = false;
+            return this;
         }
     };
     export {A}

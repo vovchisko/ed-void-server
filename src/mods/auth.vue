@@ -4,8 +4,6 @@
 
             <h2>ed-void login</h2>
 
-            <div v-bind:class="['msg',msg.type]">{{msg.text}}</div>
-
             <div class="ui">
                 <input type="email" v-model="auth.email"/>
                 <label>Email</label>
@@ -28,7 +26,7 @@
 
         <form v-if="sign_==='up'">
             <h2>create new cmdr</h2>
-            <div v-bind:class="['msg',msg.type]">{{msg.text}}</div>
+
             <div class="ui">
                 <input type="email" v-model="auth.email"/>
                 <label>Email</label>
@@ -56,16 +54,14 @@
 
             <div v-if="secret">
 
-                <div v-bind:class="['msg',reset.type]">{{reset.text}}</div>
-
                 <div class="ui">
                     <input type="password" v-model="reset.new_pass"/>
-                    <label>Password</label>
+                    <label>new password</label>
                 </div>
 
                 <div class="ui">
                     <input type="password" v-model="reset.new_pass_c"/>
-                    <label>Confirm password</label>
+                    <label>confirm new password</label>
                 </div>
 
                 <div class="ui">
@@ -75,11 +71,9 @@
             </div>
 
             <div v-if="!secret">
-                <div v-bind:class="['msg',reset.type]">{{reset.text}}</div>
-
                 <div class="ui" v-if="!reset.result">
                     <input type="email" v-model="auth.email"/>
-                    <label>email</label>
+                    <label>account email</label>
                 </div>
 
                 <div class="ui" v-if="!reset.result">
@@ -103,10 +97,6 @@
     import MODE from '../ctrl/mode';
     import {A} from '../components/alert';
 
-    const WELCOME_IN = 'welcome back commander';
-    const WELCOME_UP = 'welcome in the void commander';
-
-
     export default {
         name: "auth",
         data: () => {
@@ -114,9 +104,9 @@
                 MODE: MODE,
                 route: Route,
                 auth: {email: '', pass: ''},
-                sign_: 'in', msg: {type: '', text: WELCOME_IN},
+                sign_: 'in',
                 secret: '',
-                reset: {result: 0, type: '', text: '', new_pass: '', new_pass_c: ''},
+                reset: {new_pass: '', new_pass_c: ''},
                 pass_c: '',
             }
         },
@@ -153,32 +143,22 @@
                 this.sign('in');
             },
             request_reset: function () {
+
                 Net.api('passrst', {email: this.auth.email})
                     .then((result) => {
+
                         if (result) {
-                            this.reset.result = result.result;
-                            this.reset.text = result.text;
-                            this.reset.type = result.type;
+                            A.add(result);
                         } else {
-                            throw new Error('no result')
+                            A.error({text: 'reset password request failed',});
                         }
                     })
-                    .catch((err) => {
-                        this.reset.result = 0;
-                        this.reset.text = 'operation failed. try again later.';
-                        this.reset.type = 'error';
-                        console.log('requert failed', err);
-                    });
+                    .catch((e) => A.error({text: 'undable to complete request. please try again later'}));
             },
             reset_pass: function () {
-                if (this.reset.new_pass !== this.reset.new_pass_c) {
-                    this.reset.text = 'passwords and confirmation not equal';
-                    this.reset.type = 'error';
-                    this.reset.result = 0;
-                    return;
-                }
+                if (this.reset.new_pass !== this.reset.new_pass_c)
+                    return A.error({text: 'password and confirmation are not equal',});
 
-                //todo: global preloader required!
                 Net.api('passrst', {secret: this.secret, pass: this.reset.new_pass})
                     .then((result) => {
                         if (result.result) {
@@ -186,60 +166,37 @@
                             CFG.save();
                             Route.reset_route();
                         } else {
-                            this.reset.text = result.text;
-                            this.reset.type = result.type;
+                            return A.error(result);
                         }
                     })
-                    .catch((err) => {
-                        alert('oh snap! something went wrong');
-                        console.log('requert failed', err);
-                    });
+                    .catch((e) => A.error({text: 'undable to complete request. please try again later'}));
+
             },
             sign: function (to = 'in') {
                 this.sign_ = to;
-                this.msg.type = '';
-                if (this.sign_ === 'reset') return this.msg.text = '';
-                if (this.sign_ === 'up') return this.msg.text = WELCOME_UP;
-                if (this.sign_ === 'in') return this.msg.text = WELCOME_IN;
             },
             signup: function () {
-                if (this.auth.pass !== this.pass_c) {
-                    this.msg.type = 'warn';
-                    this.msg.text = 'password/confirm are not equal';
-                    return;
-                }
-                //todo: global preloader required!
+                if (this.auth.pass !== this.pass_c)
+                    return A.error({text: 'password/confirm are not equal'});
+
                 Net.api('signup', this.auth)
                     .then((dat) => {
-                        if (!dat.result) {
-                            this.msg.type = dat.type;
-                            this.msg.text = dat.text;
-                            return;
-                        }
+                        if (!dat.result) return A.add(dat);
                         this.signin();
                         this.sign = 'in';
                     })
-                    .catch((e) => {
-                        this.msg.type = 'error';
-                        this.msg.text = 'undable to complete request. please try again later';
-                    });
+                    .catch((e) => A.error({text: 'undable to complete request. please try again later'}));
+
             },
             signin: function () {
                 Net.api('signin', {email: this.auth.email, pass: this.auth.pass})
                     .then((dat) => {
-                        if (!dat.result) {
-                            this.msg.type = dat.type;
-                            this.msg.text = dat.text;
-                            return;
-                        }
+                        if (!dat.result) return A.add(dat);
                         CFG.api_key = dat.user.api_key;
                         this.auth.pass = '';
                         Net.init();
                     })
-                    .catch((e) => {
-                        this.msg.type = 'error';
-                        this.msg.text = 'undable to complete request. please try again later';
-                    });
+                    .catch((e) => A.error({text: 'undable to complete request. please try again later'}));
             },
         }
     }
@@ -261,7 +218,7 @@
         .all-actions { text-align: center; font-size: 0.9em;
             button { display: inline-block; margin: 0 5px;}
         }
-        h2 { @include hcaps(); font-size: 2em; }
+        h2 { @include hcaps(); font-size: 2em; padding-bottom: 1.5em; }
         form {
             width: 18em;
             margin: 0 auto;

@@ -100,11 +100,10 @@
                     </div>
                     <div>
                         <h5>password &nbsp;
-                            <button type="button" class="link" v-if="!pass_ch.toggle" v-on:click="pass_ch.toggle = true; pass_ch.result.text = ''"><i class="i-chevron-down"></i> change</button>
-                            <button type="button" class="link" v-if="pass_ch.toggle" v-on:click="pass_ch.toggle = false; pass_ch.result.text = ''"><i class="i-chevron-up"></i> cancel</button>
+                            <button type="button" class="link" v-if="!pass_ch.toggle" v-on:click="pass_ch.toggle = true;"><i class="i-chevron-down"></i> change</button>
+                            <button type="button" class="link" v-if="pass_ch.toggle" v-on:click="pass_ch.toggle = false;"><i class="i-chevron-up"></i> cancel</button>
                         </h5>
-                        <p v-if="!pass_ch.toggle && !pass_ch.result.text">*************</p>
-                        <p v-if="pass_ch.toggle || pass_ch.result.text" v-bind:class="['msg',pass_ch.result.type]">{{pass_ch.result.text}}</p>
+                        <p v-if="!pass_ch.toggle">*************</p>
 
                         <div v-if="pass_ch.toggle">
                             <div class="ui">
@@ -148,23 +147,23 @@
                 data: Data,
                 CFG: CFG,
                 re_everify_result: {result: 0, type: '', text: ''},
-                pass_ch: {toggle: false, c: '', n: '', nc: '', result: {result: 0, text: '', type: ''}}
+                pass_ch: {toggle: false, c: '', n: '', nc: ''}
             }
         },
         mounted: function () { this.cgf_apply(); },
         methods: {
             change_pass() {
+                if (this.pass_ch.n !== this.pass_ch.nc) return A.warn({text: 'password/confirm are not equal'});
                 NET.api('passch', {curr_pass: this.pass_ch.c, new_pass: this.pass_ch.n})
                     .then((res) => {
-                        this.pass_ch.result.type = res.type;
-                        this.pass_ch.result.text = res.text;
-                        this.pass_ch.result.result = res.result;
                         if (res.result) {
                             this.pass_ch.toggle = false;
                             A.info({
                                 text: 'password chnaged',
                                 desc: 'you can use new password next time'
                             });
+                        } else {
+                            A.error(res);
                         }
                     })
                     .catch((e) => {
@@ -180,7 +179,7 @@
                             NET.api('apirst', {})
                                 .then((result) => {
                                     if (result.result) {
-                                        A.info({text: "api-key changed successfully", desc: result.text});
+                                        A.info({text: "api-key changed successfully", desc: 'you need to re-login now an all your devices'});
                                     } else {
                                         A.error({text: "Unable to reset api-key", desc: result.text});
                                     }
@@ -193,7 +192,7 @@
                 });
             },
             re_everify: function () {
-                NET.api('everify', {email: this.CFG.email})
+                NET.api('everify', {email: this.CFG.email}, 'sending verification email...')
                     .then((result) => {
                         A.add(result);
                     })

@@ -18,27 +18,16 @@
 
         </header>
 
-        <div class="alert modal" v-bind:class="[state.alert.type, state.loading ? 'progress':'']" v-show=" state.alert.show === true">
-            <i class="i-ed-alert"></i>
-            <div>{{state.alert.text}}</div>
-            <small>{{state.alert.desc}}</small>
-            <div class="ui" v-if="!state.loading">
-                <button type="button" v-on:click="state.alert.show = false" v-if="!state.complete">roger that</button>
-                <button type="button" v-on:click="state.alert.show = false; go_view()" v-if="state.complete">ok</button>
-            </div>
-        </div>
-
         <div id="repo-edit" v-if="c_tab==='edit'" class="container-fluid">
             <h4 class="title edfx" v-if="repo.curr._id">
                 <span class="date">{{repo.curr.submited | date}}</span>
                 <span class="id">{{repo.curr._id}}</span>
                 <span class="type">{{report_types[repo.curr.type]}}</span>
             </h4>
+            <h4 class="title edfx" v-if="!repo.curr._id">NEW REPORT</h4>
+
             <div class="row">
                 <div class="col-sm curr-entry">
-
-                    <h4 class="title edfx" v-if="!repo.curr._id">NEW REPORT</h4>
-                    <br>
                     <div class="ui">
                         <select v-model="repo.curr.type" v-on:change="curr_change_type()">
                             <option v-for="(type, t) in report_types" v-bind:value="t">{{type}}</option>
@@ -63,19 +52,9 @@
                         <label>report description ({{repo.curr.description.length}} / 1000)</label>
                     </div>
 
-                    <div class="alert warn edfx" v-if="navi.body.name !== null && !navi.body.radius">
-                        <i class="i-ed-alert"></i>
-                        <div>No body data in database</div>
-                        <small>Scan body to identify radius and gravity correctly</small>
-                    </div>
                 </div>
 
                 <div class="col-sm curr-location">
-
-                    <h4 class="edfx">
-                        location
-                        <button type="button" v-if="!repo.curr._id" class="link" v-on:click="curr_location()"><i class="i-globe"></i> auto</button>
-                    </h4>
 
                     <div class="ui">
                         <input v-model="repo.curr.system" placeholder="Not Specified">
@@ -106,9 +85,14 @@
                         <input type="text" v-model="repo.curr.reporter" placeholder="cmdr name">
                         <label>reported by</label>
                     </div>
+
+                    <button type="button" v-if="!repo.curr._id" class="link" v-on:click="curr_location()"><i class="i-globe"></i> use current position and cmdr</button>
+
                 </div>
 
             </div>
+
+            <br>
 
             <div class="row">
                 <div class="col-sm">
@@ -132,6 +116,7 @@
                             <small>This links is required for report validation.<br>Other CMDRs can't see it.</small>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="col-sm">
@@ -145,9 +130,8 @@
                     </h4>
                     <div class="ui" v-for="(k,i) in repo.curr.links">
                         <input type="text" v-model="repo.curr.links[i]">
-                        <label>link #{{i+1}}
-                            <button type="button" class="link" v-on:click="repo.curr.links.splice(i,1)">remove <i class="i-cross"></i></button>
-                        </label>
+                        <label>link #{{i+1}}</label>
+                        <button type="button" class="link" v-on:click="repo.curr.links.splice(i,1)">remove <i class="i-cross"></i></button>
                     </div>
                 </div>
 
@@ -223,7 +207,7 @@
 
         <div id="repo-reports" v-if="c_tab==='home'">
 
-            <div class="alert info edfx" v-if="repo.reports_count === 0 && !state.loading">
+            <div class="alert info edfx" v-if="repo.reports_count === 0">
                 <i class="i-ed-alert"></i>
                 <div>No reports found</div>
                 <small>there is no reports matching your request</small>
@@ -267,24 +251,15 @@
 
 <script>
     import Vars from '../ctrl/vars';
-    import NET from '../ctrl/network';
     import Vue from 'vue';
     import extend from 'deep-extend';
 
-    let state = {
-        loading: false,
-        alert: {
-            show: false,
-            type: '',
-            text: 'nothing happened',
-            desc: '',
-        },
-        complete: false,
-    };
+    import {A} from '../components/alert';
+    import NET from '../ctrl/network';
+    import PILOT from '../ctrl/pilot';
 
     const _REPO_NULL = {};
     const REPO = {
-
         curr: {
             _id: null,
 
@@ -293,7 +268,7 @@
             sub_type: null,
             subject: '',
             description: '',
-            links: [],
+            links: [''],
             screens: {
                 cockpit: '',
                 sys_map: ''
@@ -322,8 +297,8 @@
 
     extend(_REPO_NULL, REPO);
 
-    function reset_report(){
-        extend(REPO.curr, _REPO_NULL);
+    function reset_report() {
+        extend(REPO.curr, _REPO_NULL.curr);
     }
 
     export default {
@@ -333,17 +308,12 @@
                 c_tab: 'home',
                 tabs: ['home', 'view', 'edit'],
                 repo: REPO,
-                navi: REPO.navi,
-                env: REPO.env,
-                cmdr: REPO.cmdr,
-                state: state,
                 report_types: Vars.REPORT_TYPES,
                 report_sub_types: Vars.REPORT_SUB_TYPES,
             }
         },
         methods: {
             go_home() {
-                this.state.alert.show = false;
                 reset_report();
                 this.c_tab = 'home';
                 this.get_recent();
@@ -359,11 +329,7 @@
                 this.c_tab = 'view';
             },
             get_recent: function () {
-                this.state.loading = true;
-                this.state.alert.show = true;
-                this.state.alert.text = 'loading reports, please wait';
-                this.state.alert.desc = '';
-                this.state.alert.type = 'info';
+                A.lock('loading recent reports...');
                 this.repo.reports.splice(0, this.repo.reports.length);
                 setTimeout(() => {
                     NET.send('repo-search', {});
@@ -371,18 +337,18 @@
             },
             curr_location: function () {
                 if (this.repo.curr._id) return;
-                this.repo.curr.system = this.env.system.name;
-                this.repo.curr.system_id = this.env.system._id;
-                if (this.env.body) {
-                    this.repo.curr.body = this.env.body.name;
-                    this.repo.curr.body_id = this.env.body._id;
-                    this.repo.curr.lat = this.navi.pos.lat;
-                    this.repo.curr.lon = this.navi.pos.lon;
+                this.repo.curr.system = PILOT.env.system.name;
+                this.repo.curr.system_id = PILOT.env.system._id;
+                if (PILOT.env.body) {
+                    this.repo.curr.body = PILOT.env.body.name;
+                    this.repo.curr.body_id = PILOT.env.body._id;
+                    this.repo.curr.lat = PILOT.status.lat;
+                    this.repo.curr.lon = PILOT.status.lon;
                 }
-                this.repo.curr.reporter = this.cmdr.name;
-                this.repo.curr.starpos[0] = this.env.system.starpos[0];
-                this.repo.curr.starpos[1] = this.env.system.starpos[1];
-                this.repo.curr.starpos[2] = this.env.system.starpos[2];
+                this.repo.curr.reporter = PILOT.cmdr.name;
+                this.repo.curr.starpos[0] = PILOT.env.system.starpos[0];
+                this.repo.curr.starpos[1] = PILOT.env.system.starpos[1];
+                this.repo.curr.starpos[2] = PILOT.env.system.starpos[2];
             },
             curr_change_type: function () {
                 if (!this.report_sub_types[this.repo.curr.type]) return (this.repo.curr.sub_type = null);
@@ -391,14 +357,17 @@
             },
 
             curr_submit: function () {
-                this.state.loading = true;
-                this.state.alert.show = true;
-                this.state.alert.text = 'processing report, please wait';
-                this.state.alert.desc = '';
-                this.state.alert.type = 'info';
-                this.state.complete = false;
                 setTimeout(() => {
-                    NET.send('repo-submit', this.repo.curr);
+                    NET.api('poirep', this.repo.curr)
+                        .then((res) => {
+                            if (res.report) {
+                                Vue.set(this.repo, 'curr', res.report);
+                                this.c_tab = 'view';
+                            }
+                        })
+                        .catch((err) => {
+                            A.error({text: 'operation failed', desc: err.message});
+                        });
                 }, 500);
             },
             curr_reset: function () {
@@ -412,22 +381,6 @@
         }
     }
 
-    NET.on('uni:repo-current', (report) => {
-        state.loading = false;
-        Vue.set(REPO, 'curr', report);
-    });
-
-    NET.on('uni:repo-submition', (dat) => {
-        state.loading = false;
-        state.alert.show = true;
-        state.alert.text = dat.text;
-        state.alert.desc = dat.desc;
-        state.alert.type = dat.type || 'info';
-        state.complete = false;
-        if (!dat.result) return;
-        state.complete = true;
-    });
-
     NET.on('uni:repo-search', (reports) => {
         let list = REPO.reports;
 
@@ -436,8 +389,7 @@
             list.push(reports[i]);
         }
         REPO.reports_count = reports.length;
-        state.loading = false;
-        state.alert.show = false;
+        A.release();
     });
 
 </script>

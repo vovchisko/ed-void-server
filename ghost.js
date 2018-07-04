@@ -27,6 +27,7 @@ async function init() {
     UNI.init();
 
     await wipe_stellars();
+    await re_index_void();
     await re_index_journals();
 
     await re_process();
@@ -39,6 +40,14 @@ async function init() {
 async function wipe_stellars() {
     await DB.db_void.collection('bodies').deleteMany({});
     await DB.db_void.collection('systems').deleteMany({});
+}
+
+async function re_index_void(cb) {
+    console.log(`\n>> RE_INDEXING VOID...`);
+
+    await DB.db_void.collection('bodies').ensureIndex([['name', 'text']]);
+    await DB.db_void.collection('systems').ensureIndex([['name', 'text']]);
+    await DB.db_void.collection('stations').ensureIndex([['name', 'text']]);
 }
 
 async function re_index_journals(cb) {

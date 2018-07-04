@@ -5,20 +5,48 @@
         </header>
 
         <div v-if="c_tab === 'log'">
-            <div v-for="l in log">{{l}}</div>
+            <pre v-for="l in log">{{l[0]}} : {{l[1]}}</pre>
         </div>
-        <pre v-if="c_tab === 'stat'">{{stat}}</pre>
-        <pre v-if="c_tab === 'pipe'">{{pipe}}</pre>
-        <pre v-if="c_tab === 'uni'">{{uni}}</pre>
+
+        <div v-if="c_tab === 'stat'" class="container-fluid">
+            <div class="row">
+                <div class="col-sm">
+                    <pre>PILOT:STAT {{PILOT.status}}</pre>
+                </div>
+                <div class="col-sm">
+                    <pre>PILOT:DEST {{PILOT.dest}}</pre>
+                </div>
+                <div class="col-sm">
+                    <pre>CFG: {{CFG}}</pre>
+                </div>
+
+            </div>
+        </div>
+
+        <div v-if="c_tab === 'pipe'">
+            <pre>{{pipe}}</pre>
+        </div>
+        <div v-if="c_tab === 'uni'">
+            <pre>{{uni}}</pre>
+        </div>
+
+        <div v-if="c_tab === 'test'">
+            <input-body v-model="test.id" id="999"></input-body>
+            <pre>TEST: {{test}}</pre>
+
+        </div>
+
     </div>
 </template>
 
 <script>
-    import Data from '../ctrl/data'
     import NET from '../ctrl/network'
+    import PILOT from '../ctrl/pilot'
+    import CFG from '../ctrl/cfg'
+
+    import InputBody from '../components/input-body'
 
     const dev = {
-        stat: Data.cmdr.status,
         pipe: [],
         uni: [],
         log: [],
@@ -26,15 +54,17 @@
 
     export default {
         name: "dev",
+        components: {InputBody},
         data: () => {
             return {
-                c_tab: 'log',
-                tabs: ['log', 'stat', 'uni', 'pipe'],
-                data: Data,
+                c_tab: 'test',
+                tabs: ['test', 'log', 'stat', 'uni', 'pipe'],
+                PILOT: PILOT, CFG: CFG,
                 log: dev.log,
                 stat: dev.stat,
                 pipe: dev.pipe,
                 uni: dev.uni,
+                test: {search: '', body: {}, id: 'mundii@1'},
             }
         }
     }
@@ -42,7 +72,6 @@
     NET.on('ping', (dat) => {
         let log = dev.log;
         let lag = 0;
-
         if (log.length)
             lag = dat.t - log[0][0];
         log.unshift([parseInt(dat.t), lag || 0]);
