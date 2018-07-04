@@ -31,9 +31,8 @@
         </div>
 
         <div v-if="c_tab === 'test'">
-            <input-body v-model="test.id" id="999"></input-body>
+            <input-body v-model="test.body_id" :id="test.body_id" label="select body"></input-body>
             <pre>TEST: {{test}}</pre>
-
         </div>
 
     </div>
@@ -64,7 +63,7 @@
                 stat: dev.stat,
                 pipe: dev.pipe,
                 uni: dev.uni,
-                test: {search: '', body: {}, id: 'mundii@1'},
+                test: {body_id: 'mundii@1:1:1'},
             }
         }
     }

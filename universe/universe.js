@@ -280,7 +280,7 @@ class Universe extends EE3 {
 
     }
 
-    async find_bodies(str) {
+    async find_bodies(name) {
         // something like this... pay attention at '""' << it means just the same as with google
         DB.bodies.find({$text: {$search: '"blu thua "'}}).limit(10);
     }

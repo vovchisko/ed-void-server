@@ -1,9 +1,8 @@
 <template>
     <div class="ui">
-        <input :value="search" @input="do_search()">
-        <pre>SEARCH: {{search}}</pre>
-        <pre>ID: {{id}}</pre>
-        <pre>LIST: {{list}}</pre>
+        <input v-model="search" @input="do_search()">
+        <label v-if="!!label">{{label}}</label>
+
     </div>
 </template>
 
@@ -13,7 +12,8 @@
     export default {
         name: "input-body",
         props: {
-            id: {type: String, default: ''},
+            id: {default: ''},
+            label: {default: ''},
         },
         data: () => {
             return {
@@ -24,10 +24,13 @@
         mounted: function () { if (!this.search && this.id) this.search = this.id},
         methods: {
             do_search: function () {
-                NET.search
+                console.log('search time', this.search);
+                if (Math.random() > 0.8) this.select_body('mundii@1:1:' + Math.floor(Math.random() * 1000));
+                NET.api('findbody', {name: this.search});
             },
             select_body: function (body_id) {
-                this.$emit('input', Math.floor(Math.random() * 1000))
+                this.$emit('input', body_id);
+                console.log('let`t say user selected new body');
             }
 
         }
@@ -35,5 +38,5 @@
 </script>
 
 <style scoped>
-    .ui { padding: 3px; margin: 3px; border: 1px solid #555}
+
 </style>
