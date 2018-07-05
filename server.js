@@ -59,15 +59,17 @@ const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
 const race = server.race = require('./universe/race');
 const clog = server.clog = require('./clog');
-
-const action_signup = require('./universe/actions/signup');
-const action_signin = require('./universe/actions/signin');
-const action_record = require('./universe/actions/record');
-const action_passch = require('./universe/actions/passch');
-const action_everify = require('./universe/actions/everify');
-const action_passrst = require('./universe/actions/passrst');
-const action_apirst = require('./universe/actions/apirst');
-const action_poirep = require('./universe/actions/poirep');
+const API = {
+    signup: require('./universe/actions/signup'),
+    signin: require('./universe/actions/signin'),
+    record: require('./universe/actions/record'),
+    passch: require('./universe/actions/passch'),
+    everify: require('./universe/actions/everify'),
+    passrst: require('./universe/actions/passrst'),
+    apirst: require('./universe/actions/apirst'),
+    poirep: require('./universe/actions/poirep'),
+    findbody: require('./universe/actions/findbody'),
+};
 
 
 class Clients {
@@ -179,31 +181,14 @@ require('http').createServer(function (request, response) {
 
     let route_url = request.url.endsWith('/') ? request.url.slice(0, -1) : request.url;
 
-    // API
-    if (route_url === '/api/record')
-        return action_record(request, response);
-
-    if (route_url === '/api/signup')
-        return action_signup(request, response);
-
-    if (route_url === '/api/signin')
-        return action_signin(request, response);
-
-    if (route_url === '/api/passch')
-        return action_passch(request, response);
-
-    if (route_url === '/api/everify')
-        return action_everify(request, response);
-
-    if (route_url === '/api/passrst')
-        return action_passrst(request, response);
-
-    if (route_url === '/api/apirst')
-        return action_apirst(request, response);
-
-    if (route_url === '/api/poirep')
-        return action_poirep(request, response);
-
+    if (route_url.includes('/api/')) {
+        let method = route_url.split('/')[2];
+        if (method && typeof API[method] === 'function') {
+            return API[method](request, response);
+        } else {
+            clog(`SRV: no API method ${route_url}`);
+        }
+    }
 
     if (route_url === '/app') // APP
         return app.serveFile('/index.html', 200, {}, request, response);
@@ -218,7 +203,6 @@ require('http').createServer(function (request, response) {
                 app.serveFile('/error.html', 404, {}, request, response);
             }
         });
-
     }).resume();
 
 }).listen(cfg.main.port);

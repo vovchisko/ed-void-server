@@ -4,7 +4,9 @@
     Find body by specified parameters.
 
     PARAMS: {
-        name: <String> part of name,
+        search: <String> part of name,
+        //OR
+        ... other criterias
     }
 */
 
@@ -23,31 +25,34 @@ module.exports = function (req, res) {
         };
         let log = 'SEARCH: ';
         try {
-            let dat = server.parse_json(buffer.toString());
-            if (!dat) return res.end();
+            let params = server.parse_json(buffer.toString());
+            if (!params) return res.end();
             let head = req.headers;
             let user = await UNI.get_user({api_key: head.api_key});
             if (user) {
-                if (user.pass === DB.hash(dat.curr_pass)) {
-                    if (dat.new_pass && dat.new_pass.length >= 5) {
+                let bodies; // future cursor
+                let query = {};
 
-                        //server.JCL.wss.drop_client(user._id);
-                        //server.CLS.wss.drop_client(user._id);
-
-                        user.touch({
-                            pass: DB.hash(dat.new_pass),
-                            // api_key: DB.some_hash(),
-                        });
-                        await user.save();
-                        result.result = 1;
-                        result.type = 'info';
-                        result.text = 'password successfully changed';
-                    } else {
-                        result.text = 'new passwrd should contain atleast 5 chars';
-                    }
+                if (params.search) {
+                    query = {name: {$regex: `^${params.search.toLowerCase()}.*`}};
+                    console.log(query);
+                    //query = {$text: {$search: '"' + params.search + '"'}}
                 } else {
-                    result.text = 'invalid current password';
+                    //TODO: search by specified parameters
                 }
+
+                bodies = await DB.bodies.find(query).limit(10);
+
+                while (await bodies.hasNext()) {
+                    result.bodies.push(await bodies.next());
+                }
+
+                result.result = 1;
+                result.type = 'info';
+                result.text = 'found ' + result.bodies.length + ' bodies';
+                res.statusCode = 200;
+
+                clog(result);
             } else {
                 res.statusCode = 498;
                 result.text = 'invalid api-key';
