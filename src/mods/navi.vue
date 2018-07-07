@@ -106,8 +106,8 @@
             dest_apply: function () {
                 NET.send('dest-apply', {
                     //todo: you can specify "r" manually
-                    system: null,
-                    body: null,
+                    system_id: null,
+                    body_id: null,
                     lat: this.navi.dest.lat,
                     lon: this.navi.dest.lon,
                     r: this.env.body.radius || _navi.c_radius_km

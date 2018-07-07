@@ -60,15 +60,17 @@ const UNI = server.UNI = require('./universe/universe');
 const race = server.race = require('./universe/race');
 const clog = server.clog = require('./clog');
 const API = {
-    signup: require('./universe/actions/signup'),
-    signin: require('./universe/actions/signin'),
-    record: require('./universe/actions/record'),
-    passch: require('./universe/actions/passch'),
-    everify: require('./universe/actions/everify'),
-    passrst: require('./universe/actions/passrst'),
-    apirst: require('./universe/actions/apirst'),
-    poirep: require('./universe/actions/poirep'),
-    findbody: require('./universe/actions/findbody'),
+    'signup': require('./universe/actions/signup'),
+    'signin': require('./universe/actions/signin'),
+    'record': require('./universe/actions/record'),
+    'passch': require('./universe/actions/passch'),
+    'everify': require('./universe/actions/everify'),
+    'passrst': require('./universe/actions/passrst'),
+    'apirst': require('./universe/actions/apirst'),
+    'poirep': require('./universe/actions/poirep'),
+    's-bodies': require('./universe/actions/s-boides'),
+    's-systems': require('./universe/actions/s-systems'),
+    's-stations': require('./universe/actions/s-stations'),
 };
 
 

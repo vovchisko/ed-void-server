@@ -31,8 +31,13 @@
         </div>
 
         <div v-if="c_tab === 'test'">
-            <input-body v-model="test.body_id" :id="test.body_id" label="select body"></input-body>
             <pre>TEST: {{test}}</pre>
+            <button v-on:click="external_change()">PEW!</button>
+            <br>
+
+            <input-body v-bind:id.sync="test.body_id" label="target body"></input-body>
+            <input-system v-bind:id.sync="test.system_id" label="target system"></input-system>
+
         </div>
 
     </div>
@@ -44,6 +49,8 @@
     import CFG from '../ctrl/cfg'
 
     import InputBody from '../components/input-body'
+    import InputSystem from '../components/input-system'
+    import InputStation from '../components/input-station'
 
     const dev = {
         pipe: [],
@@ -53,7 +60,7 @@
 
     export default {
         name: "dev",
-        components: {InputBody},
+        components: {InputBody, InputSystem, InputStation},
         data: () => {
             return {
                 c_tab: 'test',
@@ -63,8 +70,22 @@
                 stat: dev.stat,
                 pipe: dev.pipe,
                 uni: dev.uni,
-                test: {body_id: 'mundii@1:1:1'},
+                test: {
+                    system_id: 'apoyota@-1078:-139:1964',
+                    body_id: 'apoyota@-1078:-139:1964/*',
+                },
             }
+        },
+        methods: {
+            on_change: function (e) {
+                console.log('PEW!', e);
+            },
+
+            external_change: function () {
+                this.test.system_id = 'apoyota@-1078:-139:1964'
+                this.test.body_id = 'apoyota@-1078:-139:1964/*'
+            }
+
         }
     }
 

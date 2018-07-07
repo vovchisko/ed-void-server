@@ -410,7 +410,7 @@ class Universe extends EE3 {
         s = new SYSTEM({
             _id: id,
             name: name,
-            starpos: starpos,
+            starpos: starpos.map((x) => {return Math.floor(x * 32)}),
         });
         await s.save();
         return s;

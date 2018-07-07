@@ -23,7 +23,7 @@ module.exports = function (req, res) {
             text: 'unknown error',
             bodies: [],
         };
-        let log = 'SEARCH: ';
+        let log = 'API/S-BODIES: ';
         try {
             let params = server.parse_json(buffer.toString());
             if (!params) return res.end();
