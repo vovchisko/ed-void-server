@@ -38,6 +38,15 @@
             <input-body v-bind:id.sync="test.body_id" label="target body"></input-body>
             <input-system v-bind:id.sync="test.system_id" label="target system"></input-system>
 
+            <pre>
+                we need another trick.
+                
+                - somehow we need to figureout with clickout
+                  OR
+                - show list using CSS + transition-delay
+                  OR
+                - combine select/blur into single funtion with setTimeout
+            </pre>
         </div>
 
     </div>
