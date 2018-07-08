@@ -5,7 +5,7 @@ import extend from 'deep-extend'
 const PILOT = {
     cmdr: {
         name: null,
-        system_id: null,
+        sys_id: null,
         body_id: null,
         starpos: [0, 0, 0],
         last_rec: null,

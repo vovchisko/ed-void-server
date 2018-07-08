@@ -106,11 +106,13 @@
             dest_apply: function () {
                 NET.send('dest-apply', {
                     //todo: you can specify "r" manually
-                    system_id: null,
+                    sys_id: null,
                     body_id: null,
+                    station_id: null,
                     lat: this.navi.dest.lat,
                     lon: this.navi.dest.lon,
-                    r: this.env.body.radius || _navi.c_radius_km
+                    r: this.env.body.radius || _navi.c_radius_km,
+                    goal: 0 // describe goal condition. reach by default.
                 })
             },
             dest_dismiss: function () {
@@ -193,7 +195,6 @@
         .location-data {
             margin-top: 3em;
             h4 { margin-bottom: 0; }
-            .starpos { text-align: center; }
         }
         small { color: darken($ui-text, 25%);}
         .alert.info { margin-top: 2em}

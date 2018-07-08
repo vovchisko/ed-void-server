@@ -61,7 +61,7 @@ async function _poi_submit(user, report) {
         },
         parent_id: null, //for a few reports in the same place
         starpos: [0, 0, 0], // get automatically from the system
-        system_id: null, // get automatically from
+        sys_id: null, // get automatically from
         body_id: null,
     };
 
@@ -133,7 +133,7 @@ async function _poi_submit(user, report) {
 
     //user can't edit
     r.starpos = report.starpos;
-    r.system_id = report.system_id;
+    r.sys_id = report.sys_id;
     r.body_id = report.body_id;
     r.updated = new Date(Date.now());
 

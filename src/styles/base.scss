@@ -176,26 +176,7 @@ hr {
     &.short select, &.short input, &.short button { width: auto; min-width: 8em }
 }
 
-.ui.input-search {
-    &.z-overall { z-index: 100;}
-    & .remove { visibility: hidden; }
-    &:hover .remove { visibility: visible}
-    input {@include hcaps();}
-    input:focus::placeholder { color: darken($ui-text, 25%); }
-    .list {
-        z-index: 2000;
-        position: absolute;
-        padding: 0.2em 0;
-        top: 100%; width: 100%;
-        background: darken($ui-bg, 3%);
-        button {
-            display: block;
-            padding: 0.2em 0.5em;
-            span {opacity: 0.5; }
-        }
-    }
-    label .inline-msg { color: $ui-text; }
-}
+
 
 .starpos { color: darken($ui-text, 25%); margin-bottom: 0.5em }
 .starpos u { font-size: 0.8em; color: darken($ui-text, 25%); }

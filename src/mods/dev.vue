@@ -30,25 +30,26 @@
             <pre>{{uni}}</pre>
         </div>
 
-        <div v-if="c_tab === 'test'">
-            <pre>TEST: {{test}}</pre>
-            <button v-on:click="external_change()">PEW!</button>
-            <br>
+        <div class="container-fluid" v-if="c_tab === 'test'">
+            <div class="row">
+                <div class="col-sm">
+                    <pre>TEST: {{test}}</pre>
+                    <button v-on:click="external_change()">PEW!</button>
+                    <br>
+                    <br>
+                    A: <star-dist :dest="test.b"></star-dist> <br>
+                    B: <star-dist :dest="test.a"></star-dist> <br>
 
-            <input-body v-bind:id.sync="test.body_id" label="target body"></input-body>
-            <input-system v-bind:id.sync="test.system_id" label="target system"></input-system>
+                </div>
+                <div class="col-sm">
 
-            <pre>
-                we need another trick.
-                
-                - somehow we need to figureout with clickout
-                  OR
-                - show list using CSS + transition-delay
-                  OR
-                - combine select/blur into single funtion with setTimeout
-            </pre>
+                    <input-body v-bind:id.sync="test.body_id" label="target body"></input-body>
+                    <input-system v-bind:id.sync="test.sys_id" label="target system"></input-system>
+                    <input-station v-bind:id.sync="test.station_id" label="target station"></input-station>
+
+                </div>
+            </div>
         </div>
-
     </div>
 </template>
 
@@ -60,6 +61,8 @@
     import InputBody from '../components/input-body'
     import InputSystem from '../components/input-system'
     import InputStation from '../components/input-station'
+    import StarDist from '../components/star-dist'
+    import StarPos from '../components/star-pos'
 
     const dev = {
         pipe: [],
@@ -69,7 +72,7 @@
 
     export default {
         name: "dev",
-        components: {InputBody, InputSystem, InputStation},
+        components: {InputBody, InputSystem, InputStation, StarDist, StarPos},
         data: () => {
             return {
                 c_tab: 'test',
@@ -80,8 +83,11 @@
                 pipe: dev.pipe,
                 uni: dev.uni,
                 test: {
-                    system_id: 'apoyota@-1078:-139:1964',
-                    body_id: 'apoyota@-1078:-139:1964/*',
+                    sys_id: null,
+                    station_id: null,
+                    body_id: null,
+                    a: [0,0,0],
+                    b: [0,0,0],
                 },
             }
         },
@@ -91,8 +97,11 @@
             },
 
             external_change: function () {
-                this.test.system_id = 'apoyota@-1078:-139:1964'
-                this.test.body_id = 'apoyota@-1078:-139:1964/*'
+                this.test.sys_id = 'apoyota@-1078:-139:1964';
+                this.test.body_id = 'apoyota@-1078:-139:1964/b 4';
+                this.test.station_id = 'mundii@2738:-34:-12/elder hub';
+                this.test.a = [50,6520,567];
+                this.test.b = [33,15,21];
             }
 
         }

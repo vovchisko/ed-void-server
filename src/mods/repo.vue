@@ -285,7 +285,7 @@
             //user can't edit
             parent_id: null, //for a few reports in the same place
             starpos: [0, 0, 0],
-            system_id: null,
+            sys_id: null,
             body_id: null,
             reported: null,
             updated: null,
@@ -338,7 +338,7 @@
             curr_location: function () {
                 if (this.repo.curr._id) return;
                 this.repo.curr.system = PILOT.env.system.name;
-                this.repo.curr.system_id = PILOT.env.system._id;
+                this.repo.curr.sys_id = PILOT.env.system._id;
                 if (PILOT.env.body) {
                     this.repo.curr.body = PILOT.env.body.name;
                     this.repo.curr.body_id = PILOT.env.body._id;

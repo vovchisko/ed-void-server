@@ -64,6 +64,8 @@ class Database {
         this.reports = this.db_void.collection('reports');
         this.bodies = this.db_void.collection('bodies');
         this.systems = this.db_void.collection('systems');
+        this.stations = this.db_void.collection('stations');
+
         this.exp_data = this.db_void.collection('exp_data');
         this.exp_discovered = this.db_void.collection('exp_discovered');
 

@@ -69,8 +69,8 @@ class Universe extends EE3 {
 
                 scans.forEach((rec) => { this.emit(EV_PIPE, user._id, rec.event, rec) });
 
-                if (user._cmdr.system_id) {
-                    let sys = await this.get_system(user._cmdr.system_id);
+                if (user._cmdr.sys_id) {
+                    let sys = await this.get_system(user._cmdr.sys_id);
                     this.emit(EV_NET, uid, 'c_system', sys);
                 }
 
@@ -171,11 +171,14 @@ class Universe extends EE3 {
             if (rec.event === 'LeaveBody') return this.proc_LeaveBody(cmdr, rec);
             if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec);
             if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
+            if (rec.event === 'Docked') return this.proc_Docked(cmdr, rec);
+            if (rec.event === 'SupercruiseExit') return this.proc_SupercruiseExit(cmdr, rec);
         } catch (e) {
             clog('UNI.process()', rec.event, e);
         }
         return null;
     }
+
 
     async proc_SellExplorationData(cmdr, data) {
         await  cmdr._exp.exp_data_sell(cmdr, data);
@@ -183,16 +186,48 @@ class Universe extends EE3 {
     }
 
     async proc_Scan(cmdr, Scan) {
-        let body = await this.spawn_body(Scan.BodyName, cmdr.system_id);
+        let body = await this.spawn_body(Scan.BodyName, cmdr.sys_id);
         if (!body) return;
         await body.append(cmdr, Scan);
 
         //track exploration data
-        await cmdr._exp.exp_data_add(Scan, cmdr.system_id);
+        await cmdr._exp.exp_data_add(Scan, cmdr.sys_id);
         this.emit(EV_NET, cmdr.uid, 'exp-data', cmdr._exp.get_exp_data(false, cmdr.current_system_name()));
 
         if (body._id === cmdr.body_id)
             this.emit(EV_NET, cmdr.uid, 'c_body', body);
+    }
+
+    async proc_SupercruiseExit(cmdr, SupercruiseExit) {
+        /*
+        SupercruiseExit = {
+            "timestamp": "2018-06-20T20:15:18Z",
+            "event": "SupercruiseExit",
+            "StarSystem": "Mundii",
+            "SystemAddress": 16065191028137,
+            "Body": "Elder Hub",
+            "BodyID": 26,
+            "BodyType": "Station"
+        }
+        */
+        if (SupercruiseExit.BodyID && SupercruiseExit.BodyType === 'Station') {
+            let station = await this.spawn_station(SupercruiseExit.Body, cmdr.sys_id);
+            if (!station) return;
+            if (station && !station.body_id) {
+                station.body_id = SupercruiseExit.BodyID;
+                station.save();
+            }
+        }
+
+    }
+
+
+    async proc_Docked(cmdr, Docked) {
+        let station = await this.spawn_station(Docked.StationName, cmdr.sys_id);
+        if (!station) return;
+        await station.append(cmdr, Docked);
+
+        this.emit(EV_NET, cmdr.uid, 'c_station', station);
     }
 
     async proc_DiscoveryScan(cmdr, rec) {
@@ -200,7 +235,7 @@ class Universe extends EE3 {
         cmdr.metrics.curr_ds += rec.Bodies;
         cmdr.touch();
 
-        await UNI.get_system(cmdr.system_id)
+        await UNI.get_system(cmdr.sys_id)
             .then((system) => {
                 if (!system) return;
                 if (cmdr.metrics.curr_ds > system.ds_count) {
@@ -217,7 +252,7 @@ class Universe extends EE3 {
 
         cmdr.touch();
 
-        await UNI.get_system(cmdr.system_id)
+        await UNI.get_system(cmdr.sys_id)
             .then((system) => {
                 if (!system) return;
                 if (cmdr.metrics.curr_ds > system.ds_count)
@@ -235,7 +270,7 @@ class Universe extends EE3 {
     }
 
     async proc_ApproachBody(cmdr, ApproachBody) {
-        let body = await this.spawn_body(ApproachBody.Body, cmdr.system_id);
+        let body = await this.spawn_body(ApproachBody.Body, cmdr.sys_id);
         cmdr.touch({
             body_id: body._id
         });
@@ -248,7 +283,7 @@ class Universe extends EE3 {
         await sys.append(cmdr, Location);
 
         let td = {
-            system_id: sys._id,
+            sys_id: sys._id,
             starpos: sys.starpos,
         };
 
@@ -268,7 +303,7 @@ class Universe extends EE3 {
 
 
         cmdr.touch({
-            system_id: sys._id,
+            sys_id: sys._id,
             starpos: sys.starpos,
             body_id: null,
             metrics: {curr_ds: 0}
@@ -304,16 +339,16 @@ class Universe extends EE3 {
     /**
      * Get or create body
      * @param body_name
-     * @param system_id
+     * @param sys_id
      * @returns {Promise<BODY>}
      */
-    async spawn_body(body_name, system_id) {
+    async spawn_body(body_name, sys_id) {
 
         //find system
-        let sys = await this.get_system(system_id);
+        let sys = await this.get_system(sys_id);
         if (!sys) return null;
 
-        let body_id = Universe.body_id(system_id, body_name);
+        let body_id = Universe.body_id(sys_id, body_name);
         let b = await this.get_body(body_id);
 
         if (b) return new BODY(b);
@@ -341,6 +376,48 @@ class Universe extends EE3 {
         if (b) return new BODY(b);
         return null;
     }
+
+
+    /**
+     * Get or create station
+     * @param station_name
+     * @param sys_id
+     * @returns {Promise<STATION>}
+     */
+    async spawn_station(station_name, sys_id) {
+
+        //find system
+        let sys = await this.get_system(sys_id);
+        if (!sys) return null;
+
+        let station_id = Universe.station_id(sys_id, station_name);
+        let b = await this.get_station(station_id);
+
+        if (b) return new STATION(b);
+        b = new STATION({
+            _id: station_id,
+            sys_id: sys._id, // or by sys id
+            sys_name: sys.name, // to make search by system easy
+            starpos: sys.starpos.slice(), // to make search by pos easy
+            name: con.LOW_CASE(station_name),
+            name_raw: station_name,
+            type: null,
+        });
+        await b.save();
+        return b;
+    }
+
+    /**
+     * get Station by ID
+     * @param station_id
+     * @returns {Promise<STATION>}
+     */
+    async get_station(station_id) {
+        let b = await DB.stations.findOne({_id: station_id});
+        if (b) return new STATION(b);
+        return null;
+    }
+
 
     /**
      * Get user by mongodb query. Is also can be cached in Universe Instance
@@ -402,7 +479,7 @@ class Universe extends EE3 {
      * @returns {Promise<SYSTEM>}
      */
     async spawn_system(name, starpos) {
-        let id = Universe.system_id(name, starpos);
+        let id = Universe.sys_id(name, starpos);
         let s = await DB.systems.findOne({_id: id});
 
         if (s) return new SYSTEM(s);
@@ -416,8 +493,8 @@ class Universe extends EE3 {
         return s;
     }
 
-    async get_system(system_id) {
-        let s = await DB.systems.findOne({_id: system_id});
+    async get_system(sys_id) {
+        let s = await DB.systems.findOne({_id: sys_id});
         if (s) return new SYSTEM(s);
         return null;
     }
@@ -428,15 +505,66 @@ class Universe extends EE3 {
      * @param {array} starpos SparPos[x,y,z]
      * @returns {string} Cool System ID
      */
-    static system_id(name, starpos) {
+    static sys_id(name, starpos) {
         return con.LOW_CASE(name) + SEP_SYSTEM + starpos.map(x => Math.round(x * 32)).join(SEP_COORD);
     }
 
-    static body_id(system_id, body_name) {
-        let n = con.LOW_CASE(body_name).replace(system_id.split(SEP_SYSTEM)[0], '').trim();
-        return system_id + SEP_BODY + (n ? n : FIRST_SYS_OBJ);
+    static body_id(sys_id, body_name) {
+        let n = con.LOW_CASE(body_name).replace(sys_id.split(SEP_SYSTEM)[0], '').trim();
+        return sys_id + SEP_BODY + (n ? n : FIRST_SYS_OBJ);
     }
 
+    static station_id(sys_id, station_name) {
+        return sys_id + SEP_BODY + con.LOW_CASE(station_name);
+    }
+
+}
+
+
+class STATION {
+    constructor(station) {
+        this._id = null;
+        this.name = null;
+        this.submited = null;
+        this.upd = 0;
+        extend(this, station);
+    }
+
+    append(cmdr, rec) {
+
+        pickx(rec, this,
+            ['SystemAddress', 'sys_addr'],
+            ['MarketID', 'market_id'],
+            ['StationFaction', 'faction'],
+            ['FactionState', 'faction_state'],
+            ['StationGovernment', 'goverment'],
+            ['StationAllegiance', 'allegiance'],
+            ['StationServices', 'services'],
+            ['StationEconomy', 'economy'],
+            ['StationType', 'type', con.LOW_CASE],
+            ['StationEconomies', 'economies', (ecs) => {
+                if (!ecs) return null;
+                let e = {};
+                for (let i = 0; i < ecs.length; i++) e['Name'] = 'Proportion';
+                return e;
+            }],
+            ['DistFromStarLS', 'arrival'],
+        );
+
+        this.sys_id = cmdr.sys_id;
+        this.starpos = cmdr.starpos.map(x => x);
+
+        if (!this.submited) this.submited = cmdr.name;
+        if (this.upd < rec.timestamp) this.upd = rec.timestamp;
+
+        return this.save();
+    }
+
+
+    async save() {
+        //no temporary fields here...
+        await DB.stations.save(this);
+    }
 }
 
 
@@ -493,8 +621,6 @@ class BODY {
             ['RotationPeriod', 'rot_period'],
             ['AxialTilt', 'rot_axial_tilt'],
             ['TidalLock', 'rot_tidal_lock'],
-
-            //['_est', ??? ],
         );
 
         if (rec.AtmosphereComposition) {
@@ -695,7 +821,7 @@ class CMDR {
         this.uid = null;
         this.name = null;
         this.last_rec = new Date(0);
-        this.system_id = null;
+        this.sys_id = null;
         this.body_id = null;
         this.starpos = [0, 0, 0];
         this.metrics = {curr_ds: 0};
@@ -801,12 +927,12 @@ class CMDR {
     }
 
     current_system_name() {
-        if (!this.system_id) return 'unknown';
-        return this.system_id.split('@')[0];
+        if (!this.sys_id) return 'unknown';
+        return this.sys_id.split('@')[0];
     }
 
     __reset() {
-        this.system_id = null;
+        this.sys_id = null;
         this.body_id = null;
         this.starpos = [0, 0, 0];
         this.metrics.curr_ds = 0;
@@ -824,7 +950,7 @@ class CMDR {
         return pickx(this, this._data,
             ['name', 'name'],
             ['last_rec', 'last_rec'],
-            ['system_id', 'system_id'],
+            ['sys_id', 'sys_id'],
             ['body_id', 'body_id'],
             ['starpos', 'starpos'],
             ['metrics', 'metrics'],
