@@ -205,6 +205,11 @@ function circle_intersect(x0, y0, r, // center and radius of circle
 
 }
 
+function safe_regexp(str) {
+    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+module.exports.safe_regexp = safe_regexp;
 module.exports.circle_intersect = circle_intersect;
 module.exports.scan_obj_type = scan_obj_type;
 module.exports.recout = recout;

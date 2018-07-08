@@ -33,14 +33,8 @@ module.exports = function (req, res) {
                 let systems; // future cursor
                 let query = {};
 
-                if (params.search) {
-                    //todo: is this reaaly the only way?
-                    query = {name: {$regex: `^${params.search.toLowerCase()}.*`}};
-                    console.log(query);
-                    //query = {$text: {$search: '"' + params.search + '"'}}
-                } else {
-                    //todo: search by specified parameters
-                }
+                if (params.search) query.name = {$regex: `^${server.tools.safe_regexp(params.search.toLowerCase())}.*`};
+                //query = {$text: {$search: '"' + params.search + '"'}}
 
                 systems = await DB.systems.find(query).limit(10);
 

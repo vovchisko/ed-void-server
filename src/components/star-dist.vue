@@ -41,7 +41,7 @@
                 this.err = false;
                 this.v1 = this.pos.map(x => x);
                 this.v2 = this.dest.map(x => x);
-                this.dist = this.$options.filters.nn(TOOLS.distance(this.v1, this.v2), 0, 0) + ' ly';
+                this.dist = this.$options.filters.nn(TOOLS.distance(this.v1, this.v2) / 32, 0, 0) + ' ly';
             }
         }
     }

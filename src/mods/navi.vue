@@ -5,8 +5,8 @@
 
         <div class="alert info edfx" v-if="navi.status.alt===null">
             <i class="i-ed-alert"></i>
-            <div>Approach to the body<br/>NAV-Module will engage automatically</div>
-            <small>Scan body Before approaching to identify radius and gravity correctly</small>
+            <h4>approach to the body</h4>
+            <p>nav-module will engage automatically on approach</p>
         </div>
 
         <div class="navi-surf" v-if="navi.status.alt!==null">

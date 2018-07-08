@@ -21,7 +21,7 @@ class Network extends EventEmitter3 {
     }
 
     init() {
-        A.lock({text:'connecting to ed-void server'});
+        A.lock({text: 'connecting to ed-void server'});
         this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
         this.ws.onopen = () => {
             A.release();
@@ -40,7 +40,7 @@ class Network extends EventEmitter3 {
             if (e.reason) return console.log('ws:ouch!', e.reason);
             A.error({
                 text: 'void: network error',
-                desc: 'server unavailable. attempting to reconnect automatically',
+                desc: 'Server not available right now. Please try again later',
                 acts: {'re-connect': () => this.init()}
             }, true)
 

@@ -17,6 +17,9 @@
                     <pre>PILOT:DEST {{PILOT.dest}}</pre>
                 </div>
                 <div class="col-sm">
+                    <pre>CMDR: {{PILOT.cmdr}}</pre>
+                </div>
+                <div class="col-sm">
                     <pre>CFG: {{CFG}}</pre>
                 </div>
 
@@ -37,8 +40,12 @@
                     <button v-on:click="external_change()">PEW!</button>
                     <br>
                     <br>
-                    A: <star-dist :dest="test.b"></star-dist> <br>
-                    B: <star-dist :dest="test.a"></star-dist> <br>
+                    A:
+                    <star-dist :dest="test.b"></star-dist>
+                    <br>
+                    B:
+                    <star-dist :dest="test.a"></star-dist>
+                    <br>
 
                 </div>
                 <div class="col-sm">
@@ -86,8 +93,8 @@
                     sys_id: null,
                     station_id: null,
                     body_id: null,
-                    a: [0,0,0],
-                    b: [0,0,0],
+                    a: [0, 0, 0],
+                    b: [0, 0, 0],
                 },
             }
         },
@@ -100,8 +107,8 @@
                 this.test.sys_id = 'apoyota@-1078:-139:1964';
                 this.test.body_id = 'apoyota@-1078:-139:1964/b 4';
                 this.test.station_id = 'mundii@2738:-34:-12/elder hub';
-                this.test.a = [50,6520,567];
-                this.test.b = [33,15,21];
+                this.test.a = [50, 6520, 567];
+                this.test.b = [33, 15, 21];
             }
 
         }
