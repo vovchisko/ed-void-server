@@ -47,7 +47,6 @@ module.exports = function (req, res) {
                 result.text = 'found ' + result.systems.length + ' systems';
                 res.statusCode = 200;
 
-                clog(result);
             } else {
                 res.statusCode = 498;
                 result.text = 'invalid api-key';
@@ -57,7 +56,7 @@ module.exports = function (req, res) {
             result.text = 'operation failed';
         }
         res.end(JSON.stringify(result));
-        clog(log + result.text);
+        //clog(log + result.text);
     });
 };
 

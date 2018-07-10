@@ -1,81 +1,97 @@
 <template>
     <div id="navi">
 
-        <header class="edfx">{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}</header>
+        <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}{{env.station ? env.body.station : '' }}</header>
 
-        <div class="alert info edfx" v-if="navi.status.alt===null">
+        <div class="alert info edfx" v-if="!status.alt">
             <i class="i-ed-alert"></i>
             <h4>approach to the body</h4>
             <p>nav-module will engage automatically on approach</p>
         </div>
 
-        <div class="navi-surf" v-if="navi.status.alt!==null">
+        <div class="navi-surf" v-if="status.alt">
             <div class="compass edfx">
-                <div class="ruler" v-bind:style="navi.style_ruler">
-                    <b class="head">{{navi.status.head}}</b>
+                <div class="ruler" v-bind:style="N.style_ruler">
+                    <b class="head">{{status.head}}</b>
                 </div>
-                <div class="dest" v-bind:style="navi.style_dest" v-if="dest_on">
-                    <b class="head" v-bind:class="navi.dest_align">{{navi.dest.head}}</b>
+                <div class="dest" v-if="N.dest.head" v-bind:style="N.style_dest">
+                    <b class="head" v-bind:class="N.dest_align">{{N.dest.head}}</b>
                 </div>
             </div>
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-6 cords justified">
-                        <div class="edfx">
-                            <h5>CURR. POSITION</h5>
-                            <em><b>LAT</b><span>{{navi.status.lat | nn(4,4)}} <u>°</u></span></em>
-                            <em><b>LON</b><span>{{navi.status.lon | nn(4,4)}} <u>°</u></span></em>
-                            <em><b>ALT</b><span>{{navi.status.alt / 1000}} <u>KM</u></span></em>
-                        </div>
-                        <div v-if="dest_on" class="edfx">
-                            <br>
-                            <em><b>HEAD</b><span>{{navi.dest.head | nn(0,0)}} <u>°</u></span></em>
-                            <em><b>DIST</b><span>{{navi.dest.dist / 1000 | nn(3,3)}} <u>KM</u></span></em>
-                        </div>
+        </div>
+
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-sm edfx">
+                    <h5>CURR. POSITION</h5>
+                    <em v-if="env.system"><b>SYSTEM</b><span>{{env.system.name}}</span></em>
+                    <em v-if="env.body"><b>BODY</b><span>{{env.body.name}}</span></em>
+                    <em v-if="env.station"><b>ST</b><span>{{env.station.name}}</span></em>
+                    <em v-if="!env.station && !env.station"><b>&nbsp;</b><span>deep space</span></em>
+                    <em v-if="status.alt"><b>LAT</b><span>{{status.lat}} <u>°</u></span></em>
+                    <em v-if="status.alt"><b>LON</b><span>{{status.lon}} <u>°</u></span></em>
+                    <em v-if="status.alt"><b>ALT</b><span>{{status.alt}} <u>M</u></span></em>
+                </div>
+                <div class="col-sm">
+                    <div class="ui" v-if="N.edit" >
+                        <button @click="set_goal(g)" v-for="g in N.DEST_GOAL" v-bind:class="N.dest.goal === g ? 'active':''">{{g}}</button>
                     </div>
-                    <div class="col-6 cords justified">
+                    <div v-if="!N.edit">
                         <h5>DESTINATION</h5>
-                        <div v-if="dest_on" class="edfx">
-                            <em class="editable">
-                                <b>LAT</b>
-                                <span><input type="number" min="-90" max="90" step="any" @focus="$event.target.select()" v-model="navi.dest.lat"><u>°</u></span>
-                            </em>
-                            <em class="editable">
-                                <b>LON</b>
-                                <span><input type="number" min="-180" max="180" step="any" @focus="$event.target.select()" v-model="navi.dest.lon"><u>°</u></span>
-                            </em>
-                            <em class="editable" v-if="env.body, !env.body.radius">
-                                <b>RADIUS</b>
-                                <span><input type="number" @focus="$event.target.select()" v-model="navi.c_radius_km"><u>KM</u></span>
-                            </em>
-                        </div>
-                        <button class="edfx" v-if="!dest_on" v-on:click="dest_on = true"><i class="i-aim"></i> SET DESTINATION</button>
-                        <button class="edfx" v-if="dest_on" v-on:click="dest_apply()"><i class="i-aim"></i> APPLY DESTINATION</button>
-                        <button class="edfx" v-if="dest_on" v-on:click="dest_dismiss()"><i class="i-cross"></i> DISMISS</button>
+                        <em v-if="N.dest.sys_id"><b>SYS</b><span>{{N.dest.sys_id}}</span></em>
+                        <em v-if="N.dest.st_id"><b>ST</b><span>{{N.dest.st_id}}</span></em>
+                        <em v-if="N.dest.body_id"><b>BODY</b><span>{{N.dest.body_id}}</span></em>
+                        <em v-if="N.dest.head"><b>HEAD</b><span>{{N.dest.head | nn(0,0)}} <u>°</u></span></em>
+                        <em v-if="N.dest.dist"><b>DIST</b><span>{{N.dest.dist / 1000 | nn(3,3)}} <u>KM</u></span></em>
+                    </div>
 
+                    <div v-if="N.edit">
+                        <div v-if="N.dest.goal === N.DEST_GOAL.STATION">
+                            <input-station :id.sync="N.dest.st_id" label="target station"></input-station>
+                        </div>
+
+                        <div v-if="N.dest.goal ===  N.DEST_GOAL.SYSTEM">
+                            <input-system :id.sync="N.dest.sys_id" label="target system"></input-system>
+                        </div>
+
+                        <div v-if="N.dest.goal === N.DEST_GOAL.SURFACE">
+                            <input-body :id.sync="N.dest.body_id" label="target body"></input-body>
+                            <div class="ui">
+                                <input type="number" min="-90" max="90" step="any" @focus="$event.target.select()" v-model="N.dest.lat">
+                                <label>lat</label>
+                            </div>
+                            <div class="ui">
+                                <input type="number" min="-180" max="180" step="any" @focus="$event.target.select()" v-model="N.dest.lon">
+                                <label>lon</label>
+                            </div>
+                            <div class="ui" v-if="N.dest.f.includes('-CR')">
+                                <input type="number" @focus="$event.target.select()" v-model="N.dest.r">
+                                <label>target body radius</label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="ui">
+                        <button v-if="!N.edit" v-on:click="dest_edit()"><i class="i-aim"></i> edit destination</button>
+                        <button v-if="N.edit" v-on:click="dest_apply()"><i class="i-aim"></i> apply destination</button>&nbsp;
+                        <button v-on:click="dest_clear()"><i class="i-cross"></i> clear</button>
                     </div>
                 </div>
             </div>
-            <pre>{{navi}}</pre>
-            <div class="container-fluid location-data edfx">
-                <div class="centered">
-                    <div class="alert warn " v-if="!env.body || !env.body.radius">
-                        <i class="i-ed-alert"></i>
-                        <div>No scan data in database</div>
-                        <small>Scan body to identify radius and gravity correctly</small>
-                    </div>
-                    <div>
-                        <h4>{{env.system ? env.system.name : 'UNDEFINED SYSTEM'}}</h4>
-                        <div class="starpos" v-if="env.system"><u v-for="x in env.system.starpos">{{x/32}}; </u></div>
-                        <div v-if="env.body">
-                            <em><b>BODY</b> <span>{{env.body.name || 'N/A'}}</span></em>
-                            <em><b>RADIUS</b> <span>{{env.body.radius / 1000 || null | nn(3,3, 'N/A') }} <u>KM</u></span></em>
-                            <em><b>GRAVITY</b> <span>{{env.body.gravity | nn(3,3, 'N/A')}} <u>G</u></span></em>
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-6 cords justified">
+                    <pre>{{N.status}}</pre>
+                </div>
+                <div class="col-6 cords justified">
+                    <pre>{{N.dest}}</pre>
                 </div>
             </div>
 
+            <!--pre>
+                Can we do SupercruiseExit or ApproachBody on non-landable planets?
+            </pre-->
         </div>
     </div>
 </template>
@@ -83,62 +99,77 @@
 <script>
     import NET from '../ctrl/network'
     import PILOT from '../ctrl/pilot'
+    import InputBody from "../components/input-body";
+    import InputStation from "../components/input-station";
+    import InputSystem from "../components/input-system";
+    import extend from 'deep-extend';
+    import {A} from '../components/alert';
 
-    const _navi = {
+    const N = {
         style_ruler: {'background-position-x': 0},
         style_dest: {'background-position-x': 0},
         status: PILOT.status,
         dest: PILOT.dest,
-        c_radius_km: 1001,
         dest_align: '',
+        edit: false,
+
+        DEST_GOAL: {
+            SURFACE: 'surface',
+            SYSTEM: 'system',
+            STATION: 'station',
+        },
     };
 
     export default {
         name: "navi",
+        components: {InputSystem, InputStation, InputBody},
         data: () => {
             return {
-                dest_on: false,
-                navi: _navi,
-                env: PILOT.env
+                N: N,
+                env: PILOT.env,
+                status: PILOT.status
             }
         },
         methods: {
-            dest_apply: function () {
-                NET.send('dest-apply', {
-                    //todo: you can specify "r" manually
-                    sys_id: null,
-                    body_id: null,
-                    station_id: null,
-                    lat: this.navi.dest.lat,
-                    lon: this.navi.dest.lon,
-                    r: this.env.body.radius || _navi.c_radius_km,
-                    goal: 0 // describe goal condition. reach by default.
-                })
+            set_goal: function (g) {
+                N.dest.goal = g;
             },
-            dest_dismiss: function () {
-                NET.send('dest-dismiss');
-                this.dest_on = false;
+            dest_clear: function () {
+                NET.send('dest-set', null);
+                N.edit = false;
+            },
+            dest_edit: function () {
+                NET.send('dest-toggle', false);
+                if (!N.dest.goal) N.dest.goal = N.DEST_GOAL.SURFACE;
+                N.edit = true;
+            },
+            dest_apply: function () {
+                NET.send('dest-set', N.dest);
+                N.edit = false;
             },
         }
     }
 
 
-    NET.on('uni:dest', (dest) => update_dest());
+    NET.on('uni:dest', (dest) => update_dest(dest));
+    NET.on('uni:dest-set', (dest) => {
+        if (dest.f.includes('/ER')) { N.edit = true; }
+    });
 
-    function update_dest() {
+    function update_dest(dest) {
         let rw = window.innerWidth;
-        let offset = (rw / 2) - _navi.status.head * 4;
-        _navi.style_ruler['background-position-x'] = offset + 'px';
-        if (_navi.dest.enabled) {
-            if (isNaN(_navi.dest.head)) {
-                _navi.style_dest['background-position-x'] = '0px';
-                _navi.dest_align = 'err';
+        let offset = (rw / 2) - N.status.head * 4;
+        N.style_ruler['background-position-x'] = offset + 'px';
+        if (N.dest.enabled) {
+            if (isNaN(N.dest.head)) {
+                N.style_dest['background-position-x'] = '0px';
+                N.dest_align = 'err';
             } else {
-                _navi.style_dest['background-position-x'] = (rw / 2) - ((_navi.status.head - _navi.dest.head) * 4) + 'px';
-                let alg = Math.abs(_navi.dest.head - _navi.status.head);
-                if (alg <= 3) _navi.dest_align = 'alg0';
-                if (alg > 3) _navi.dest_align = 'alg1';
-                if (alg > 10) _navi.dest_align = 'alg2';
+                N.style_dest['background-position-x'] = (rw / 2) - ((N.status.head - N.dest.head) * 4) + 'px';
+                let alg = Math.abs(N.dest.head - N.status.head);
+                if (alg <= 3) N.dest_align = 'alg0';
+                if (alg > 3) N.dest_align = 'alg1';
+                if (alg > 10) N.dest_align = 'alg2';
             }
         }
     }
@@ -152,9 +183,9 @@
 
     #navi {
         header { }
-        .justified em { }
-        .justified em > b { width: 30%}
-        .justified em > span { width: 70%; text-align: left }
+        em { }
+        em > b { width: 30%}
+        em > span { width: 70%; text-align: left }
         .compass {overflow: hidden; height: 145px;margin: 0 -5px 10px -5px;
             .ruler { image-rendering: pixelated;
                 background: transparent url('../../public/assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
@@ -181,17 +212,7 @@
                 .head.err:before { content: 'destination data invalid'; color: $red }
             }
         }
-        .cords {
-            .editable {
-                line-height: 2.4em;
-                b { }
-                span { }
-                span input { border-width: 0 0 1px 0 !important; }
-                span u { }
-            }
-            input[type=number] { width: calc(100% - 2.1em); display: inline-block; text-align: right; line-height: 1.8em; font-size: 1.2em; max-width: 13em; }
-            button { margin-top: 15px}
-        }
+
         .location-data {
             margin-top: 3em;
             h4 { margin-bottom: 0; }

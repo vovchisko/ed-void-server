@@ -16,9 +16,10 @@ export default {
         let dx = v1[0] - v2[0];
         let dy = v1[1] - v2[1];
         let dz = v1[2] - v2[2];
-
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    },
 
-    }
+
+
 
 }

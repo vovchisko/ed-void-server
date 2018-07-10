@@ -77,8 +77,8 @@
                         console.log(err);
                     });
             },
-            select_station: function (station_id = null, external = false) {
-                this.e_id = station_id;
+            select_station: function (st_id = null, external = false) {
+                this.e_id = st_id;
                 if (!external) this.cleanup();
                 this.reset_field();
                 if (!external) this.$emit('update:id', this.e_id);

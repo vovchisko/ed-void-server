@@ -7,10 +7,13 @@ const extend = require('deep-extend');
 const DB = require('./services/database');
 const clog = require('../clog');
 const tools = require('./tools');
-const pick = tools.pick;
-const pickx = tools.pickx;
-const con = tools.convert;
-const checksum = tools.checksum;
+
+
+global.DEST_GOAL = {
+    SURFACE: 'surface',
+    SYSTEM: 'system',
+    STATION: 'station',
+};
 
 
 global.EV_PIPE = 'uni-pipe';
@@ -81,7 +84,7 @@ class Universe extends EE3 {
 
                 this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(false, user._cmdr.current_system_name()));
 
-                user._cmdr.dest_calc();
+                user._cmdr.dest_set(user._cmdr.dest);
 
                 await this.repo_search(user, {uid: user._id});
 
@@ -316,8 +319,9 @@ class Universe extends EE3 {
     }
 
     user_msg(user, c, data) {
-        if (c === 'dest-apply') { return user._cmdr ? user._cmdr.dest_apply(data) : false; }
-        if (c === 'dest-dismiss') {return user._cmdr ? user._cmdr.dest_dismiss() : false;}
+        clog(c, data);
+        if (c === 'dest-set') { return user._cmdr ? user._cmdr.dest_set(data) : false; }
+        if (c === 'dest-toggle') {return user._cmdr ? user._cmdr.dest.enabled = !!data : false;}
         if (c === 'repo-search') return this.repo_search(user, data);
         if (c === 'exp-refresh') return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
         if (c === 'exp-reset') {
@@ -357,9 +361,9 @@ class Universe extends EE3 {
             sys_id: sys._id, // or by sys id
             sys_name: sys.name, // to make search by system easy
             starpos: sys.starpos.slice(), // to make search by pos easy
-            name: con.LOW_CASE(body_name),
+            name: tools.convert.LOW_CASE(body_name),
             name_raw: body_name,
-            short_name: con.LOW_CASE(body_name).replace(sys.name, '').trim() || FIRST_SYS_OBJ,
+            short_name: tools.convert.LOW_CASE(body_name).replace(sys.name, '').trim() || FIRST_SYS_OBJ,
             type: null,
         });
         await b.save();
@@ -390,16 +394,16 @@ class Universe extends EE3 {
         let sys = await this.get_system(sys_id);
         if (!sys) return null;
 
-        let station_id = Universe.station_id(sys_id, station_name);
-        let b = await this.get_station(station_id);
+        let st_id = Universe.st_id(sys_id, station_name);
+        let b = await this.get_station(st_id);
 
         if (b) return new STATION(b);
         b = new STATION({
-            _id: station_id,
+            _id: st_id,
             sys_id: sys._id, // or by sys id
             sys_name: sys.name, // to make search by system easy
             starpos: sys.starpos.slice(), // to make search by pos easy
-            name: con.LOW_CASE(station_name),
+            name: tools.convert.LOW_CASE(station_name),
             name_raw: station_name,
             type: null,
         });
@@ -409,11 +413,11 @@ class Universe extends EE3 {
 
     /**
      * get Station by ID
-     * @param station_id
+     * @param st_id
      * @returns {Promise<STATION>}
      */
-    async get_station(station_id) {
-        let b = await DB.stations.findOne({_id: station_id});
+    async get_station(st_id) {
+        let b = await DB.stations.findOne({_id: st_id});
         if (b) return new STATION(b);
         return null;
     }
@@ -506,568 +510,28 @@ class Universe extends EE3 {
      * @returns {string} Cool System ID
      */
     static sys_id(name, starpos) {
-        return con.LOW_CASE(name) + SEP_SYSTEM + starpos.map(x => Math.round(x * 32)).join(SEP_COORD);
+        return tools.convert.LOW_CASE(name) + SEP_SYSTEM + starpos.map(x => Math.round(x * 32)).join(SEP_COORD);
     }
 
     static body_id(sys_id, body_name) {
-        let n = con.LOW_CASE(body_name).replace(sys_id.split(SEP_SYSTEM)[0], '').trim();
+        let n = tools.convert.LOW_CASE(body_name).replace(sys_id.split(SEP_SYSTEM)[0], '').trim();
         return sys_id + SEP_BODY + (n ? n : FIRST_SYS_OBJ);
     }
 
-    static station_id(sys_id, station_name) {
-        return sys_id + SEP_BODY + con.LOW_CASE(station_name);
+    static st_id(sys_id, station_name) {
+        return sys_id + SEP_BODY + tools.convert.LOW_CASE(station_name);
     }
 
 }
 
-
-class STATION {
-    constructor(station) {
-        this._id = null;
-        this.name = null;
-        this.submited = null;
-        this.upd = 0;
-        extend(this, station);
-    }
-
-    append(cmdr, rec) {
-
-        pickx(rec, this,
-            ['SystemAddress', 'sys_addr'],
-            ['MarketID', 'market_id'],
-            ['StationFaction', 'faction'],
-            ['FactionState', 'faction_state'],
-            ['StationGovernment', 'goverment'],
-            ['StationAllegiance', 'allegiance'],
-            ['StationServices', 'services'],
-            ['StationEconomy', 'economy'],
-            ['StationType', 'type', con.LOW_CASE],
-            ['StationEconomies', 'economies', (ecs) => {
-                if (!ecs) return null;
-                let e = {};
-                for (let i = 0; i < ecs.length; i++) e['Name'] = 'Proportion';
-                return e;
-            }],
-            ['DistFromStarLS', 'arrival'],
-        );
-
-        this.sys_id = cmdr.sys_id;
-        this.starpos = cmdr.starpos.map(x => x);
-
-        if (!this.submited) this.submited = cmdr.name;
-        if (this.upd < rec.timestamp) this.upd = rec.timestamp;
-
-        return this.save();
-    }
-
-
-    async save() {
-        //no temporary fields here...
-        await DB.stations.save(this);
-    }
-}
-
-
-class BODY {
-    constructor(body) {
-        this._id = null;
-        this.name = null;
-        this.type = null;
-        this.submited = null;
-        this.discovered = null;
-        this.upd = 0;
-        extend(this, body);
-    }
-
-    append(cmdr, rec) {
-
-        this.type = tools.scan_obj_type(rec);
-
-        pickx(rec, this,
-            ['BodyName', 'name', con.LOW_CASE],
-            ['BodyName', 'name_raw'],
-            ['BodyID', 'body_id'],
-            ['DistanceFromArrivalLS', 'arrival'],
-            ['Radius', 'radius'],
-
-            //starts
-            ['Luminosity', 'luminosity'],
-            ['StarType', 'class'],
-            ['AbsoluteMagnitude', 'star_absm'],
-            ['Age_MY', 'age'],
-            ['StellarMass', 'mass', con.Sol2GT],
-
-            //planets
-            ['Landable', 'landable', con.toBool, true],
-            ['PlanetClass', 'class'],
-            ['MassEM', 'mass', con.Earth2GT],
-            ['SurfaceGravity', 'surf_gravity', con.GF2Gravity],
-            ['SurfacePressure', 'surf_presure'],
-            ['SurfaceTemperature', 'surf_temperature'],
-            ['TerraformState', 'terraform_state'],
-            ['Volcanism', 'volcanism'],
-            ['Composition', 'composition'],
-            ['Atmosphere', 'atmo'],
-            ['AtmosphereType', 'atmo_type'],
-            ['ReserveLevel', 'reserve_level'],
-
-            //orbit / rotatation / position
-            ['Parents', 'parents'],
-            ['SemiMajorAxis', 'o_smaxis'],
-            ['Eccentricity', 'o_eccentricity'],
-            ['OrbitalInclination', 'o_inclination'],
-            ['Periapsis', 'o_periapsis'],
-            ['OrbitalPeriod', 'o_period'],
-            ['RotationPeriod', 'rot_period'],
-            ['AxialTilt', 'rot_axial_tilt'],
-            ['TidalLock', 'rot_tidal_lock'],
-        );
-
-        if (rec.AtmosphereComposition) {
-            if (!this.atmo_composition) this.atmo_composition = {};
-            for (let i in rec.AtmosphereComposition) this.atmo_composition[rec.AtmosphereComposition[i].Name] = rec.AtmosphereComposition[i].Percent;
-        }
-
-        if (rec.Materials) {
-            if (!this.materials) this.materials = {};
-            for (let i in rec.Materials) this.materials[rec.Materials[i].Name] = rec.Materials[i].Percent;
-        }
-
-        if (rec.Rings) {
-            if (!this.rings) this.rings = [];
-            for (let i in rec.Rings) {
-                this.rings.push({
-                    name: rec.Rings[i].Name,
-                    clas: rec.Rings[i].RingClass,
-                    mass: rec.Rings[i].MassMT / 1000, //GT
-                    r_inner: rec.Rings[i].InnerRad / 1000,
-                    r_outer: rec.Rings[i].OuterRad / 1000,
-                });
-            }
-        }
-
-        if (!this.submited) this.submited = cmdr.name;
-        if (this.upd < rec.timestamp) this.upd = rec.timestamp;
-
-        return this.save();
-    }
-
-    async save() {
-        //no temporary fields here...
-        await DB.bodies.save(this);
-    }
-}
-
-class SYSTEM {
-    constructor(sys) {
-        this._id = null;
-        this.name = null;
-        this.submited = null;
-        this.upd = 0;
-        this.ds_count = 0;
-        extend(this, sys);
-    }
-
-    append(cmdr, rec) {
-        pickx(rec, this,
-            ['StarSystem', 'name', con.LOW_CASE],
-            ['StarSystem', 'name_raw'],
-            ['StarPos', 'starpos', arr => arr.map((x) => {return Math.floor(x * 32)})],
-            ['SystemSecurity', 'security'],
-            ['SystemEconomy', 'economy'],
-            ['Population', 'population'],
-            ['SystemAllegiance', 'allegiance'],
-            ['SystemGovernment', 'government'],
-            ['SystemFaction', 'faction'],
-        );
-
-        if (rec.Factions) {
-            this.factions = [];
-            for (let i in rec.Factions) {
-                let fa = {};
-                pickx(rec.Factions[i], fa,
-                    ['Name', 'name'],
-                    ['FactionState', 'state'],
-                    ['Government', 'gov'],
-                    ['Influence', 'influence'],
-                    ['Allegiance', 'allegiance'],
-                    ['PendingStates', 'state_pending'],
-                    ['RecoveringStates', 'state_recovering'],
-                );
-                this.factions.push(fa);
-            }
-        }
-
-
-        if (!this.submited) this.submited = cmdr.name;
-        if (this.upd < rec.timestamp) this.upd = rec.timestamp;
-
-        return this.save();
-    }
-
-
-    async save() {
-        //no temporary fields here...
-        await DB.systems.save(this);
-    }
-}
-
-
-class USER {
-    constructor(data) {
-        this._id = '';
-        this._ch = true;
-        this.email = '';
-        this.api_key = '';
-        this.cmdr_name = '';
-        this.last_rec = new Date(0);
-        this.cmdrs = [];
-        this.online = false;
-        this.dev = false;
-        this.valid = false;
-        this._rec_left = 0;
-        this._overload = false;
-        this._overtimeout = null;
-        this._cmdr = null;
-        this._data = {};
-        extend(this, data);
-    }
-
-    track_overload(records_left = null) {
-
-        if (records_left === null) {
-            records_left = this._rec_left;
-        }
-
-        if (records_left && !this._overload) {
-            UNI.emitf(EV_NET, this._id, 'overload', true);
-            this._overload = true;
-        }
-
-        if (records_left === 0) {
-            if (this._overtimeout) {
-                clearTimeout(this._overtimeout);
-                this._overtimeout = null;
-            }
-            //re-fill timeout
-            this._overtimeout = setTimeout(() => {
-                if (this._rec_left && this._overload) return;
-                if (this._overload && !this._rec_left) {
-                    this._overload = false;
-                    UNI.emit(EV_NET, this._id, 'overload', false);
-                    UNI.refill_user(this._id);
-
-                    clearTimeout(this._overtimeout);
-                    this._overtimeout = null;
-                }
-            }, 800);
-        }
-        this._rec_left = records_left;
-    }
-
-    async init() {
-        if (this.cmdr_name) this._cmdr = await UNI.get_cmdr(this._id, this.cmdr_name);
-    }
-
-    async set_cmdr(name) {
-        if (!name) return;
-        this._cmdr = await UNI.get_cmdr(this._id, name);
-        this.cmdr_name = name;
-        if (!this.cmdrs.includes(name)) {
-            this.cmdrs.push(name);
-            await this._cmdr.journal_index();
-        }
-        this._ch = true;
-        UNI.emit(EV_NET, this._id, 'user', this.data());
-        UNI.emit(EV_NET, this._id, 'cmdr', this._cmdr.data());
-    }
-
-    touch(data = null) {
-        if (data) extend(this, data);
-        this._ch = true;
-    }
-
-    data() {
-        return pickx(this, this._data,
-            ['email', 'email'],
-            ['api_key', 'api_key'],
-            ['last_rec', 'last_rec'],
-            ['cmdrs', 'cmdrs'],
-            ['online', 'online'],
-            ['dev', 'dev'],
-            ['valid', 'valid'],
-        );
-    }
-
-    async save() {
-        if (!this._ch) return;
-
-        let snapshot = {};
-
-        for (let p in this)
-            if (p[0] !== '_' || p === '_id') snapshot[p] = this[p];
-
-        await DB.users.save(snapshot);
-        this._ch = false;
-    }
-
-
-}
-
-class CMDR {
-    constructor(cmdr_data) {
-        this._id = null;
-        this._ch = true;
-        this.uid = null;
-        this.name = null;
-        this.last_rec = new Date(0);
-        this.sys_id = null;
-        this.body_id = null;
-        this.starpos = [0, 0, 0];
-        this.metrics = {curr_ds: 0};
-        this.status = {
-            flags: 0,
-            pips: [0, 0, 0],
-            fgroup: 0,
-            lat: null,
-            lon: null,
-            alt: null,
-            head: null,
-        };
-        this.dest = {
-            enabled: false,
-            sys_id: null,
-            body_id: null,
-            lat: 0,
-            lon: 0,
-            r: 1000,
-            head: null,
-        };
-        this._exp = null;
-        this._data = {};
-
-        extend(this, cmdr_data);
-        this.journal_id = `${this.uid}/${DB.shash(this.name)}`;
-    }
-
-    async dest_apply(d) {
-
-        //todo: add Station_ID when it comes around
-
-        if (!d) {
-            this.dest.enabled = false;
-            return;
-        } else {
-            this.dest.enabled = true;
-        }
-
-        if (d.sys_id) {
-            let sys = await UNI.get_system(d.sys_id);
-            this.dest.sys_id = sys ? sys._id : null;
-        }
-
-        if (d.body_id) {
-            let body = await UNI.get_body(d.body_id);
-            if (body) {
-                this.dest.body_id = body._id;
-                this.dest.sys_id = body.sys_id;
-                this.dest.r = body.radius;
-            }
-        } else {
-            //todo: get radius from body by body name if it possible
-            this.dest.body_id = null;
-            this.dest.sys_id = null;
-            this.dest.r = d.r || 1000;
-        }
-
-        this.dest.lat = parseFloat(d.lat);
-        this.dest.lon = parseFloat(d.lon);
-
-        this.dest_calc();
-
-    }
-
-    dest_calc() {
-        if (this.dest.enabled) {
-            if (this.status.alt === null) return;
-            let latStart = this.status.lat * Math.PI / 180;
-            let lonStart = this.status.lon * Math.PI / 180;
-            let latDest = this.dest.lat * Math.PI / 180;
-            let lonDest = this.dest.lon * Math.PI / 180;
-            let deltaLon = lonDest - lonStart;
-            let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
-            let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
-            if (initialBearing < 0) initialBearing = 360 + initialBearing;
-            this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
-            this.dest.head = Math.floor(initialBearing);
-            if (isNaN(this.dest.head)) this.dest.head = 'ERR';
-            UNI.emitf(EV_NET, this.uid, 'dest', this.dest);
-        }
-    }
-
-    dest_dismiss() {
-        this.dest.enabled = false;
-    }
-
-    journal() {
-        return DB.journal(`${this.uid}/${DB.shash(this.name)}`);
-    }
-
-    journal_index() {
-        return DB.journal_index(`${this.uid}/${DB.shash(this.name)}`);
-    }
-
-    async init() {
-        let exp = await DB.exp_data.findOne({_id: this._id});
-        if (!exp) {
-            this._exp = new EXP_DATA({_id: this._id});
-        } else {
-            this._exp = new EXP_DATA(exp);
-        }
-    }
-
-    current_system_name() {
-        if (!this.sys_id) return 'unknown';
-        return this.sys_id.split('@')[0];
-    }
-
-    __reset() {
-        this.sys_id = null;
-        this.body_id = null;
-        this.starpos = [0, 0, 0];
-        this.metrics.curr_ds = 0;
-        this.status = {};
-        this._exp.reset();
-    }
-
-    touch(data = null) {
-        if (data) extend(this, data);
-        this._ch = true;
-        if (this.uid) UNI.emit(EV_NET, this.uid, 'cmdr', this.data());
-    }
-
-    data() {
-        return pickx(this, this._data,
-            ['name', 'name'],
-            ['last_rec', 'last_rec'],
-            ['sys_id', 'sys_id'],
-            ['body_id', 'body_id'],
-            ['starpos', 'starpos'],
-            ['metrics', 'metrics'],
-        );
-    }
-
-    async save() {
-        this._exp.save();
-        if (!this._ch) return;
-        if (!this._id || !this.uid) return;
-        let snapshot = {};
-        for (let p in this)
-            if (p[0] !== '_' || p === '_id') snapshot[p] = this[p];
-        await DB.cmdrs.save(snapshot);
-        this._ch = false;
-    }
-}
-
-class EXP_DATA {
-    constructor(exp_data) {
-        this._id = null;
-        this._ch = true;
-        this.total = 0;
-        this.sys_count = 0;
-        this.summ = {p: 0, s: 0, c: 0,};
-        this.systems = {};
-
-        extend(this, exp_data)
-    }
-
-    reset() {
-        this.total = 0;
-        this.sys_count = 0;
-        this.summ = {p: 0, s: 0, c: 0,};
-        this.systems = {};
-        this._ch = true;
-    }
-
-    async exp_data_add(rec, c_sys_id) {
-
-        let scan_type = tools.scan_obj_type(rec);
-
-        if (!scan_type) return;
-
-        //get current system in lower case
-        let sys_name = c_sys_id.split('@')[0];
-        let body_name = con.LOW_CASE(rec.BodyName).replace(sys_name, '').trim();
-        if (!body_name) body_name = '*';
-
-        if (!this.systems[sys_name]) this.systems[sys_name] = {upd: 0, bodies: {}};
-        this.systems[sys_name].upd = Date.now();
-
-        this.systems[sys_name].bodies[body_name] = {t: scan_type[0], v: tools.estimate_scan(rec)};
-
-        this.calc();
-
-        this._ch = true;
-    }
-
-    get_exp_data(detailed = false, curr_system_name = undefined) {
-        this.calc();
-
-        return {
-            total: this.total,
-            sys_count: this.sys_count,
-            summ: this.summ,
-            systems: detailed ? this.systems : undefined,
-            curr_system: curr_system_name ? this.systems[curr_system_name] : undefined
-        }
-    }
-
-    async exp_data_sell(cmdr, rec) {
-
-        for (let i in rec.Systems) {
-            let sys = con.LOW_CASE(rec.Systems[i]);
-            delete this.systems[sys];
-        }
-
-        if (rec.Discovered)
-            for (let i = 0; i < rec.Discovered.length; i++) {
-                let b_name = con.LOW_CASE(rec.Discovered[i]);
-                await DB.exp_discovered.save({_id: b_name, cmdr: cmdr.name});
-            }
-
-        this.calc();
-
-        this._ch = true;
-        await this.save();
-    }
-
-    calc() {
-        this.total = 0;
-        this.sys_count = 0;
-
-        for (let i in this.summ) {
-            this.summ[i] = 0;
-        }
-
-        for (let s in this.systems) {
-            this.sys_count++;
-            for (let b in this.systems[s].bodies) {
-                this.total += this.systems[s].bodies[b].v;
-                this.summ[this.systems[s].bodies[b].t]++;
-            }
-        }
-    }
-
-    async save() {
-        if (!this._ch) return;
-        let snapshot = {};
-        for (let p in this) if (p[0] !== '_' || p === '_id') snapshot[p] = this[p];
-        await DB.exp_data.save(snapshot);
-        this._ch = false;
-    }
-}
 
 const UNI = new Universe();
 module.exports = UNI;
+
+let CMDR = require('./cmdr').init(UNI, DB);
+let SYSTEM = require('./system').init(UNI, DB);
+let BODY = require('./body').init(UNI, DB);
+let USER = require('./user').init(UNI, DB);
+let STATION = require('./station').init(UNI, DB);
 
 

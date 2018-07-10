@@ -209,6 +209,15 @@ function safe_regexp(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
+function not_nulled(obj) {
+    let ret = {};
+    for (let i in obj) {
+        if (obj[i]) ret[i] = obj[i]
+    }
+    return ret;
+}
+
+module.exports.not_nulled = not_nulled;
 module.exports.safe_regexp = safe_regexp;
 module.exports.circle_intersect = circle_intersect;
 module.exports.scan_obj_type = scan_obj_type;

@@ -52,7 +52,7 @@
 
                     <input-body v-bind:id.sync="test.body_id" label="target body"></input-body>
                     <input-system v-bind:id.sync="test.sys_id" label="target system"></input-system>
-                    <input-station v-bind:id.sync="test.station_id" label="target station"></input-station>
+                    <input-station v-bind:id.sync="test.st_id" label="target station"></input-station>
 
                 </div>
             </div>
@@ -91,7 +91,7 @@
                 uni: dev.uni,
                 test: {
                     sys_id: null,
-                    station_id: null,
+                    st_id: null,
                     body_id: null,
                     a: [0, 0, 0],
                     b: [0, 0, 0],
@@ -106,7 +106,7 @@
             external_change: function () {
                 this.test.sys_id = 'apoyota@-1078:-139:1964';
                 this.test.body_id = 'apoyota@-1078:-139:1964/b 4';
-                this.test.station_id = 'mundii@2738:-34:-12/elder hub';
+                this.test.st_id = 'mundii@2738:-34:-12/elder hub';
                 this.test.a = [50, 6520, 567];
                 this.test.b = [33, 15, 21];
             }

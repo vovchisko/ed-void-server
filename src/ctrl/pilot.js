@@ -22,16 +22,36 @@ const PILOT = {
     },
     dest: {
         enabled: false,
-        lat: 0, lon: 0, head: 0, dist: 0,
+        goal: null,
+        lat: null, lon: null, head: null, dist: null, r: null,
+        sys_id: null,
+        body_id: null,
+        st_id: null,
+        f: '',
     },
     env: {body: null, system: null, station: null},
     exp_data: {},
+    dest_clear: function () {
+        extend(this.dest, {
+            enabled: false,
+            goal: null,
+            lat: null, lon: null, head: null, dist: null, r: null,
+            sys_id: null,
+            body_id: null,
+            st_id: null,
+        });
+    },
+    dest_set(dest) {
+        this.dest_clear();
+        extend(this.dest, dest)
+    }
 };
 
-NET.on('uni:dest', (dat) => extend(PILOT.dest, dat));
-NET.on('uni:cmdr', (dat) => extend(PILOT.cmdr, dat));
-NET.on('uni:status', (dat) => extend(PILOT.status, dat));
-NET.on('uni:c_system', (dat) => Vue.set(PILOT.env, 'system', dat));
-NET.on('uni:c_body', (dat) => Vue.set(PILOT.env, 'body', dat));
+NET.on('uni:dest-set', (dest) => PILOT.dest_set(dest));
+NET.on('uni:dest', (dest) => extend(PILOT.dest, dest));
+NET.on('uni:cmdr', (cmdr) => extend(PILOT.cmdr, cmdr));
+NET.on('uni:status', (status) => extend(PILOT.status, status));
+NET.on('uni:c_system', (system) => Vue.set(PILOT.env, 'system', system));
+NET.on('uni:c_body', (body) => Vue.set(PILOT.env, 'body', body));
 
 export default PILOT;

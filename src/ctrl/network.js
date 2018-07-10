@@ -29,6 +29,7 @@ class Network extends EventEmitter3 {
         };
         this.ws.onmessage = (msg) => {
             let m = JSON.parse(msg.data);
+            console.log(m.c, m.dat);
             if (this.warn_unlistened && !this._events[m.c]) console.warn('master::no_listeners', m.c, m.dat);
             this.emit(m.c, m.dat);
             this.emit('net:any', m.c, m.dat);
