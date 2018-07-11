@@ -49,6 +49,7 @@ class CMDR {
             r: null,
             head: null,
             f: '',
+            done: false,
         };
         this._exp = null;
         this._data = {};
@@ -79,7 +80,7 @@ class CMDR {
                     this.dest.sys_id = body.sys_id;
 
                     if (body.radius) {
-                        this.dest.r = body.radius;
+                        this.dest.r = body.radius / 1000;
                         this.dest.enabled = true; //success
                     } else {
                         this.dest.f += '/WA-CR';
@@ -135,21 +136,30 @@ class CMDR {
     }
 
     dest_calc() {
-        if (this.dest.enabled && this.dest.goal === DEST_GOAL.SURFACE) {
-            if (this.status.alt === null) return;
-            let latStart = this.status.lat * Math.PI / 180;
-            let lonStart = this.status.lon * Math.PI / 180;
-            let latDest = this.dest.lat * Math.PI / 180;
-            let lonDest = this.dest.lon * Math.PI / 180;
-            let deltaLon = lonDest - lonStart;
-            let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
-            let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
-            if (initialBearing < 0) initialBearing = 360 + initialBearing;
-            this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
-            this.dest.head = Math.floor(initialBearing);
-            if (isNaN(this.dest.head)) this.dest.head = 'ERR';
-            UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
+        if(!this.dest.enabled) return false;
+
+        if (this.dest.sys_id && this.dest.sys_id !== this.sys_id) {
+            //todo: something here...
         }
+
+        if (this.dest.goal === DEST_GOAL.SURFACE) {
+            if (this.dest.enabled) {
+                if (this.status.alt === null) return;
+                let latStart = this.status.lat * Math.PI / 180;
+                let lonStart = this.status.lon * Math.PI / 180;
+                let latDest = this.dest.lat * Math.PI / 180;
+                let lonDest = this.dest.lon * Math.PI / 180;
+                let deltaLon = lonDest - lonStart;
+                let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
+                let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
+                if (initialBearing < 0) initialBearing = 360 + initialBearing;
+                this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
+                this.dest.head = Math.floor(initialBearing);
+                if (isNaN(this.dest.head)) this.dest.head = 'ERR';
+                UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
+            }
+        }
+
     }
 
     dest_clear() {

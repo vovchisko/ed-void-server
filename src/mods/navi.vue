@@ -3,16 +3,18 @@
 
         <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}{{env.station ? env.body.station : '' }}</header>
 
-        <div class="alert info edfx" v-if="!status.alt">
+        <div class="alert info edfx" v-if="N.status.head === null">
             <i class="i-ed-alert"></i>
-            <h4>approach to the body</h4>
+            <h4>Approach to the body
+                <div class="objective">{{N.dest.body_id}}</div>
+            </h4>
             <p>nav-module will engage automatically on approach</p>
         </div>
 
-        <div class="navi-surf" v-if="status.alt">
+        <div class="navi-surf" v-if="N.status.head !== null">
             <div class="compass edfx">
                 <div class="ruler" v-bind:style="N.style_ruler">
-                    <b class="head">{{status.head}}</b>
+                    <b class="head">{{N.status.head}}</b>
                 </div>
                 <div class="dest" v-if="N.dest.head" v-bind:style="N.style_dest">
                     <b class="head" v-bind:class="N.dest_align">{{N.dest.head}}</b>
@@ -28,10 +30,10 @@
                     <em v-if="env.system"><b>SYSTEM</b><span>{{env.system.name}}</span></em>
                     <em v-if="env.body"><b>BODY</b><span>{{env.body.name}}</span></em>
                     <em v-if="env.station"><b>ST</b><span>{{env.station.name}}</span></em>
-                    <em v-if="!env.station && !env.station"><b>&nbsp;</b><span>deep space</span></em>
-                    <em v-if="status.alt"><b>LAT</b><span>{{status.lat}} <u>°</u></span></em>
-                    <em v-if="status.alt"><b>LON</b><span>{{status.lon}} <u>°</u></span></em>
-                    <em v-if="status.alt"><b>ALT</b><span>{{status.alt}} <u>M</u></span></em>
+                    <em v-if="!env.station && !env.body"><b>&nbsp;</b><span>deep space</span></em>
+                    <em v-if="N.status.alt"><b>LAT</b><span>{{N.status.lat}} <u>°</u></span></em>
+                    <em v-if="N.status.alt"><b>LON</b><span>{{N.status.lon}} <u>°</u></span></em>
+                    <em v-if="N.status.alt"><b>ALT</b><span>{{N.status.alt}} <u>M</u></span></em>
                 </div>
                 <div class="col-sm">
                     <div class="ui" v-if="N.edit" >
@@ -127,7 +129,6 @@
             return {
                 N: N,
                 env: PILOT.env,
-                status: PILOT.status
             }
         },
         methods: {
