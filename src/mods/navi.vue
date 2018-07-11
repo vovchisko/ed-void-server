@@ -43,7 +43,7 @@
                         <em v-if="N.dest.st_id"><b>ST</b><span>{{N.dest.st_id}}</span></em>
                         <em v-if="N.dest.body_id"><b>BODY</b><span>{{N.dest.body_id}}</span></em>
                         <em v-if="N.dest.head"><b>HEAD</b><span>{{N.dest.head | nn(0,0)}} <u>°</u></span></em>
-                        <em v-if="N.dest.dist"><b>DIST</b><span>{{N.dest.dist / 1000 | nn(3,3)}} <u>KM</u></span></em>
+                        <em v-if="N.dest.dist"><b>DIST</b><span>{{N.dest.dist | nn(3,3)}} <u>KM</u></span></em>
                     </div>
 
                     <div v-if="N.edit">

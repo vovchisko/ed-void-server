@@ -67,7 +67,7 @@ class Universe extends EE3 {
                 let scans = user._cmdr.journal()
                     .find({event: {$in: ['Scan', 'FSDJump']}})
                     .sort({timestamp: -1})
-                    .limit(32);
+                    .limit(16);
 
 
                 scans.forEach((rec) => { this.emit(EV_PIPE, user._id, rec.event, rec) });
@@ -80,6 +80,11 @@ class Universe extends EE3 {
                 if (user._cmdr.body_id) {
                     let body = await this.get_body(user._cmdr.body_id);
                     this.emit(EV_NET, uid, 'c_body', body);
+                }
+
+                if (user._cmdr.st_id) {
+                    let st = await this.get_station(user._cmdr.st_id);
+                    this.emit(EV_NET, uid, 'c_station', st);
                 }
 
                 this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(false, user._cmdr.current_system_name()));
@@ -175,6 +180,7 @@ class Universe extends EE3 {
             if (rec.event === 'DiscoveryScan') return this.proc_DiscoveryScan(cmdr, rec);
             if (rec.event === 'NavBeaconScan') return this.proc_NavBeaconScan(cmdr, rec);
             if (rec.event === 'Docked') return this.proc_Docked(cmdr, rec);
+            if (rec.event === 'Undocked') return this.proc_Undocked(cmdr, rec);
             if (rec.event === 'SupercruiseExit') return this.proc_SupercruiseExit(cmdr, rec);
         } catch (e) {
             clog('UNI.process()', rec.event, e);
@@ -225,10 +231,17 @@ class Universe extends EE3 {
     }
 
 
+    async proc_Undocked(cmdr, Docked) {
+        cmdr.touch({st_id: null});
+        this.emit(EV_NET, cmdr.uid, 'c_station', null);
+
+    }
     async proc_Docked(cmdr, Docked) {
         let station = await this.spawn_station(Docked.StationName, cmdr.sys_id);
         if (!station) return;
         await station.append(cmdr, Docked);
+
+        cmdr.touch({st_id: station._id});
 
         this.emit(EV_NET, cmdr.uid, 'c_station', station);
     }

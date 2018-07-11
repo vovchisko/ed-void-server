@@ -53,5 +53,6 @@ NET.on('uni:cmdr', (cmdr) => extend(PILOT.cmdr, cmdr));
 NET.on('uni:status', (status) => extend(PILOT.status, status));
 NET.on('uni:c_system', (system) => Vue.set(PILOT.env, 'system', system));
 NET.on('uni:c_body', (body) => Vue.set(PILOT.env, 'body', body));
+NET.on('uni:c_station', (station) => Vue.set(PILOT.env, 'station', station));
 
 export default PILOT;

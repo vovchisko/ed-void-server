@@ -129,7 +129,7 @@ class CMDR {
 
 
         this.dest_calc();
-        console.log('DEST::', d, this.dest);
+
         UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
 
     }
