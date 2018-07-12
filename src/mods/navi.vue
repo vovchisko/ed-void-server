@@ -11,16 +11,9 @@
             <p>nav-module will engage automatically on approach</p>
         </div>
 
-        <div class="navi-surf" v-if="N.status.head !== null">
-            <div class="compass edfx">
-                <div class="ruler" v-bind:style="N.style_ruler">
-                    <b class="head">{{N.status.head}}</b>
-                </div>
-                <div class="dest" v-if="N.dest.head" v-bind:style="N.style_dest">
-                    <b class="head" v-bind:class="N.dest_align">{{N.dest.head}}</b>
-                </div>
-            </div>
-        </div>
+
+
+        <navigator></navigator>
 
         <div class="container-fluid">
 
@@ -108,12 +101,11 @@
     import InputBody from "../components/input-body";
     import InputStation from "../components/input-station";
     import InputSystem from "../components/input-system";
-    import extend from 'deep-extend';
+    import Navigator from "../components/navigator";
     import {A} from '../components/alert';
 
     const N = {
-        style_ruler: {'background-position-x': 0},
-        style_dest: {'background-position-x': 0},
+
         status: PILOT.status,
         dest: PILOT.dest,
         dest_align: '',
@@ -129,7 +121,7 @@
 
     export default {
         name: "navi",
-        components: {InputSystem, InputStation, InputBody},
+        components: {InputSystem, InputStation, InputBody, Navigator},
         data: () => {
             return {
                 N: N,
@@ -156,30 +148,10 @@
         }
     }
 
-
-    NET.on('uni:status', (dest) => update_head(dest));
-    NET.on('uni:dest', (dest) => update_head(dest));
     NET.on('uni:dest-set', (dest) => {
         if (dest.f.includes('/ER')) { N.edit = true; }
     });
 
-    function update_head(dest) {
-        let rw = window.innerWidth;
-        let offset = (rw / 2) - N.status.head * 4;
-        N.style_ruler['background-position-x'] = offset + 'px';
-        if (N.dest.enabled) {
-            if (isNaN(N.dest.head)) {
-                N.style_dest['background-position-x'] = '0px';
-                N.dest_align = 'err';
-            } else {
-                N.style_dest['background-position-x'] = (rw / 2) - ((N.status.head - N.dest.head) * 4) + 'px';
-                let alg = Math.abs(N.dest.head - N.status.head);
-                if (alg <= 3) N.dest_align = 'alg0';
-                if (alg > 3) N.dest_align = 'alg1';
-                if (alg > 10) N.dest_align = 'alg2';
-            }
-        }
-    }
 
 </script>
 
