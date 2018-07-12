@@ -40,6 +40,9 @@ class USER {
 
     track_overload(records_left = null) {
 
+        if (records_left && records_left < 3 && !this._overload)
+            return console.log('...ignore low track_overload(' + records_left + '); this._rec_left = ' + this._rec_left);
+
         if (records_left === null) {
             records_left = this._rec_left;
         }

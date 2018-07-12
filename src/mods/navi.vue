@@ -1,7 +1,7 @@
 <template>
     <div id="navi">
 
-        <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}{{env.station ? env.body.station : '' }}</header>
+        <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}{{env.station ? ' / ' +  env.station.name : '' }}</header>
 
         <div class="alert info edfx" v-if="N.status.head === null">
             <i class="i-ed-alert"></i>
@@ -55,6 +55,10 @@
 
                         <div v-if="N.dest.goal ===  N.DEST_GOAL.SYSTEM">
                             <input-system :id.sync="N.dest.sys_id" label="target system"></input-system>
+                        </div>
+
+                        <div v-if="N.dest.goal ===  N.DEST_GOAL.BODY">
+                            <input-body :id.sync="N.dest.body_id" label="target body (approach)"></input-body>
                         </div>
 
                         <div v-if="N.dest.goal === N.DEST_GOAL.SURFACE">
@@ -117,6 +121,7 @@
 
         DEST_GOAL: {
             SURFACE: 'surface',
+            BODY: 'body',
             SYSTEM: 'system',
             STATION: 'station',
         },
@@ -152,12 +157,13 @@
     }
 
 
-    NET.on('uni:dest', (dest) => update_dest(dest));
+    NET.on('uni:status', (dest) => update_head(dest));
+    NET.on('uni:dest', (dest) => update_head(dest));
     NET.on('uni:dest-set', (dest) => {
         if (dest.f.includes('/ER')) { N.edit = true; }
     });
 
-    function update_dest(dest) {
+    function update_head(dest) {
         let rw = window.innerWidth;
         let offset = (rw / 2) - N.status.head * 4;
         N.style_ruler['background-position-x'] = offset + 'px';

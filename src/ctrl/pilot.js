@@ -28,6 +28,7 @@ const PILOT = {
         body_id: null,
         st_id: null,
         f: '',
+        x: 0,
     },
     env: {body: null, system: null, station: null},
     exp_data: {},
@@ -39,6 +40,8 @@ const PILOT = {
             sys_id: null,
             body_id: null,
             st_id: null,
+            f: '',
+            x: 0,
         });
     },
     dest_set(dest) {

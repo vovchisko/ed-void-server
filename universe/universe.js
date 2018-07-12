@@ -11,6 +11,7 @@ const tools = require('./tools');
 
 global.DEST_GOAL = {
     SURFACE: 'surface',
+    BODY: 'body',
     SYSTEM: 'system',
     STATION: 'station',
 };
@@ -105,16 +106,18 @@ class Universe extends EE3 {
 
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
-        extend(user._cmdr.status, {
-            focus: Status.GuiFocus || null,
-            flags: Status.Flags,
-            pips: Status.Pips,
-            fgroup: Status.FireGroup || 0,
-            lat: typeof Status.Latitude !== 'undefined' ? parseFloat(Status.Latitude) : null,
-            lon: typeof Status.Longitude !== 'undefined' ? parseFloat(Status.Longitude) : null,
-            alt: typeof Status.Altitude !== 'undefined' ? parseFloat(Status.Altitude) : null,
-            head: typeof Status.Heading !== 'undefined' ? parseFloat(Status.Heading) : null,
-        });
+
+        user._cmdr.trail();
+
+        user._cmdr.status.focus = Status.GuiFocus || null;
+        user._cmdr.status.flags = Status.Flags;
+        user._cmdr.status.pips = Status.Pips;
+        user._cmdr.status.fgroup = Status.FireGroup || 0;
+        user._cmdr.status.lat = typeof Status.Latitude !== 'undefined' ? parseFloat(Status.Latitude) : null;
+        user._cmdr.status.lon = typeof Status.Longitude !== 'undefined' ? parseFloat(Status.Longitude) : null;
+        user._cmdr.status.alt = typeof Status.Altitude !== 'undefined' ? parseFloat(Status.Altitude) : null;
+        user._cmdr.status.head = typeof Status.Heading !== 'undefined' ? parseFloat(Status.Heading) : null;
+
         user._cmdr._ch = true; // but mark as changed
         if (user._cmdr.dest.enabled) user._cmdr.dest_calc();
 
@@ -234,23 +237,21 @@ class Universe extends EE3 {
     async proc_Undocked(cmdr, Docked) {
         cmdr.touch({st_id: null});
         this.emit(EV_NET, cmdr.uid, 'c_station', null);
-
+        cmdr.dest_calc();
     }
+
     async proc_Docked(cmdr, Docked) {
         let station = await this.spawn_station(Docked.StationName, cmdr.sys_id);
         if (!station) return;
         await station.append(cmdr, Docked);
-
         cmdr.touch({st_id: station._id});
-
         this.emit(EV_NET, cmdr.uid, 'c_station', station);
+        cmdr.dest_calc();
     }
 
     async proc_DiscoveryScan(cmdr, rec) {
-
         cmdr.metrics.curr_ds += rec.Bodies;
         cmdr.touch();
-
         await UNI.get_system(cmdr.sys_id)
             .then((system) => {
                 if (!system) return;
@@ -263,11 +264,8 @@ class Universe extends EE3 {
     }
 
     async proc_NavBeaconScan(cmdr, rec) {
-
         cmdr.metrics.curr_ds = rec.NumBodies;
-
         cmdr.touch();
-
         await UNI.get_system(cmdr.sys_id)
             .then((system) => {
                 if (!system) return;
@@ -275,22 +273,21 @@ class Universe extends EE3 {
                     system.ds_count = cmdr.metrics.curr_ds;
                 return system.save();
             });
-
     }
 
     async proc_LeaveBody(cmdr, LeaveBody) {
-        cmdr.touch({
-            body_id: null,
-        });
+        cmdr.touch({body_id: null});
         this.emit(EV_NET, cmdr.uid, 'c_body', null);
+        cmdr.dest_calc();
+
     }
 
     async proc_ApproachBody(cmdr, ApproachBody) {
         let body = await this.spawn_body(ApproachBody.Body, cmdr.sys_id);
-        cmdr.touch({
-            body_id: body._id
-        });
+        cmdr.touch({body_id: body._id});
         this.emit(EV_NET, cmdr.uid, 'c_body', body);
+        cmdr.dest_calc();
+
     }
 
     async proc_Location(cmdr, Location) {
@@ -310,24 +307,24 @@ class Universe extends EE3 {
         }
         cmdr.touch(td);
 
+        cmdr.dest_calc();
+
     }
 
     async proc_FSDJump(cmdr, FSDJump) {
         let sys = await this.spawn_system(FSDJump.StarSystem, FSDJump.StarPos);
         if (!sys) return;
         sys.append(cmdr, FSDJump);
-
-
         cmdr.touch({
             sys_id: sys._id,
             starpos: sys.starpos,
             body_id: null,
             metrics: {curr_ds: 0}
         });
-
         this.emit(EV_NET, cmdr.uid, 'c_system', sys);
+        cmdr.dest_calc();
 
-        return this.emit(EV_NET, cmdr.uid, 'exp-data', cmdr._exp.get_exp_data(false, cmdr.current_system_name()));
+        this.emit(EV_NET, cmdr.uid, 'exp-data', cmdr._exp.get_exp_data(false, cmdr.current_system_name())); //todo: why? WHY??? what if you racing?
 
     }
 
@@ -360,7 +357,6 @@ class Universe extends EE3 {
      * @returns {Promise<BODY>}
      */
     async spawn_body(body_name, sys_id) {
-
         //find system
         let sys = await this.get_system(sys_id);
         if (!sys) return null;

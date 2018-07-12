@@ -27,6 +27,7 @@ class CMDR {
         this.last_rec = new Date(0);
         this.sys_id = null;
         this.body_id = null;
+        this.st_id = null;
         this.starpos = [0, 0, 0];
         this.metrics = {curr_ds: 0};
         this.status = {
@@ -49,8 +50,9 @@ class CMDR {
             r: null,
             head: null,
             f: '',
-            done: false,
+            x: 0,
         };
+        this._trail = {};
         this._exp = null;
         this._data = {};
 
@@ -74,13 +76,13 @@ class CMDR {
             case DEST_GOAL.SURFACE:
                 this.dest.goal = d.goal;
 
-                let body = d.body_id ? await UNI.get_body(d.body_id) : null;
-                if (body) {
-                    this.dest.body_id = body._id;
-                    this.dest.sys_id = body.sys_id;
+                let sbody = d.body_id ? await UNI.get_body(d.body_id) : null;
+                if (sbody) {
+                    this.dest.body_id = sbody._id;
+                    this.dest.sys_id = sbody.sys_id;
 
-                    if (body.radius) {
-                        this.dest.r = body.radius / 1000;
+                    if (sbody.radius) {
+                        this.dest.r = sbody.radius / 1000;
                         this.dest.enabled = true; //success
                     } else {
                         this.dest.f += '/WA-CR';
@@ -98,6 +100,18 @@ class CMDR {
                 this.dest.lat = parseFloat(d.lat) || 0;
                 this.dest.lon = parseFloat(d.lon) || 0;
 
+                break;
+            case DEST_GOAL.BODY:
+                this.dest.goal = d.goal;
+
+                let body = d.body_id ? await UNI.get_body(d.body_id) : null;
+                if (body) {
+                    this.dest.body_id = body._id;
+                    this.dest.sys_id = body.sys_id;
+                    this.dest.enabled = true;
+                } else {
+                    this.dest.f += '/ER-BODY';
+                }
                 break;
 
             case DEST_GOAL.STATION:
@@ -135,14 +149,22 @@ class CMDR {
 
     }
 
+    trail() {
+        this._trail.lat = this.status.lat;
+        this._trail.lon = this.status.lon;
+        this._trail.alt = this.status.alt;
+    }
+
     dest_calc() {
-        if(!this.dest.enabled) return false;
+        if (!this.dest.enabled) return false;
+        this.dest.x = 0;
 
-        if (this.dest.sys_id && this.dest.sys_id !== this.sys_id) {
-            //todo: something here...
-        }
+        if (this.dest.sys_id && this.dest.sys_id !== this.sys_id) this.dest.x++;
+        if (this.dest.st_id && this.dest.st_id !== this.st_id) this.dest.x++;
+        if (this.dest.body_id && this.dest.body_id !== this.body_id) this.dest.x++;
 
-        if (this.dest.goal === DEST_GOAL.SURFACE) {
+        if (this.dest.goal === DEST_GOAL.SURFACE && this.dest.body_id === this.body_id) {
+            //okay, so we here...
             if (this.dest.enabled) {
                 if (this.status.alt === null) return;
                 let latStart = this.status.lat * Math.PI / 180;
@@ -154,11 +176,31 @@ class CMDR {
                 let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
                 if (initialBearing < 0) initialBearing = 360 + initialBearing;
                 this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
+                this.dest.dist = Math.floor(this.dest.dist * 1000) / 1000;
                 this.dest.head = Math.floor(initialBearing);
                 if (isNaN(this.dest.head)) this.dest.head = 'ERR';
-                UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
+            }
+
+            let min_alt = 2250; //m
+            let min_dist = .150; //km
+            let check_radius = 0.0050; //km
+
+            if (this.status.alt && this.status.alt <= min_alt && (this.dest.dist <= min_dist || tools.circle_intersect(
+                this.dest.lat, this.dest.lon, check_radius,  // center and radius of circle in deg
+                this._trail.lat, this._trail.lon,    // previous point
+                this.status.lat, this.status.lon,    // current point
+            ))) {
+                console.log(this.dest.dist + ' - check!!! ');
+            } else {
+                console.log(this.dest.dist);
+                this.dest.x++
+
             }
         }
+
+        // if (this.dest.x === 0) this.dest.enabled = false;
+
+        UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
 
     }
 
@@ -213,6 +255,7 @@ class CMDR {
             ['body_id', 'body_id'],
             ['starpos', 'starpos'],
             ['metrics', 'metrics'],
+            ['_trail', '_trail'], //todo: remove it when finish testing nav/racing function
         );
     }
 

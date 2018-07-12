@@ -11,13 +11,16 @@
         <div v-if="c_tab === 'stat'" class="container-fluid">
             <div class="row">
                 <div class="col-sm">
-                    <pre>PILOT:STAT {{PILOT.status}}</pre>
+                    <pre>CMDR: {{PILOT.cmdr}}</pre>
                 </div>
                 <div class="col-sm">
                     <pre>PILOT:DEST {{PILOT.dest}}</pre>
                 </div>
+            </div>
+
+            <div class="row">
                 <div class="col-sm">
-                    <pre>CMDR: {{PILOT.cmdr}}</pre>
+                    <pre>PILOT:STAT {{PILOT.status}}</pre>
                 </div>
                 <div class="col-sm">
                     <pre>CFG: {{CFG}}</pre>
