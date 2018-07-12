@@ -182,10 +182,10 @@ class CMDR {
             }
 
             let min_alt = 2250; //m
-            let min_dist = .150; //km
-            let check_radius = 0.0050; //km
+            let min_dist = 1250; //km
+            let check_radius = 0.0001; //deg
 
-            if (this.status.alt && this.status.alt <= min_alt && (this.dest.dist <= min_dist || tools.circle_intersect(
+            if (this.status.alt && this.status.alt <= min_alt && (this.dest.dist <= min_dist && tools.circle_intersect(
                 this.dest.lat, this.dest.lon, check_radius,  // center and radius of circle in deg
                 this._trail.lat, this._trail.lon,    // previous point
                 this.status.lat, this.status.lon,    // current point
