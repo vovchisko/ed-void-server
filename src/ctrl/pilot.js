@@ -23,7 +23,7 @@ const PILOT = {
     dest: {
         enabled: false,
         goal: null,
-        lat: null, lon: null, head: null, dist: null, r: null,
+        lat: null, lon: null, alt:null, head: null, dist: null, r: null,
         sys_id: null,
         body_id: null,
         st_id: null,

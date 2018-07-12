@@ -47,6 +47,7 @@ class CMDR {
             st_id: null,
             lat: null,
             lon: null,
+            alt: null, // todo: yes. altitude is important
             r: null,
             head: null,
             f: '',
@@ -63,7 +64,7 @@ class CMDR {
     async dest_set(d, flag = '') {
 
         this.dest_clear();
-        this.dest.f = flag;
+        this.dest.f = flag; //todo: we can also use flag to lock current point. so you should leave race to be able to change it.
 
         if (!d) {
             this.dest.f = '/CLR';
@@ -181,25 +182,23 @@ class CMDR {
                 if (isNaN(this.dest.head)) this.dest.head = 'ERR';
             }
 
-            let min_alt = 2250; //m
-            let min_dist = 1250; //km
-            let check_radius = 0.0001; //deg
+            let min_alt = 2000; //m
+            let min_dist = 1.25; //km
+            let check_radius = 0.03; //deg
 
-            if (this.status.alt && this.status.alt <= min_alt && (this.dest.dist <= min_dist && tools.circle_intersect(
-                this.dest.lat, this.dest.lon, check_radius,  // center and radius of circle in deg
-                this._trail.lat, this._trail.lon,    // previous point
-                this.status.lat, this.status.lon,    // current point
-            ))) {
+            if (this.status.alt && this.status.alt <= min_alt && (this.dest.dist <= min_dist)) {
                 console.log(this.dest.dist + ' - check!!! ');
             } else {
                 console.log(this.dest.dist);
                 this.dest.x++
-
             }
         }
 
-        // if (this.dest.x === 0) this.dest.enabled = false;
+        // if (this.dest.x === 0) this.dest.enabled = false; //todo: here we should just fire some event. race will wait for it.
 
+        //todo: this should send super-tiny message with head, '.x' and '.f' because othe rdata already on client and not changing.
+        //      so we need another message like dest-???something (short version)
+        //
         UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
 
     }

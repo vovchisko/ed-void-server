@@ -18,7 +18,7 @@
         <div class="container-fluid">
 
             <div class="row">
-                <div class="col-sm edfx">
+                <div class="col-sm edfx"> <!--TODO: THIS ALSO CAN BE MOVED TO <NAVIGATOR> -->
                     <h5>CURR. POSITION</h5>
                     <em v-if="env.system"><b>SYSTEM</b><span>{{env.system.name}}</span></em>
                     <em v-if="env.body"><b>BODY</b><span>{{env.body.name}}</span></em>

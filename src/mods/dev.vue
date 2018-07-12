@@ -37,26 +37,26 @@
         </div>
 
         <div class="container-fluid" v-if="c_tab === 'test'">
+            <navigator></navigator>
+            <h1>CHECK: <b>{{dest.x === 0 ? 'HELL YEA!!!' : 'nope'}}</b></h1>
             <div class="row">
-                <div class="col-sm">
-                    <pre>TEST: {{test}}</pre>
-                    <button v-on:click="external_change()">PEW!</button>
-                    <br>
-                    <br>
-                    A:
-                    <star-dist :dest="test.b"></star-dist>
-                    <br>
-                    B:
-                    <star-dist :dest="test.a"></star-dist>
-                    <br>
-
+                <div class="col-sm"> <!--TODO: THIS ALSO CAN BE MOVED TO <NAVIGATOR> -->
+                    <h5>CURR. POSITION</h5>
+                    <em v-if="env.system"><b>SYSTEM</b><span>{{env.system.name}}</span></em>
+                    <em v-if="env.body"><b>BODY</b><span>{{env.body.name}}</span></em>
+                    <em v-if="env.station"><b>ST</b><span>{{env.station.name}}</span></em>
+                    <em v-if="!env.station && !env.body"><b>&nbsp;</b><span>deep space</span></em>
+                    <em v-if="status.alt"><b>LAT</b><span>{{status.lat}} <u>°</u></span></em>
+                    <em v-if="status.alt"><b>LON</b><span>{{status.lon}} <u>°</u></span></em>
+                    <em v-if="status.alt"><b>ALT</b><span>{{status.alt}} <u>M</u></span></em>
                 </div>
                 <div class="col-sm">
-
-                    <input-body v-bind:id.sync="test.body_id" label="target body"></input-body>
-                    <input-system v-bind:id.sync="test.sys_id" label="target system"></input-system>
-                    <input-station v-bind:id.sync="test.st_id" label="target station"></input-station>
-
+                    <h5>DESTINATION</h5>
+                    <em v-if="dest.sys_id"><b>SYS</b><span>{{dest.sys_id}}</span></em>
+                    <em v-if="dest.st_id"><b>ST</b><span>{{dest.st_id}}</span></em>
+                    <em v-if="dest.body_id"><b>BODY</b><span>{{dest.body_id}}</span></em>
+                    <em v-if="dest.head"><b>HEAD</b><span>{{dest.head | nn(0,0)}} <u>°</u></span></em>
+                    <em v-if="dest.dist"><b>DIST</b><span>{{dest.dist | nn(3,3)}} <u>KM</u></span></em>
                 </div>
             </div>
         </div>
@@ -73,6 +73,7 @@
     import InputStation from '../components/input-station'
     import StarDist from '../components/star-dist'
     import StarPos from '../components/star-pos'
+    import Navigator from "../components/navigator";
 
     const dev = {
         pipe: [],
@@ -82,12 +83,15 @@
 
     export default {
         name: "dev",
-        components: {InputBody, InputSystem, InputStation, StarDist, StarPos},
+        components: {Navigator, InputBody, InputSystem, InputStation, StarDist, StarPos},
         data: () => {
             return {
                 c_tab: 'test',
                 tabs: ['test', 'log', 'stat', 'uni', 'pipe'],
                 PILOT: PILOT, CFG: CFG,
+                dest: PILOT.dest,
+                env: PILOT.env,
+                status: PILOT.status,
                 log: dev.log,
                 stat: dev.stat,
                 pipe: dev.pipe,
