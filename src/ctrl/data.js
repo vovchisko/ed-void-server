@@ -1,5 +1,5 @@
-
 class DataStorage {
+
     constructor() {
 
         this.cmdr = {
@@ -11,7 +11,6 @@ class DataStorage {
             status: {}
         };
 
-
         this.vass = {
             recent: [],
             exp: {
@@ -22,19 +21,6 @@ class DataStorage {
                 systems: []
             }
         };
-
-
-        this.env = {
-            system: null,
-            body: null,
-            station: null,
-        };
-
-        this.init();
-    }
-
-    init() {
-
 
     }
 

@@ -10,6 +10,7 @@
             <vass v-if="MODE.c_mode === 'vass'"></vass>
             <navi v-if="MODE.c_mode === 'navi'"></navi>
             <repo v-if="MODE.c_mode === 'repo'"></repo>
+            <run v-if="MODE.c_mode === 'run'"></run>
             <cfg v-if="MODE.c_mode === 'cfg'"></cfg>
             <dev v-if="MODE.c_mode === 'dev'"></dev>
         </div>
@@ -33,6 +34,7 @@
     import Navi from './mods/navi.vue'
     import Vass from './mods/vass.vue'
     import Repo from './mods/repo.vue'
+    import Run from './mods/run.vue'
     import Cfg from './mods/cfg.vue'
     import Dev from './mods/dev.vue'
 
@@ -40,7 +42,7 @@
         name: 'app',
         data: () => {return {MODE: MODE, CFG: CFG, A: A, PILOT: PILOT}},
         components: {
-            Alert, Navbar, Auth, Cmdr, Navi, Vass, Repo, Cfg, Dev
+            Alert, Navbar, Auth, Cmdr, Navi, Vass, Repo, Run, Cfg, Dev
         },
     }
 

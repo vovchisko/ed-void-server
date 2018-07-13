@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const extend = require('deep-extend');
 const clog = require('../../clog');
 const sh = require("shorthash");
+
 class Database {
     constructor() {
         //databases links
@@ -43,8 +44,8 @@ class Database {
             });
     }
 
-    shash(string){
-       return sh.unique(string);
+    shash(string) {
+        return sh.unique(string);
     }
 
     gen_id() {
@@ -65,6 +66,9 @@ class Database {
         this.bodies = this.db_void.collection('bodies');
         this.systems = this.db_void.collection('systems');
         this.stations = this.db_void.collection('stations');
+
+        this.run_tracks = this.db_void.collection('run_tracks');
+        this.run_races = this.db_void.collection('run_races');
 
         this.exp_data = this.db_void.collection('exp_data');
         this.exp_discovered = this.db_void.collection('exp_discovered');

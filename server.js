@@ -57,7 +57,7 @@ const cfg = server.cfg = require('./config');
 const EML = server.EML = new MailService(server.cfg.email);
 const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
-const race = server.race = require('./universe/race');
+const run = server.run = require('./universe/run');
 const clog = server.clog = require('./clog');
 const API = {
     'signup': require('./universe/actions/signup'),
@@ -71,6 +71,7 @@ const API = {
     's-bodies': require('./universe/actions/s-boides'),
     's-systems': require('./universe/actions/s-systems'),
     's-stations': require('./universe/actions/s-stations'),
+    's-tracks': require('./universe/actions/s-tracks'),
 };
 
 
@@ -225,11 +226,21 @@ function init() {
 
 
     UNI.on(EV_PIPE, (uid, rec_event, rec) => {
-        CLS.send_to(uid, 'pipe:' + rec_event, tools.recout(rec));
+        try {
+            CLS.send_to(uid, 'pipe:' + rec_event, tools.recout(rec));
+        } catch (e) {
+            console.log(`ERROR! Catched error in CLS.send_to(${uid}, pipe:${rec_event});`, e);
+        }
+
     });
 
     UNI.on(EV_NET, (uid, uni_event, data) => {
-        CLS.send_to(uid, 'uni:' + uni_event, data);
+        try {
+            CLS.send_to(uid, 'uni:' + uni_event, data);
+        } catch (e) {
+            console.log(`ERROR! Catched error in CLS.send_to(${uid}, uni:${uni_event});`, e);
+        }
+
     });
 
 

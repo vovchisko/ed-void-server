@@ -11,8 +11,6 @@
             <p>nav-module will engage automatically on approach</p>
         </div>
 
-
-
         <navigator></navigator>
 
         <div class="container-fluid">
@@ -30,7 +28,7 @@
                 </div>
                 <div class="col-sm">
                     <div class="ui" v-if="N.edit" >
-                        <button @click="set_goal(g)" v-for="g in N.DEST_GOAL" v-bind:class="N.dest.goal === g ? 'active':''">{{g}}</button>
+                        <button @click="set_goal(g)" v-for="g in N.DGOAL" v-bind:class="N.dest.goal === g ? 'active':''">{{g}}</button>
                     </div>
                     <div v-if="!N.edit">
                         <h5>DESTINATION</h5>
@@ -42,19 +40,19 @@
                     </div>
 
                     <div v-if="N.edit">
-                        <div v-if="N.dest.goal === N.DEST_GOAL.STATION">
+                        <div v-if="N.dest.goal === N.DGOAL.STATION">
                             <input-station :id.sync="N.dest.st_id" label="target station"></input-station>
                         </div>
 
-                        <div v-if="N.dest.goal ===  N.DEST_GOAL.SYSTEM">
+                        <div v-if="N.dest.goal ===  N.DGOAL.SYSTEM">
                             <input-system :id.sync="N.dest.sys_id" label="target system"></input-system>
                         </div>
 
-                        <div v-if="N.dest.goal ===  N.DEST_GOAL.BODY">
+                        <div v-if="N.dest.goal ===  N.DGOAL.BODY">
                             <input-body :id.sync="N.dest.body_id" label="target body (approach)"></input-body>
                         </div>
 
-                        <div v-if="N.dest.goal === N.DEST_GOAL.SURFACE">
+                        <div v-if="N.dest.goal === N.DGOAL.SURFACE">
                             <input-body :id.sync="N.dest.body_id" label="target body"></input-body>
                             <div class="ui">
                                 <input type="number" min="-90" max="90" step="any" @focus="$event.target.select()" v-model="N.dest.lat">
@@ -111,7 +109,7 @@
         dest_align: '',
         edit: false,
 
-        DEST_GOAL: {
+        DGOAL: {
             SURFACE: 'surface',
             BODY: 'body',
             SYSTEM: 'system',
@@ -138,7 +136,7 @@
             },
             dest_edit: function () {
                 NET.send('dest-toggle', false);
-                if (!N.dest.goal) N.dest.goal = N.DEST_GOAL.SURFACE;
+                if (!N.dest.goal) N.dest.goal = N.DGOAL.SURFACE;
                 N.edit = true;
             },
             dest_apply: function () {

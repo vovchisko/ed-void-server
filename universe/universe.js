@@ -9,7 +9,7 @@ const clog = require('../clog');
 const tools = require('./tools');
 
 
-global.DEST_GOAL = {
+global.DGOAL = {
     SURFACE: 'surface',
     BODY: 'body',
     SYSTEM: 'system',
@@ -30,6 +30,7 @@ class Universe extends EE3 {
         this.users = {};
         this.cmdrs = {};
         this.users_api_key = {};
+        this.runs = {}; // active runs
         clog('UNIVERSE: OK');
     }
 
@@ -330,7 +331,7 @@ class Universe extends EE3 {
 
     user_msg(user, c, data) {
         clog(c, data);
-        if (c === 'dest-set') { return user._cmdr ? user._cmdr.dest_set(data) : false; }
+        if (c === 'dest-set') { return user._cmdr && !user._cmdr.run_id ? user._cmdr.dest_set(data) : false; }
         if (c === 'dest-toggle') {return user._cmdr ? user._cmdr.dest.enabled = !!data : false;}
         if (c === 'repo-search') return this.repo_search(user, data);
         if (c === 'exp-refresh') return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
@@ -338,6 +339,25 @@ class Universe extends EE3 {
             user._cmdr._exp.reset();
             return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
         }
+        // runs now here
+        if (c === 'run-list') {
+            let list = [];
+            for (let i in this.runs) list.push({_id: this.runs[i]._id, name: this.runs[i].name});
+            return this.emitf(EV_NET, user._id, 'run-list', list);
+
+        }
+        if (c === 'run-new') return this.create_race(user, data);
+    }
+
+    async create_race(user, data) {
+        if (!user._cmdr) return; //just in case
+        if (user._cmdr.run_id) return clog('cmdr is already in run!', user._cmdr.run_id);
+
+        let track = await DB.run_tracks.findOne({_id: data.track_id});
+        if (!track) return clog('unable to find track!', user._id, data);
+        let r = new RUN(track, user._cmdr);
+        this.runs[r._id] = r;
+        this.runs[r._id].join(user._cmdr);
 
     }
 
@@ -542,5 +562,6 @@ let SYSTEM = require('./system').init(UNI, DB);
 let BODY = require('./body').init(UNI, DB);
 let USER = require('./user').init(UNI, DB);
 let STATION = require('./station').init(UNI, DB);
+let RUN = require('./run').init(UNI, DB);
 
 

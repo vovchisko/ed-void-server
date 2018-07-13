@@ -11,6 +11,7 @@ exports = module.exports = server;
 const cfg = server.cfg = require('./config');
 const DB = server.DB = require('./universe/services/database');
 const UNI = server.UNI = require('./universe/universe');
+const DATA = require('./ghost-data');
 
 DB.connect(cfg.database, init);
 
@@ -29,6 +30,8 @@ async function init() {
     await wipe_stellars();
     await re_index_void();
     await re_index_journals();
+
+    await re_fill_tracks();
 
     await re_process();
 
@@ -111,6 +114,13 @@ async function re_process() {
     console.log(`total time: ${end_all / 1000}sec`);
 }
 
+function re_fill_tracks() {
+    console.log(`\n>> RE_FILL TRACKS...`);
+    for (let i = 0; i < DATA.tracks.length; i++) {
+        DB.run_tracks.save(DATA.tracks[i]);
+        console.log(i + ' - ' + DATA.tracks[i]._id + ' :: ' + DATA.tracks[i].name)
+    }
+}
 
 function pause(t) {
     return new Promise((resolve, reject) => {

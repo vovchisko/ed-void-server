@@ -28,6 +28,7 @@ class CMDR {
         this.sys_id = null;
         this.body_id = null;
         this.st_id = null;
+        this.run_id = null;
         this.starpos = [0, 0, 0];
         this.metrics = {curr_ds: 0};
         this.status = {
@@ -40,6 +41,7 @@ class CMDR {
             head: null,
         };
         this.dest = {
+            name: '',
             enabled: false,
             goal: null,
             sys_id: null,
@@ -59,12 +61,15 @@ class CMDR {
 
         extend(this, cmdr_data);
         this.journal_id = `${this.uid}/${DB.shash(this.name)}`;
+        if (this.run_id) if (!UNI.runs[this.run_id]) this.run_id = null;
+
     }
 
     async dest_set(d, flag = '') {
 
         this.dest_clear();
-        this.dest.f = flag; //todo: we can also use flag to lock current point. so you should leave race to be able to change it.
+        this.dest.f = flag; //todo: we can also use flag to lock current point. so you should leave run to be able to change it.
+        this.dest.name = d.name || '';
 
         if (!d) {
             this.dest.f = '/CLR';
@@ -74,7 +79,8 @@ class CMDR {
         }
 
         switch (d.goal) {
-            case DEST_GOAL.SURFACE:
+            case DGOAL.SURFACE:
+
                 this.dest.goal = d.goal;
 
                 let sbody = d.body_id ? await UNI.get_body(d.body_id) : null;
@@ -102,7 +108,7 @@ class CMDR {
                 this.dest.lon = parseFloat(d.lon) || 0;
 
                 break;
-            case DEST_GOAL.BODY:
+            case DGOAL.BODY:
                 this.dest.goal = d.goal;
 
                 let body = d.body_id ? await UNI.get_body(d.body_id) : null;
@@ -115,7 +121,7 @@ class CMDR {
                 }
                 break;
 
-            case DEST_GOAL.STATION:
+            case DGOAL.STATION:
                 this.dest.goal = d.goal;
                 let st = d.st_id ? await UNI.get_station(d.st_id) : null;
                 if (st) {
@@ -128,7 +134,7 @@ class CMDR {
 
                 break;
 
-            case DEST_GOAL.SYSTEM:
+            case DGOAL.SYSTEM:
                 this.dest.goal = d.goal;
                 let sys = d.sys_id ? await UNI.get_system(d.sys_id) : null;
                 if (sys) {
@@ -164,7 +170,7 @@ class CMDR {
         if (this.dest.st_id && this.dest.st_id !== this.st_id) this.dest.x++;
         if (this.dest.body_id && this.dest.body_id !== this.body_id) this.dest.x++;
 
-        if (this.dest.goal === DEST_GOAL.SURFACE && this.dest.body_id === this.body_id) {
+        if (this.dest.goal === DGOAL.SURFACE && this.dest.body_id === this.body_id) {
             //okay, so we here...
             if (this.dest.enabled) {
                 if (this.status.alt === null) return;
@@ -187,19 +193,24 @@ class CMDR {
             let check_radius = 0.03; //deg
 
             if (this.status.alt && this.status.alt <= min_alt && (this.dest.dist <= min_dist)) {
-                console.log(this.dest.dist + ' - check!!! ');
+                console.log(this.dest.dist + ' - check!!!');
             } else {
-                console.log(this.dest.dist);
+                //console.log(this.dest.dist);
                 this.dest.x++
             }
         }
 
-        // if (this.dest.x === 0) this.dest.enabled = false; //todo: here we should just fire some event. race will wait for it.
+        // if (this.dest.x === 0) this.dest.enabled = false; //todo: here we should just fire some event. run will wait for it.
 
         //todo: this should send super-tiny message with head, '.x' and '.f' because othe rdata already on client and not changing.
         //      so we need another message like dest-???something (short version)
         //
         UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
+
+
+        clog('LOOK OVER HERE!!!');
+        // TODO: NO SEARCH FOR /RUN:<RUN_ID> FLAG ADN TELL SEND SOMETHIGN TO RACE
+
 
     }
 
@@ -252,6 +263,8 @@ class CMDR {
             ['last_rec', 'last_rec'],
             ['sys_id', 'sys_id'],
             ['body_id', 'body_id'],
+            ['st_id', 'st_id'],
+            ['run_id', 'run_id'],
             ['starpos', 'starpos'],
             ['metrics', 'metrics'],
             ['_trail', '_trail'], //todo: remove it when finish testing nav/racing function
@@ -280,7 +293,7 @@ class EXP_DATA {
         this.summ = {p: 0, s: 0, c: 0,};
         this.systems = {};
 
-        extend(this, exp_data)
+        extend(this, exp_data);
     }
 
     reset() {

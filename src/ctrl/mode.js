@@ -6,6 +6,7 @@ let MODE = {
         'navi': 'nav',
         'vass': 'scan',
         'repo': 'poi',
+        'run': 'run',
         'cfg': 'cfg',
     },
     is_in: false,
