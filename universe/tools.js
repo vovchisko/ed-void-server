@@ -212,7 +212,7 @@ function safe_regexp(str) {
 function not_nulled(obj) {
     let ret = {};
     for (let i in obj) {
-        if (obj[i]) ret[i] = obj[i]
+        if (obj[i] !== null) ret[i] = obj[i];
     }
     return ret;
 }

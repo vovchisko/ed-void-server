@@ -8,8 +8,7 @@
                 <b class="head" v-bind:class="NAV.dest_align">{{NAV.dest.head}}</b>
             </div>
         </div>
-
-        <div class="container-fluid ">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-sm loc-curr">
                     <h5>CURR. POSITION</h5>
@@ -77,7 +76,7 @@
 <style lang="scss">
     @import "../styles/vars";
     .navigator {
-        .compass {overflow: hidden; height: 145px;margin: 0 -5px 10px -5px;
+        .compass {overflow: hidden; height: 135px;margin: 0 -5px 10px -5px;
             .ruler { image-rendering: pixelated;
                 background: transparent url('../../public/assets/nav-ruler.gif') 0 0; width: 100%; height: 30px;margin: 40px 0 33px 0;position: relative;transition: all linear 1000ms;}
             .ruler .head {width: 50px;font-size: 14px;display: block;text-align: center;border: 1px solid #ff8800;color: #ff8800;position: absolute;left: 50%;margin: -30px 0 0 -25px;}
@@ -105,7 +104,6 @@
         }
 
         .loc-curr, .loc-dest {
-            margin-top: 3em;
             h4 { margin-bottom: 0; }
             em { }
             em > b { width: 30%}

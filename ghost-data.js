@@ -1,8 +1,18 @@
 const tracks = [
     {
+        _id: 'FARSEER_TEST',
+        cycle: 0,
+        name: 'farseer: test 1',
+        points: [
+            {goal: DGOAL.SURFACE, lat: 23.6426, lon: 153.5391, body_id: 'deciat@3924:-26:-1513/6 a', name: 'start!'},
+            {goal: DGOAL.SURFACE, lat: 23.7291, lon: 153.0292, body_id: 'deciat@3924:-26:-1513/6 a', name: 'void sponsor: farseer inc.'},
+            {goal: DGOAL.SURFACE, lat: 23.6426, lon: 153.5391, body_id: 'deciat@3924:-26:-1513/6 a', name: 'start!'},
+        ]
+    },
+    {
         _id: 'FARSEER_INC_1',
         cycle: 0,
-        name: 'farseer inc.',
+        name: 'farseer: test 2',
         points: [
             {goal: DGOAL.SURFACE, lat: 23.6426, lon: 153.5391, body_id: 'deciat@3924:-26:-1513/6 a', name: 'start!'},
             {goal: DGOAL.SURFACE, lat: 23.7291, lon: 153.0292, body_id: 'deciat@3924:-26:-1513/6 a', name: 'void sponsor: farseer inc.'},

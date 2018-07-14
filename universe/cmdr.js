@@ -61,7 +61,7 @@ class CMDR {
 
         extend(this, cmdr_data);
         this.journal_id = `${this.uid}/${DB.shash(this.name)}`;
-        if (this.run_id) if (!UNI.runs[this.run_id]) this.run_id = null;
+        if (this.run_id && !UNI.runs[this.run_id]) this.run_id = null;
 
     }
 
@@ -164,52 +164,39 @@ class CMDR {
 
     dest_calc() {
         if (!this.dest.enabled) return false;
+        let prev_x = this.dest.x;
         this.dest.x = 0;
 
         if (this.dest.sys_id && this.dest.sys_id !== this.sys_id) this.dest.x++;
         if (this.dest.st_id && this.dest.st_id !== this.st_id) this.dest.x++;
         if (this.dest.body_id && this.dest.body_id !== this.body_id) this.dest.x++;
 
-        if (this.dest.goal === DGOAL.SURFACE && this.dest.body_id === this.body_id) {
-            //okay, so we here...
-            if (this.dest.enabled) {
-                if (this.status.alt === null) return;
-                let latStart = this.status.lat * Math.PI / 180;
-                let lonStart = this.status.lon * Math.PI / 180;
-                let latDest = this.dest.lat * Math.PI / 180;
-                let lonDest = this.dest.lon * Math.PI / 180;
-                let deltaLon = lonDest - lonStart;
-                let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
-                let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
-                if (initialBearing < 0) initialBearing = 360 + initialBearing;
-                this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
-                this.dest.dist = Math.floor(this.dest.dist * 1000) / 1000;
-                this.dest.head = Math.floor(initialBearing);
-                if (isNaN(this.dest.head)) this.dest.head = 'ERR';
-            }
+        if (this.dest.goal === DGOAL.SURFACE && this.dest.body_id === this.body_id && this.status.alt !== null) {
+            let latStart = this.status.lat * Math.PI / 180;
+            let lonStart = this.status.lon * Math.PI / 180;
+            let latDest = this.dest.lat * Math.PI / 180;
+            let lonDest = this.dest.lon * Math.PI / 180;
+            let deltaLon = lonDest - lonStart;
+            let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
+            let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
+            if (initialBearing < 0) initialBearing = 360 + initialBearing;
+            this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
+            this.dest.dist = Math.floor(this.dest.dist * 1000) / 1000;
+            this.dest.head = Math.floor(initialBearing);
+            if (isNaN(this.dest.head)) this.dest.head = 'ERR';
 
             let min_alt = 2000; //m
-            let min_dist = 1.25; //km
-            let check_radius = 0.03; //deg
+            let min_dist = 1.5; //km
 
-            if (this.status.alt && this.status.alt <= min_alt && (this.dest.dist <= min_dist)) {
-                console.log(this.dest.dist + ' - check!!!');
-            } else {
-                //console.log(this.dest.dist);
+            if (this.status.alt > min_alt || this.dest.dist > min_dist) {
                 this.dest.x++
             }
         }
 
-        // if (this.dest.x === 0) this.dest.enabled = false; //todo: here we should just fire some event. run will wait for it.
-
-        //todo: this should send super-tiny message with head, '.x' and '.f' because othe rdata already on client and not changing.
-        //      so we need another message like dest-???something (short version)
-        //
         UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
 
-
-        clog('LOOK OVER HERE!!!');
-        // TODO: NO SEARCH FOR /RUN:<RUN_ID> FLAG ADN TELL SEND SOMETHIGN TO RACE
+        if (this.run_id)
+            if (prev_x !== this.dest.x) UNI.runs[this.run_id].update(this);
 
 
     }

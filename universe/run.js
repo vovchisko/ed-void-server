@@ -23,32 +23,76 @@ class RUN {
         this.track_id = track._id;
         this.status = 0; // 0 - preparation, 1 - in progress, 2 - complete
         this.name = track.name;
-        this.cmdrs = {}; // records about racers/cmdrs to save
-        this.host_cmdr = cmdr._id;
-        this.host_cmdr_name = cmdr.name;
+        this.pilots = {/* id, name, point_id */};
+
+        this.cmdr_id = cmdr._id;
+        this.cmdr_name = cmdr.name;
+
         this.points = [];
         track.points.forEach(p => {this.points.push(extend({}, p))});
-        this._heart = setInterval(() => {this.tick()}, 5000);
+        this._heart = setInterval(() => {this.tick()}, 2000);
+
+        this._listener = null;
 
     }
 
     tick() {
-        console.log('run tick: ', this);
+        console.log('race tick... AND ADD FAKE UPDATE BUTTON WITH x=0 ON UI SO YOU CAN TEST ALL THE THINGS>');
+    }
+
+    update(cmdr) {
+        if (cmdr.dest.x === 0) {
+            this.pilots[cmdr._id].pid++;
+            if (this.points[this.pilots[cmdr._id].pid]) {
+                cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].pid]), '/RUN');
+            } else {
+                this.pilots[cmdr._id].pid = -1;
+                cmdr.dest_clear();
+            }
+        }
+
+        this.broadcast();
+    }
+
+    broadcast(about_cmdr = null) {
+        if (!about_cmdr) {
+            //broadcast all race status for everyone
+        } else {
+            //broadcast specified cmdr update
+        }
+
+    }
+
+    start() {
+
     }
 
     join(cmdr) {
         if (cmdr.run_id) return clog('cmdr already busy with run ' + cmdr.name + ' / run_id: ' + cmdr.run_id);
-        this.cmdrs[cmdr._id] = {id: cmdr._id, name: cmdr.name, point: 0};
+        this.pilots[cmdr._id] = {
+            id: cmdr._id,
+            name: cmdr.name,
+            pid: 0
+        };
+
         cmdr.touch({run_id: this._id});
-        cmdr.dest_set(extend({r: 1000}, this.points[0]), '/RUN:' + this._id); // todo: sometimes R not defined and cause errors
-        console.log('dest:', this.points[0]);
+        cmdr.dest_set(extend({r: 1000}, this.points[0]), '/RUN');
+
+        clog(`RUN: CMDR ${cmdr._id} (${cmdr.name}) joined the race ${this._id}`);
     }
+
 
     info() {
         return {
             name: this.name,
-            pilots: this.cmdrs,
+            pilots: this.pilots,
+            cmdr_name: this.cmdr_name,
+            cmdr_id: this.cmdr_id,
         }
+    }
+
+    stop() {
+        //party is over
     }
 
     async save() {
