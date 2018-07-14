@@ -23,7 +23,7 @@ class RUN {
         this.track_id = track._id;
         this.status = 0; // 0 - preparation, 1 - in progress, 2 - complete
         this.name = track.name;
-        this.racers = {}; // records about racers/cmdrs to save
+        this.cmdrs = {}; // records about racers/cmdrs to save
         this.host_cmdr = cmdr._id;
         this.host_cmdr_name = cmdr.name;
         this.points = [];
@@ -33,19 +33,25 @@ class RUN {
     }
 
     tick() {
-        console.log('run tick: ' + this._id);
+        console.log('run tick: ', this);
     }
 
     join(cmdr) {
-        if (cmdr.run_id) return clog('cmdr already busy with race ' + cmdr.name + ' / run_id: ' + cmdr.run_id);
-        this.racers[cmdr._id] = {id: cmdr._id, name: cmdr.name, point: 0};
+        if (cmdr.run_id) return clog('cmdr already busy with run ' + cmdr.name + ' / run_id: ' + cmdr.run_id);
+        this.cmdrs[cmdr._id] = {id: cmdr._id, name: cmdr.name, point: 0};
         cmdr.touch({run_id: this._id});
         cmdr.dest_set(extend({r: 1000}, this.points[0]), '/RUN:' + this._id); // todo: sometimes R not defined and cause errors
         console.log('dest:', this.points[0]);
     }
 
-    async save() {
+    info() {
+        return {
+            name: this.name,
+            pilots: this.cmdrs,
+        }
+    }
 
+    async save() {
         //no temporary fields here...
         await DB.systems.save(this);
     }

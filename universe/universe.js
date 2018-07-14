@@ -347,6 +347,16 @@ class Universe extends EE3 {
 
         }
         if (c === 'run-new') return this.create_race(user, data);
+        if (c === 'run-join') return this.join_race(user, data);
+    }
+
+    async join_race(user, r) {
+        let id = r ? r.run_id : null;
+        if (id && this.runs[id] && user._cmdr) {
+            this.runs[id].join(user._cmdr);
+        }else{
+            console.log('nope!',user, r)
+        }
     }
 
     async create_race(user, data) {
