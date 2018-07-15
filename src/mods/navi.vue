@@ -129,7 +129,7 @@
     }
 
     NET.on('uni:dest-set', (dest) => {
-        if (dest.f.includes('/ER')) { N.edit = true; }
+        if (dest.f && dest.f.includes('/ER')) { N.edit = true; }
     });
 
 

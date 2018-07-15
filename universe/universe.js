@@ -66,13 +66,14 @@ class Universe extends EE3 {
                 this.emit(EV_NET, user._id, 'cmdr', user._cmdr.data());
                 this.emit(EV_NET, user._id, 'status', user._cmdr.status);
 
+                /*
                 let scans = user._cmdr.journal()
                     .find({event: {$in: ['Scan', 'FSDJump']}})
                     .sort({timestamp: -1})
                     .limit(16);
 
-
                 scans.forEach((rec) => { this.emit(EV_PIPE, user._id, rec.event, rec) });
+                */
 
                 if (user._cmdr.sys_id) {
                     let sys = await this.get_system(user._cmdr.sys_id);
@@ -125,7 +126,6 @@ class Universe extends EE3 {
         this.emit(EV_NET, user._id, 'status', user._cmdr.status);
     }
 
-    /* ONLY FOR NEW RECORDS!! */
     async record(user, rec, cmdr_name, gv, lng, records_left = 0) {
 
         if (cmdr_name !== user.cmdr_name) await user.set_cmdr(cmdr_name);
@@ -348,14 +348,26 @@ class Universe extends EE3 {
         }
         if (c === 'run-new') return this.create_race(user, data);
         if (c === 'run-join') return this.join_race(user, data);
+        if (c === 'run-leave') return this.leave_race(user, data);
     }
 
     async join_race(user, r) {
         let id = r ? r.run_id : null;
         if (id && this.runs[id] && user._cmdr) {
             this.runs[id].join(user._cmdr);
-        }else{
-            console.log('nope!',user, r)
+        } else {
+            console.log('nope!', user, r)
+        }
+    }
+
+    async leave_race(user) {
+        if (user._cmdr && user._cmdr.run_id) {
+            if (this.runs[user._cmdr.run_id]) {
+                this.runs[user._cmdr.run_id].leave(user._cmdr);
+            }
+            user._cmdr.touch({run_id: null});
+            user._cmdr.dest_clear();
+
         }
     }
 

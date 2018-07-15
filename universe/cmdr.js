@@ -40,26 +40,15 @@ class CMDR {
             alt: null,
             head: null,
         };
-        this.dest = {
-            name: '',
-            enabled: false,
-            goal: null,
-            sys_id: null,
-            body_id: null,
-            st_id: null,
-            lat: null,
-            lon: null,
-            alt: null, // todo: yes. altitude is important
-            r: null,
-            head: null,
-            f: '',
-            x: 0,
-        };
+        this.dest = null;
         this._trail = {};
         this._exp = null;
         this._data = {};
 
         extend(this, cmdr_data);
+
+        this.dest_clear();
+
         this.journal_id = `${this.uid}/${DB.shash(this.name)}`;
         if (this.run_id && !UNI.runs[this.run_id]) this.run_id = null;
 
@@ -203,8 +192,22 @@ class CMDR {
 
     dest_clear() {
         this.dest = {
+            name: '',
             enabled: false,
+            goal: null,
+            sys_id: null,
+            body_id: null,
+            st_id: null,
+            lat: null,
+            lon: null,
+            alt: null, // todo: yes. altitude is important
+            r: null,
+            head: null,
+            f: '',
+            x: 0,
         };
+        UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
+
     }
 
     journal() {

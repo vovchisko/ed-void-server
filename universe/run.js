@@ -47,6 +47,7 @@ class RUN {
                 cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].pid]), '/RUN');
             } else {
                 this.pilots[cmdr._id].pid = -1;
+                this.pilots[cmdr._id].circle = 0; // we gonna use it later :3
                 cmdr.dest_clear();
             }
         }
@@ -56,15 +57,22 @@ class RUN {
 
     broadcast(about_cmdr = null) {
         if (!about_cmdr) {
-            //broadcast all race status for everyone
+            //todo: broadcast all race status for everyone
         } else {
-            //broadcast specified cmdr update
+            //todo: broadcast specified cmdr update
         }
-
     }
 
     start() {
 
+    }
+
+    leave(cmdr) {
+        if (this.pilots[cmdr._id]) {
+            this.pilots[cmdr._id].pos = null; // that's it.
+            console.log(cmdr.name, 'leave');
+        }
+        //todo: if no players here - you can leave free
     }
 
     join(cmdr) {
@@ -72,7 +80,8 @@ class RUN {
         this.pilots[cmdr._id] = {
             id: cmdr._id,
             name: cmdr.name,
-            pid: 0
+            pid: 0,
+            pos: true,
         };
 
         cmdr.touch({run_id: this._id});
