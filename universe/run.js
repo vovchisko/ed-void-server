@@ -5,6 +5,14 @@ const tools = require('./tools');
 let UNI;
 let DB;
 
+global.RUNNER = {
+    IN: 'in-game',
+    DEAD: 'dead',
+    LEAVE: 'leave',
+    FINISHED: 'finished',
+    DISQILFIED: 'disquilified',
+};
+
 /**
  * init RUN module
  * @param uni {Universe}
@@ -23,85 +31,113 @@ class RUN {
         this.track_id = track._id;
         this.status = 0; // 0 - preparation, 1 - in progress, 2 - complete
         this.name = track.name;
-        this.pilots = {/* id, name, point_id */};
-
+        this.pilots = {}; // see join() for details
         this.cmdr_id = cmdr._id;
         this.cmdr_name = cmdr.name;
-
         this.points = [];
         track.points.forEach(p => {this.points.push(extend({}, p))});
-        this._heart = setInterval(() => {this.tick()}, 2000);
-
-        this._listener = null;
-
+        this._heart = setInterval(() => {this.tick()}, 1000);
     }
 
     tick() {
-        console.log('race tick... AND ADD FAKE UPDATE BUTTON WITH x=0 ON UI SO YOU CAN TEST ALL THE THINGS>');
+        console.log('race tick...');
     }
 
     update(cmdr) {
         if (cmdr.dest.x === 0) {
-            this.pilots[cmdr._id].pid++;
-            if (this.points[this.pilots[cmdr._id].pid]) {
-                cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].pid]), '/RUN');
+            this.pilots[cmdr._id].c_point++;
+            if (this.points[this.pilots[cmdr._id].c_point]) {
+                cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].c_point]), '/RUN');
             } else {
-                this.pilots[cmdr._id].pid = -1;
-                this.pilots[cmdr._id].circle = 0; // we gonna use it later :3
+                this.pilots[cmdr._id].c_point = -1;
+                this.pilots[cmdr._id].status = RUNNER.FINISHED;
                 cmdr.dest_clear();
+
+                //todo: can we complete run ?
             }
         }
-
-        this.broadcast();
+        this.broadcast(cmdr._id);
     }
 
-    broadcast(about_cmdr = null) {
-        if (!about_cmdr) {
-            //todo: broadcast all race status for everyone
-        } else {
-            //todo: broadcast specified cmdr update
+    re_broadcast_for(cmdr) {
+        if (this.pilots[cmdr._id])
+            UNI.emitf(EV_NET, cmdr.uid, 'run-upd', this.info());
+
+    }
+
+    broadcast(cmdr_id = null, to_cmdr = null) {
+        for (let i in this.pilots) {
+            if (!cmdr_id) {
+                UNI.emitf(EV_NET, this.pilots[i].uid, 'run-upd', this.info());
+            } else {
+                UNI.emitf(EV_NET, this.pilots[i].uid, 'run-upd-cmdr', this.pilots[cmdr_id]);
+            }
         }
     }
 
     start() {
-
+        this.status = 1;
     }
 
     leave(cmdr) {
         if (this.pilots[cmdr._id]) {
-            this.pilots[cmdr._id].pos = null; // that's it.
-            console.log(cmdr.name, 'leave');
+            this.pilots[cmdr._id].status = RUNNER.LEAVE; // that's it.
+            cmdr.dest_clear();
         }
-        //todo: if no players here - you can leave free
+        if (!this.has_active_pilots()) this.complete();
+
+        this.broadcast();
+    }
+
+    complete(force = false) {
+        // check who is finished
+        // check who is leave
+        this.status = 2;
+        this.broadcast(); // broadcast changes
+        // save records
+        console.log('race complete...');
+        clearInterval(this._heart);
+        delete UNI.runs[this._id];
+    }
+
+
+    has_active_pilots() {
+        for (let i in this.pilots)
+            if (this.pilots[i].status === RUNNER.IN) return true;
+        return false;
     }
 
     join(cmdr) {
         if (cmdr.run_id) return clog('cmdr already busy with run ' + cmdr.name + ' / run_id: ' + cmdr.run_id);
         this.pilots[cmdr._id] = {
-            id: cmdr._id,
-            name: cmdr.name,
-            pid: 0,
-            pos: true,
+            id: cmdr._id,//cmdr id
+            name: cmdr.name, //cmdr name
+            c_point: 0, //current point ID
+            pos: 0, // position in race
+            status: RUNNER.IN, // current status in-race
+            uid: cmdr.uid,
         };
 
         cmdr.touch({run_id: this._id});
-        cmdr.dest_set(extend({r: 1000}, this.points[0]), '/RUN');
+        cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].c_point]), '/RUN');
 
         clog(`RUN: CMDR ${cmdr._id} (${cmdr.name}) joined the race ${this._id}`);
+
+        this.broadcast();
     }
 
 
     info() {
         return {
+            _id: this._id,
+            track_id: this.track_id,
             name: this.name,
-            pilots: this.pilots,
             cmdr_name: this.cmdr_name,
             cmdr_id: this.cmdr_id,
+            pilots: this.pilots,
+            status: this.status,
+            points: this.points,
         }
-    }
-
-    stop() {
-        //party is over
     }
 
     async save() {

@@ -41,6 +41,7 @@ module.exports = function (req, res) {
             res.statusCode = 500;
             result.text = 'operation failed';
         }
+        //clog(result);
         res.end(JSON.stringify(result));
         //clog(log + result.text);
     });

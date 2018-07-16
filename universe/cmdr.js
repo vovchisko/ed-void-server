@@ -58,7 +58,6 @@ class CMDR {
 
         this.dest_clear();
         this.dest.f = flag; //todo: we can also use flag to lock current point. so you should leave run to be able to change it.
-        this.dest.name = d.name || '';
 
         if (!d) {
             this.dest.f = '/CLR';
@@ -66,6 +65,7 @@ class CMDR {
             UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
             return;
         }
+        this.dest.name = d.name || '';
 
         switch (d.goal) {
             case DGOAL.SURFACE:
@@ -206,7 +206,7 @@ class CMDR {
             f: '',
             x: 0,
         };
-        UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
+        UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
 
     }
 

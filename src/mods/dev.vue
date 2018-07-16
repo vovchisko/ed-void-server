@@ -38,7 +38,6 @@
 
         <div class="container-fluid" v-if="c_tab === 'test'">
             <navigator></navigator>
-            <h1>CHECK: <b>{{dest.x === 0 ? 'HELL YEA!!!' : 'nope'}}</b></h1>
             <div class="row">
                 <div class="col-sm"> <!--TODO: THIS ALSO CAN BE MOVED TO <NAVIGATOR> -->
                     <h5>CURR. POSITION</h5>

@@ -1,35 +1,38 @@
 <template>
     <div class="navigator">
-        <div class="compass edfx" v-if="NAV.status.head !== null">
+        <div class="compass edfx" v-if="PILOT.status.head !== null">
             <div class="ruler" v-bind:style="NAV.style_ruler">
-                <b class="head">{{NAV.status.head}}</b>
+                <b class="head">{{PILOT.status.head}}</b>
             </div>
-            <div class="dest" v-if="NAV.dest.head" v-bind:style="NAV.style_dest">
-                <b class="head" v-bind:class="NAV.dest_align">{{NAV.dest.head}}</b>
+            <div class="dest" v-if="PILOT.dest.head" v-bind:style="NAV.style_dest">
+                <b class="head" v-bind:class="NAV.dest_align">{{PILOT.dest.head}}</b>
             </div>
         </div>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm loc-curr">
                     <h5>CURR. POSITION</h5>
-                    <em v-if="NAV.env.system"><b>SYSTEM</b><span>{{NAV.env.system.name}}</span></em>
-                    <em v-if="NAV.env.body"><b>BODY</b><span>{{NAV.env.body.name}}</span></em>
-                    <em v-if="NAV.env.station"><b>ST</b><span>{{NAV.env.station.name}}</span></em>
-                    <em v-if="!NAV.env.station && !NAV.env.body"><b>&nbsp;</b><span>deep space</span></em>
-                    <em v-if="NAV.status.alt"><b>LAT</b><span>{{NAV.status.lat}} <u>°</u></span></em>
-                    <em v-if="NAV.status.alt"><b>LON</b><span>{{NAV.status.lon}} <u>°</u></span></em>
-                    <em v-if="NAV.status.alt"><b>ALT</b><span>{{NAV.status.alt}} <u>M</u></span></em>
+                    <em v-if="PILOT.env.system"><b>SYSTEM</b><span>{{PILOT.env.system.name}}</span></em>
+                    <em v-if="PILOT.env.body"><b>BODY</b><span>{{PILOT.env.body.name}}</span></em>
+                    <em v-if="PILOT.env.station"><b>ST</b><span>{{PILOT.env.station.name}}</span></em>
+                    <em v-if="!PILOT.env.station && !PILOT.env.body"><b>&nbsp;</b><span>deep space</span></em>
+                    <em v-if="PILOT.status.alt"><b>LAT</b><span>{{PILOT.status.lat}} <u>°</u></span></em>
+                    <em v-if="PILOT.status.alt"><b>LON</b><span>{{PILOT.status.lon}} <u>°</u></span></em>
+                    <em v-if="PILOT.status.alt"><b>ALT</b><span>{{PILOT.status.alt}} <u>M</u></span></em>
                 </div>
                 <div class="col-sm loc-dest">
                     <h5>DESTINATION</h5>
-                    <em v-if="NAV.dest.sys_id"><b>SYS</b><span>{{NAV.dest.sys_id}}</span></em>
-                    <em v-if="NAV.dest.st_id"><b>ST</b><span>{{NAV.dest.st_id}}</span></em>
-                    <em v-if="NAV.dest.body_id"><b>BODY</b><span>{{NAV.dest.body_id}}</span></em>
-                    <em v-if="NAV.dest.head"><b>HEAD</b><span>{{NAV.dest.head | nn(0,0)}} <u>°</u></span></em>
-                    <em v-if="NAV.dest.dist"><b>DIST</b><span>{{NAV.dest.dist | nn(3,3)}} <u>KM</u></span></em>
+                    <em v-if="PILOT.dest.sys_id"><b>SYS</b><span>{{PILOT.dest.sys_id}}</span></em>
+                    <em v-if="PILOT.dest.st_id"><b>ST</b><span>{{PILOT.dest.st_id}}</span></em>
+                    <em v-if="PILOT.dest.body_id"><b>BODY</b><span>{{PILOT.dest.body_id}}</span></em>
+                    <em v-if="PILOT.dest.alt"><b>LAT</b><span>{{PILOT.dest.lat}} <u>°</u></span></em>
+                    <em v-if="PILOT.dest.alt"><b>LON</b><span>{{PILOT.dest.lon}} <u>°</u></span></em>
+                    <em v-if="PILOT.dest.head"><b>HEAD</b><span>{{PILOT.dest.head | nn(0,0)}} <u>°</u></span></em>
+                    <em v-if="PILOT.dest.dist"><b>DIST</b><span>{{PILOT.dest.dist | nn(3,3)}} <u>KM</u></span></em>
                 </div>
             </div>
         </div>
+        <pre> {{PILOT.dest}}</pre>
     </div>
 
 </template>
@@ -39,16 +42,13 @@
     import NET from '../ctrl/network'
 
     const NAV = {
-        dest: PILOT.dest,
-        status: PILOT.status,
-        env: PILOT.env,
         style_ruler: {'background-position-x': 0},
         style_dest: {'background-position-x': 0},
     };
 
     export default {
         name: "navigator",
-        data: () => {return {NAV: NAV}}
+        data: () => {return {NAV: NAV, PILOT: PILOT}}
     }
 
     NET.on('uni:status', () => update_head());
@@ -56,15 +56,15 @@
 
     function update_head() {
         let rw = window.innerWidth;
-        let offset = (rw / 2) - NAV.status.head * 4;
+        let offset = (rw / 2) - PILOT.status.head * 4;
         NAV.style_ruler['background-position-x'] = offset + 'px';
-        if (NAV.dest.enabled) {
-            if (isNaN(NAV.dest.head)) {
+        if (PILOT.dest.enabled) {
+            if (isNaN(PILOT.dest.head)) {
                 NAV.style_dest['background-position-x'] = '0px';
                 NAV.dest_align = 'err';
             } else {
-                NAV.style_dest['background-position-x'] = (rw / 2) - ((NAV.status.head - NAV.dest.head) * 4) + 'px';
-                let alg = Math.abs(NAV.dest.head - NAV.status.head);
+                NAV.style_dest['background-position-x'] = (rw / 2) - ((PILOT.status.head - PILOT.dest.head) * 4) + 'px';
+                let alg = Math.abs(PILOT.dest.head - PILOT.status.head);
                 if (alg <= 3) NAV.dest_align = 'alg0';
                 if (alg > 3) NAV.dest_align = 'alg1';
                 if (alg > 10) NAV.dest_align = 'alg2';

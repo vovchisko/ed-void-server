@@ -63,6 +63,17 @@ class Universe extends EE3 {
 
                 if (!user._cmdr) return;
 
+                if (user._cmdr.run_id) {
+                    if (this.runs[user._cmdr.run_id]) {
+                        this.runs[user._cmdr.run_id].re_broadcast_for(user._cmdr);
+                    } else {
+                        this.run_id = null;
+                        user._cmdr.dest_clear();
+                    }
+                } else {
+                    user._cmdr.dest_set(user._cmdr.dest);
+                }
+
                 this.emit(EV_NET, user._id, 'cmdr', user._cmdr.data());
                 this.emit(EV_NET, user._id, 'status', user._cmdr.status);
 
@@ -92,7 +103,6 @@ class Universe extends EE3 {
 
                 this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(false, user._cmdr.current_system_name()));
 
-                user._cmdr.dest_set(user._cmdr.dest);
 
                 await this.repo_search(user, {uid: user._id});
 
@@ -340,12 +350,7 @@ class Universe extends EE3 {
             return this.emit(EV_NET, user._id, 'exp-data', user._cmdr._exp.get_exp_data(true, user._cmdr.current_system_name()));
         }
         // runs now here
-        if (c === 'run-list') {
-            let list = [];
-            for (let i in this.runs) list.push({_id: this.runs[i]._id, name: this.runs[i].name});
-            return this.emitf(EV_NET, user._id, 'run-list', list);
-
-        }
+        if (c === 'run-list') return this.send_runs_list(user, data);
         if (c === 'run-new') return this.create_race(user, data);
         if (c === 'run-join') return this.join_race(user, data);
         if (c === 'run-leave') return this.leave_race(user, data);
@@ -356,7 +361,7 @@ class Universe extends EE3 {
         if (id && this.runs[id] && user._cmdr) {
             this.runs[id].join(user._cmdr);
         } else {
-            console.log('nope!', user, r)
+            this.send_runs_list(user);
         }
     }
 
@@ -367,8 +372,14 @@ class Universe extends EE3 {
             }
             user._cmdr.touch({run_id: null});
             user._cmdr.dest_clear();
-
         }
+        this.send_runs_list(user);
+    }
+
+    send_runs_list(user) {
+        let list = [];
+        for (let i in this.runs) list.push({_id: this.runs[i]._id, name: this.runs[i].name});
+        return this.emitf(EV_NET, user._id, 'run-list', list);
     }
 
     async create_race(user, data) {
