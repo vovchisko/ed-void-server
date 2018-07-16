@@ -3,14 +3,6 @@
 
         <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}{{env.station ? ' / ' +  env.station.name : '' }}</header>
 
-        <div class="alert info edfx" v-if="N.status.head === null">
-            <i class="i-ed-alert"></i>
-            <h4>Approach to the body
-                <div class="objective">{{N.dest.body_id}}</div>
-            </h4>
-            <p>nav-module will engage automatically on approach</p>
-        </div>
-
         <navigator></navigator>
 
         <div class="container-fluid">

@@ -33,13 +33,16 @@
 
         <div class="active-run" v-if="PILOT.cmdr.run_id">
             <navigator></navigator>
-            <pre> {{R.run}}</pre>
+            <div class="runner">
+
+            </div>
             <button v-on:click="leave_run()">give up</button>
         </div>
         <br>
         <br>
         <br>
 
+        <hr>
         <button v-on:click="dev = !dev">dev stuff</button>
         <div class="row" v-if="dev">
             <div class="col-sm">
@@ -52,9 +55,8 @@
                 <pre>PILOT:DEST {{PILOT.dest}}</pre>
             </div>
             <div class="col-sm">
-                <pre>PILOT:CMDR{{PILOT.cmdr}}</pre>
+                <pre>PILOT:CMDR {{PILOT.cmdr}}</pre>
             </div>
-
         </div>
     </div>
 </template>
@@ -87,7 +89,7 @@
         components: {Navigator},
         data: () => {
             return {
-                dev: false,
+                dev: true,
                 c_tab: 'runs',
                 R: R,
                 PILOT: PILOT,
@@ -121,7 +123,7 @@
             leave_run: function (run_id) {
                 A.warn({
                     text: 'are you sure that you want to leave?',
-                    desc: 'it will counts as fail for you as rece already started',
+                    desc: 'it will discard all your current race score and affect statisctic',
                     acts: {
                         'yes, leave': () => {
                             NET.send('run-leave');
@@ -153,6 +155,8 @@
     NET.on('uni:run-upd-cmdr', apply_pilot);
 
     function apply_pilot(pilot) {
+        // todo: this is a problem. it's just an array.
+        // let's drop points (semt it only once or something) and re-fill this list well
         for (let i = 0; i < R.run.pilots.length; i++)
             if (pilot.id === R.run.pilots[i].id)
                 return Vue.set(R.run.pilots, i, pilot);

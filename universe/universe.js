@@ -63,19 +63,20 @@ class Universe extends EE3 {
 
                 if (!user._cmdr) return;
 
+                this.emit(EV_NET, user._id, 'cmdr', user._cmdr.data());
+                this.emit(EV_NET, user._id, 'status', user._cmdr.status);
+
                 if (user._cmdr.run_id) {
-                    if (this.runs[user._cmdr.run_id]) {
+                    if (this.runs[user._cmdr.run_id]) { //run exists
                         this.runs[user._cmdr.run_id].re_broadcast_for(user._cmdr);
-                    } else {
+                    } else { //run not exists or inactive
                         this.run_id = null;
                         user._cmdr.dest_clear();
                     }
-                } else {
-                    user._cmdr.dest_set(user._cmdr.dest);
                 }
 
-                this.emit(EV_NET, user._id, 'cmdr', user._cmdr.data());
-                this.emit(EV_NET, user._id, 'status', user._cmdr.status);
+                if (user._cmdr.dest.enabled)
+                    UNI.emitf(EV_NET, user._id, 'dest', user._cmdr.dest);
 
                 /*
                 let scans = user._cmdr.journal()
@@ -369,9 +370,10 @@ class Universe extends EE3 {
         if (user._cmdr && user._cmdr.run_id) {
             if (this.runs[user._cmdr.run_id]) {
                 this.runs[user._cmdr.run_id].leave(user._cmdr);
+            }else{
+                user._cmdr.touch({run_id: null});
+                user._cmdr.dest_clear();
             }
-            user._cmdr.touch({run_id: null});
-            user._cmdr.dest_clear();
         }
         this.send_runs_list(user);
     }

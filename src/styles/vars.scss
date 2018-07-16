@@ -42,7 +42,7 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
 @mixin single_line { overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap; }
-@mixin hcaps { font-family: 'euro_capsregular', sans-serif; }
+@mixin hcaps { font-family: 'euro_capsregular', sans-serif;  text-transform: lowercase }
 @mixin ui-basic {
     display: table-cell;
     line-height: $ui-line-h;

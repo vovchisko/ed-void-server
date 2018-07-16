@@ -5,6 +5,9 @@ const tools = require('./tools');
 let UNI;
 let DB;
 
+const DEFAULT_MIN_DIST_KM = 2;
+const DEFAULT_MIN_ALT_M = 2000;
+
 
 /**
  * init CMDR module
@@ -31,6 +34,11 @@ class CMDR {
         this.run_id = null;
         this.starpos = [0, 0, 0];
         this.metrics = {curr_ds: 0};
+        this.void_run = {
+            win: 0,
+            total: 0,
+            score: 0,
+        };
         this.status = {
             flags: 0,
             pips: [0, 0, 0],
@@ -76,10 +84,13 @@ class CMDR {
                 if (sbody) {
                     this.dest.body_id = sbody._id;
                     this.dest.sys_id = sbody.sys_id;
+                    this.dest.min_alt = d.min_alt || DEFAULT_MIN_ALT_M;
+                    this.dest.min_dist = d.min_dist || DEFAULT_MIN_DIST_KM;
 
                     if (sbody.radius) {
                         this.dest.r = sbody.radius / 1000;
                         this.dest.enabled = true; //success
+
                     } else {
                         this.dest.f += '/WA-CR';
                         if (!d.r) {
@@ -143,6 +154,8 @@ class CMDR {
 
         UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
 
+        console.log(this.dest, d)
+
     }
 
     trail() {
@@ -174,18 +187,16 @@ class CMDR {
             this.dest.head = Math.floor(initialBearing);
             if (isNaN(this.dest.head)) this.dest.head = 'ERR';
 
-            let min_alt = 2000; //m
-            let min_dist = 1.5; //km
-
-            if (this.status.alt > min_alt || this.dest.dist > min_dist) {
+            if (this.status.alt > this.dest.min_alt || this.dest.dist > this.dest.min_dist) {
                 this.dest.x++
             }
         }
 
         UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
 
+        // prevent fire event on the planet, but fire every time when user jump or dock. see update()
         if (this.run_id)
-            if (prev_x !== this.dest.x) UNI.runs[this.run_id].update(this);
+            if (prev_x !== this.dest.x || !this.status.body_id) UNI.runs[this.run_id].update(this);
 
 
     }
@@ -200,14 +211,15 @@ class CMDR {
             st_id: null,
             lat: null,
             lon: null,
-            alt: null, // todo: yes. altitude is important
+            dist: null,
+            min_alt: null, // todo: yes. altitude is important
+            min_dist: null, // todo: yes. altitude is important
             r: null,
             head: null,
             f: '',
             x: 0,
         };
         UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
-
     }
 
     journal() {

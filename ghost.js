@@ -26,12 +26,13 @@ async function init() {
     // UNI.on(EV_NET, (uid, uni_event, data) => { });
 
     UNI.init();
-
+    await re_fill_tracks();
+    process.exit(0);
     await wipe_stellars();
     await re_index_void();
     await re_index_journals();
 
-    await re_fill_tracks();
+
 
     await re_process();
 
@@ -114,11 +115,11 @@ async function re_process() {
     console.log(`total time: ${end_all / 1000}sec`);
 }
 
-function re_fill_tracks() {
+async function  re_fill_tracks() {
     console.log(`\n>> RE_FILL TRACKS...`);
     for (let i = 0; i < DATA.tracks.length; i++) {
-        DB.run_tracks.save(DATA.tracks[i]);
-        console.log(i + ' - ' + DATA.tracks[i]._id + ' :: ' + DATA.tracks[i].name)
+        let r = await DB.run_tracks.save(DATA.tracks[i]);
+        console.log(r,i + ' - ' + DATA.tracks[i]._id + ' :: ' + DATA.tracks[i].name)
     }
 }
 

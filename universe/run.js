@@ -40,32 +40,51 @@ class RUN {
     }
 
     tick() {
-        console.log('race tick...');
+        console.log('race tick...' + this._id);
     }
 
     update(cmdr) {
-        if (cmdr.dest.x === 0) {
-            this.pilots[cmdr._id].c_point++;
-            if (this.points[this.pilots[cmdr._id].c_point]) {
-                cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].c_point]), '/RUN');
-            } else {
-                this.pilots[cmdr._id].c_point = -1;
-                this.pilots[cmdr._id].status = RUNNER.FINISHED;
-                cmdr.dest_clear();
+        let pilot = this.pilots[cmdr._id];
 
-                //todo: can we complete run ?
+        pilot.sys_id = cmdr.sys_id;
+        pilot.body_id = cmdr.body_id;
+        pilot.st_id = cmdr.st_id;
+
+        //what we gonna do with clusters btw?
+
+        if (cmdr.dest.x === 0) {
+            //score?
+            if (cmdr.dest.goal === DGOAL.SURFACE && cmdr.status.alt) pilot.score += Math.floor(9000 / cmdr.status.alt);
+            if (cmdr.dest.goal === DGOAL.STATION) pilot.score += 2000;
+            if (cmdr.dest.goal === DGOAL.BODY) pilot.score += 3000;
+            if (cmdr.dest.goal === DGOAL.SYSTEM) pilot.score += 1000;
+
+            pilot.score += 200; //always
+
+            //next point setup
+            pilot.c_point++;
+            if (this.points[pilot.c_point]) {
+                cmdr.dest_set(extend({r: 1000}, this.points[pilot.c_point]), '/RUN');
+            } else {
+                pilot.c_point = -1;
+                pilot.status = RUNNER.FINISHED;
+                cmdr.dest_clear();
+                if (!this.has_active_pilots()) { this.complete(); }
             }
         }
+        this.re_arrange();
         this.broadcast(cmdr._id);
     }
 
     re_broadcast_for(cmdr) {
-        if (this.pilots[cmdr._id])
-            UNI.emitf(EV_NET, cmdr.uid, 'run-upd', this.info());
-
+        if (this.pilots[cmdr._id]) UNI.emitf(EV_NET, cmdr.uid, 'run-upd', this.info());
     }
 
-    broadcast(cmdr_id = null, to_cmdr = null) {
+    re_arrange() {
+        //this is important - we need to rearrange players by checkpoints.
+    }
+
+    broadcast(cmdr_id = null) {
         for (let i in this.pilots) {
             if (!cmdr_id) {
                 UNI.emitf(EV_NET, this.pilots[i].uid, 'run-upd', this.info());
@@ -77,14 +96,32 @@ class RUN {
 
     start() {
         this.status = 1;
+        //simply call update for all pilots
     }
 
     leave(cmdr) {
         if (this.pilots[cmdr._id]) {
-            this.pilots[cmdr._id].status = RUNNER.LEAVE; // that's it.
+            cmdr.run_id = null;
             cmdr.dest_clear();
+            if (this.status === 1) {
+                this.pilots[cmdr._id].status = RUNNER.LEAVE; // that's it.
+                cmdr.void_run.total++;
+            }
+
+            if (this.status === 0) {
+                delete this.pilots[cmdr._id];
+            }
+
+            if (this.status === 2) {
+                cmdr.void_run.total++;
+                cmdr.void_run.score += this.pilots[cmdr._id].score;
+                //todo: win?
+            }
+            cmdr.touch({});
         }
-        if (!this.has_active_pilots()) this.complete();
+
+        if (!this.has_active_pilots())
+            return this.complete();
 
         this.broadcast();
     }
@@ -99,7 +136,6 @@ class RUN {
         clearInterval(this._heart);
         delete UNI.runs[this._id];
     }
-
 
     has_active_pilots() {
         for (let i in this.pilots)
@@ -116,6 +152,10 @@ class RUN {
             pos: 0, // position in race
             status: RUNNER.IN, // current status in-race
             uid: cmdr.uid,
+            score: 0,
+            sys_id: cmdr.sys_id,
+            body_id: cmdr.body_id,
+            st_id: cmdr.st_id,
         };
 
         cmdr.touch({run_id: this._id});
