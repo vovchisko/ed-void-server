@@ -1,8 +1,13 @@
+// OFFICIAL RACES FOR GHOST RE-FILL SCRIPT
+
 const tracks = [
     {
         _id: 'FARSEER_TEST',
-        cycle: 0,
-        name: 'farseer: test 1',
+        name: 'farseer: dev test',
+        desc: 'Instant run with 3 checkpoints. Nothing special.',
+        sponsor: 'VOID Development',
+        type: 'a-b run',
+        vehicle: 'ship',
         points: [
             {goal: DGOAL.SURFACE, lat: 23.6426, lon: 153.5391, min_alt: 1200, mid_dist: 1.95, body_id: 'deciat@3924:-26:-1513/6 a', name: 'start!'},
             {goal: DGOAL.SURFACE, lat: 23.7291, lon: 153.0292, min_alt: 1200, mid_dist: 1.95, body_id: 'deciat@3924:-26:-1513/6 a', name: 'void sponsor: farseer inc.'},
@@ -11,8 +16,11 @@ const tracks = [
     },
     {
         _id: 'FARSEER_INC_1',
-        cycle: 0,
-        name: 'farseer: test 2',
+        name: 'farseer inc. showcase',
+        desc: 'Short but still dangerous run around FARSEER INC. Grab your Sidewinder and "hit the gound"! But not literally.',
+        sponsor: 'FARSEER Inc.',
+        type: 'a-b run',
+        vehicle: 'ship',
         points: [
             {goal: DGOAL.SURFACE, lat: 23.6426, lon: 153.5391, min_alt: 1200, mid_dist: 1.95, body_id: 'deciat@3924:-26:-1513/6 a', name: 'start!'},
             {goal: DGOAL.SURFACE, lat: 23.7291, lon: 153.0292, min_alt: 1200, mid_dist: 1.95, body_id: 'deciat@3924:-26:-1513/6 a', name: 'void sponsor: farseer inc.'},

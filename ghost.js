@@ -119,7 +119,7 @@ async function  re_fill_tracks() {
     console.log(`\n>> RE_FILL TRACKS...`);
     for (let i = 0; i < DATA.tracks.length; i++) {
         let r = await DB.run_tracks.save(DATA.tracks[i]);
-        console.log(r,i + ' - ' + DATA.tracks[i]._id + ' :: ' + DATA.tracks[i].name)
+        console.log(i + ' - ' + DATA.tracks[i]._id + ' :: ' + DATA.tracks[i].name)
     }
 }
 

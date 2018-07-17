@@ -13,46 +13,50 @@
             <div class="row">
                 <div class="col-sm loc-curr">
                     <h5>CURR. POSITION</h5>
-                    <em v-if="PILOT.env.system"><b>SYSTEM</b><span>{{PILOT.env.system.name}}</span></em>
-                    <em v-if="PILOT.env.body"><b>BODY</b><span>{{PILOT.env.body.name}}</span></em>
-                    <em v-if="PILOT.env.station"><b>ST</b><span>{{PILOT.env.station.name}}</span></em>
-                    <em v-if="!PILOT.env.station && !PILOT.env.body"><b>&nbsp;</b><span>deep space</span></em>
-                    <em v-if="PILOT.status.lat !== null"><b>LAT</b><span>{{PILOT.status.lat | nn(4,4)}} <u>°</u></span></em>
-                    <em v-if="PILOT.status.lon !== null"><b>LON</b><span>{{PILOT.status.lon | nn(4,4)}} <u>°</u></span></em>
-                    <em v-if="PILOT.status.alt !== null"><b>ALT</b><span>{{PILOT.status.alt}} <u>M</u></span></em>
-                    <em v-if="PILOT.dest.dist"> <b>DIST</b><span>{{PILOT.dest.dist | nn(3,3)}} <u>KM</u></span> </em>
+                    <div>
+                        <em v-if="PILOT.env.system"><b>SYSTEM</b><span>{{PILOT.env.system.name}}</span></em>
+                        <em v-if="PILOT.env.body"><b>BODY</b><span>{{PILOT.env.body.name}}</span></em>
+                        <em v-if="PILOT.env.station"><b>ST</b><span>{{PILOT.env.station.name}}</span></em>
+                        <em v-if="!PILOT.env.station && !PILOT.env.body"><b>&nbsp;</b><span>deep space</span></em>
+                        <em v-if="PILOT.status.lat !== null"><b>LAT</b><span>{{PILOT.status.lat | nn(4,4)}} <u>°</u></span></em>
+                        <em v-if="PILOT.status.lon !== null"><b>LON</b><span>{{PILOT.status.lon | nn(4,4)}} <u>°</u></span></em>
+                        <em v-if="PILOT.status.alt !== null"><b>ALT</b><span>{{PILOT.status.alt}} <u>M</u></span></em>
+                        <em v-if="PILOT.dest.dist"> <b>DIST</b><span>{{PILOT.dest.dist | nn(3,3)}} <u>KM</u></span> </em>
+                    </div>
                 </div>
                 <div class="col-sm loc-dest">
                     <h5>DESTINATION</h5>
-                    <em v-if="PILOT.dest.sys_id"
-                        v-bind:class="PILOT.dest.sys_id === PILOT.cmdr.sys_id ? 'check' : 'uncheck'">
-                        <b>SYS</b><span>{{PILOT.dest.sys_id}}</span>
-                    </em>
-                    <em v-if="PILOT.dest.st_id"
-                        v-bind:class="PILOT.dest.st_id === PILOT.cmdr.st_id ? 'check' : 'uncheck'">
-                        <b>ST</b><span>{{PILOT.dest.st_id}}</span>
-                    </em>
-                    <em v-if="PILOT.dest.body_id"
-                        v-bind:class="PILOT.dest.body_id === PILOT.cmdr.body_id ? 'check' : 'uncheck'">
-                        <b>BODY</b><span>{{PILOT.dest.body_id}}</span>
-                    </em>
-                    <em v-if="PILOT.dest.lat !== null && PILOT.dest.lon !== null"
-                        v-bind:class="PILOT.dest.dist <= 2 ? 'check' : 'uncheck'">
-                        <b>LAT</b><span>{{PILOT.dest.lat | nn(4,4)}} <u>°</u></span>
-                        <b>LON</b><span>{{PILOT.dest.lon | nn(4,4)}} <u>°</u></span>
-                    </em>
-                    <em v-if="PILOT.dest.min_alt !== null"
-                        v-bind:class="PILOT.status.alt <= PILOT.dest.min_alt ? 'check' : 'uncheck'">
-                        <b>MIN.ALT</b><span>{{PILOT.dest.min_alt}} <u>m</u></span>
-                    </em>
-                    <em v-if="PILOT.dest.min_dist">
-                        <b>MIN.DIST</b><span>{{PILOT.dest.min_dist | nn(3,3)}} <u>Km</u></span>
-                    </em>
-
+                    <div>
+                        <em v-if="PILOT.dest.sys_id"
+                            v-bind:class="PILOT.dest.sys_id === PILOT.cmdr.sys_id ? 'check' : 'uncheck'">
+                            <b>SYS</b><span>{{PILOT.dest.sys_id}}</span>
+                        </em>
+                        <em v-if="PILOT.dest.st_id"
+                            v-bind:class="PILOT.dest.st_id === PILOT.cmdr.st_id ? 'check' : 'uncheck'">
+                            <b>ST</b><span>{{PILOT.dest.st_id}}</span>
+                        </em>
+                        <em v-if="PILOT.dest.body_id"
+                            v-bind:class="PILOT.dest.body_id === PILOT.cmdr.body_id ? 'check' : 'uncheck'">
+                            <b>BODY</b><span>{{PILOT.dest.body_id}}</span>
+                        </em>
+                        <em v-if="PILOT.dest.min_alt !== null"
+                            v-bind:class="PILOT.status.alt !== null && PILOT.status.alt <= PILOT.dest.min_alt ? 'check' : 'uncheck'">
+                            <b>MIN.ALT</b><span>{{PILOT.dest.min_alt}} <u>m</u></span>
+                        </em>
+                        <em v-if="PILOT.dest.lat !== null && PILOT.dest.lon !== null"
+                            v-bind:class="PILOT.dest.dist !== null && PILOT.dest.dist <= 2 ? 'check' : 'uncheck'">
+                            <b>LAT</b><span>{{PILOT.dest.lat | nn(4,4)}} <u>°</u></span>
+                            <b>LON</b><span>{{PILOT.dest.lon | nn(4,4)}} <u>°</u></span>
+                        </em>
+                        <em v-if="PILOT.dest.min_dist"
+                            v-bind:class="PILOT.dest.dist !== null && PILOT.dest.dist <= 2 ? 'check' : 'uncheck'">
+                            <b>MIN.DIST</b><span>{{PILOT.dest.min_dist | nn(3,3)}} <u>Km</u></span>
+                        </em>
+                        <em class="no-dest">no destination set</em>
+                    </div>
                 </div>
             </div>
         </div>
-        <!--pre>{{PILOT.dest}}</pre-->
     </div>
 
 </template>
@@ -149,6 +153,9 @@
             em > span { width: 70%; text-align: left }
             em.check { color: $green; }
         }
+
+        .loc-dest em.no-dest {display: none; opacity: 0.5}
+        .loc-dest em:first-child {display: block !important;}
         small { color: darken($ui-text, 25%);}
     }
 </style>

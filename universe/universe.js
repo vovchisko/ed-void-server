@@ -119,9 +119,6 @@ class Universe extends EE3 {
 
         if (user.cmdr_name !== cmdr_name) await user.set_cmdr(cmdr_name);
 
-
-        user._cmdr.trail();
-
         user._cmdr.status.focus = Status.GuiFocus || null;
         user._cmdr.status.flags = Status.Flags;
         user._cmdr.status.pips = Status.Pips;
@@ -355,6 +352,16 @@ class Universe extends EE3 {
         if (c === 'run-new') return this.create_race(user, data);
         if (c === 'run-join') return this.join_race(user, data);
         if (c === 'run-leave') return this.leave_race(user, data);
+        if (c === 'run-start') return this.run_start(user, data);
+    }
+
+    run_start(user) {
+
+        if (user._cmdr && user._cmdr.run_id && this.runs[user._cmdr.run_id]) {
+            this.runs[user._cmdr.run_id].start(user._cmdr);
+        } else {
+            clog('run_start: error. unable to start run');
+        }
     }
 
     async join_race(user, r) {
@@ -370,7 +377,7 @@ class Universe extends EE3 {
         if (user._cmdr && user._cmdr.run_id) {
             if (this.runs[user._cmdr.run_id]) {
                 this.runs[user._cmdr.run_id].leave(user._cmdr);
-            }else{
+            } else {
                 user._cmdr.touch({run_id: null});
                 user._cmdr.dest_clear();
             }
@@ -380,7 +387,11 @@ class Universe extends EE3 {
 
     send_runs_list(user) {
         let list = [];
-        for (let i in this.runs) list.push({_id: this.runs[i]._id, name: this.runs[i].name});
+
+        for (let i in this.runs)
+            if (this.runs[i].status === 0)
+                list.push({_id: this.runs[i]._id, name: this.runs[i].name});
+
         return this.emitf(EV_NET, user._id, 'run-list', list);
     }
 
@@ -393,7 +404,7 @@ class Universe extends EE3 {
         let r = new RUN(track, user._cmdr);
         this.runs[r._id] = r;
         this.runs[r._id].join(user._cmdr);
-
+        //todo: would be nice to have something like broadcast
     }
 
     async repo_search(user, query) {

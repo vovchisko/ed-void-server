@@ -1,43 +1,49 @@
 <template>
     <div id="navi">
 
-        <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}{{env.station ? ' / ' +  env.station.name : '' }}</header>
+        <header>{{env.system? env.system.name : 'UNDEFINED SYSTEM'}}{{env.body ? ' / ' + env.body.short_name : '' }}{{env.station ? ' / ' + env.station.name : '' }}</header>
 
         <navigator></navigator>
 
         <div class="container-fluid">
 
-            <div class="row">
+            <div class="alert info edfx" v-if="N.PILOT.cmdr.run_id">
+                <i class="i-ed-alert"></i>
+                <h4>navigation module read-only</h4>
+                <p>you can't change your destination manually duiring void-run</p>
+            </div>
+
+            <div class="row" v-if="!N.PILOT.cmdr.run_id">
                 <div class="col-sm">
-                    <div class="ui" v-if="N.edit" >
-                        <button @click="set_goal(g)" v-for="g in N.DGOAL" v-bind:class="N.dest.goal === g ? 'active':''">{{g}}</button>
+                    <div class="ui" v-if="N.edit">
+                        <button @click="set_goal(g)" v-for="g in N.DGOAL" v-bind:class="N.PILOT.dest.goal === g ? 'active':''">{{g}}</button>
                     </div>
 
                     <div v-if="N.edit">
-                        <div v-if="N.dest.goal === N.DGOAL.STATION">
-                            <input-station :id.sync="N.dest.st_id" label="target station"></input-station>
+                        <div v-if="N.PILOT.dest.goal === N.DGOAL.STATION">
+                            <input-station :id.sync="N.PILOT.dest.st_id" label="target station"></input-station>
                         </div>
 
-                        <div v-if="N.dest.goal ===  N.DGOAL.SYSTEM">
-                            <input-system :id.sync="N.dest.sys_id" label="target system"></input-system>
+                        <div v-if="N.PILOT.dest.goal ===  N.DGOAL.SYSTEM">
+                            <input-system :id.sync="N.PILOT.dest.sys_id" label="target system"></input-system>
                         </div>
 
-                        <div v-if="N.dest.goal ===  N.DGOAL.BODY">
-                            <input-body :id.sync="N.dest.body_id" label="target body (approach)"></input-body>
+                        <div v-if="N.PILOT.dest.goal ===  N.DGOAL.BODY">
+                            <input-body :id.sync="N.PILOT.dest.body_id" label="target body (approach)"></input-body>
                         </div>
 
-                        <div v-if="N.dest.goal === N.DGOAL.SURFACE">
-                            <input-body :id.sync="N.dest.body_id" label="target body"></input-body>
+                        <div v-if="N.PILOT.dest.goal === N.DGOAL.SURFACE">
+                            <input-body :id.sync="N.PILOT.dest.body_id" label="target body"></input-body>
                             <div class="ui">
-                                <input type="number" min="-90" max="90" step="any" @focus="$event.target.select()" v-model="N.dest.lat">
+                                <input type="number" min="-90" max="90" step="any" @focus="$event.target.select()" v-model="N.PILOT.dest.lat">
                                 <label>lat</label>
                             </div>
                             <div class="ui">
-                                <input type="number" min="-180" max="180" step="any" @focus="$event.target.select()" v-model="N.dest.lon">
+                                <input type="number" min="-180" max="180" step="any" @focus="$event.target.select()" v-model="N.PILOT.dest.lon">
                                 <label>lon</label>
                             </div>
-                            <div class="ui" v-if="N.dest.f.includes('-CR')">
-                                <input type="number" @focus="$event.target.select()" v-model="N.dest.r">
+                            <div class="ui" v-if="N.PILOT.dest.f.includes('-CR')">
+                                <input type="number" @focus="$event.target.select()" v-model="N.PILOT.dest.r">
                                 <label>target body radius</label>
                             </div>
                         </div>
@@ -47,22 +53,11 @@
                     <div class="ui">
                         <button v-if="!N.edit" v-on:click="dest_edit()"><i class="i-aim"></i> edit destination</button>
                         <button v-if="N.edit" v-on:click="dest_apply()"><i class="i-aim"></i> apply destination</button>&nbsp;
-                        <button v-on:click="dest_clear()"><i class="i-cross"></i> clear</button>
+                        <button v-on:click="dest_clear()" v-if="N.PILOT.dest.goal"><i class="i-cross"></i> clear</button>
                     </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6 cords justified">
-                    <pre>{{N.status}}</pre>
-                </div>
-                <div class="col-6 cords justified">
-                    <pre>{{N.dest}}</pre>
-                </div>
-            </div>
 
-            <!--pre>
-                Can we do SupercruiseExit or ApproachBody on non-landable planets?
-            </pre-->
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -77,9 +72,7 @@
     import {A} from '../components/alert';
 
     const N = {
-
-        status: PILOT.status,
-        dest: PILOT.dest,
+        PILOT: PILOT,
         dest_align: '',
         edit: false,
 
@@ -102,7 +95,7 @@
         },
         methods: {
             set_goal: function (g) {
-                N.dest.goal = g;
+                N.PILOT.dest.goal = g;
             },
             dest_clear: function () {
                 NET.send('dest-set', null);
@@ -110,11 +103,11 @@
             },
             dest_edit: function () {
                 NET.send('dest-toggle', false);
-                if (!N.dest.goal) N.dest.goal = N.DGOAL.SURFACE;
+                if (!N.PILOT.dest.goal) N.PILOT.dest.goal = N.DGOAL.SURFACE;
                 N.edit = true;
             },
             dest_apply: function () {
-                NET.send('dest-set', N.dest);
+                NET.send('dest-set', N.PILOT.dest);
                 N.edit = false;
             },
         }

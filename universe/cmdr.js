@@ -49,7 +49,6 @@ class CMDR {
             head: null,
         };
         this.dest = null;
-        this._trail = {};
         this._exp = null;
         this._data = {};
 
@@ -64,7 +63,7 @@ class CMDR {
 
     async dest_set(d, flag = '') {
 
-        this.dest_clear();
+        this.dest_clear(true);
         this.dest.f = flag; //todo: we can also use flag to lock current point. so you should leave run to be able to change it.
 
         if (!d) {
@@ -150,21 +149,12 @@ class CMDR {
         }
 
 
-        this.dest_calc();
+        this.dest_calc(true);
 
         UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
-
-        console.log(this.dest, d)
-
     }
 
-    trail() {
-        this._trail.lat = this.status.lat;
-        this._trail.lon = this.status.lon;
-        this._trail.alt = this.status.alt;
-    }
-
-    dest_calc() {
+    dest_calc(quiet = false) {
         if (!this.dest.enabled) return false;
         let prev_x = this.dest.x;
         this.dest.x = 0;
@@ -173,26 +163,30 @@ class CMDR {
         if (this.dest.st_id && this.dest.st_id !== this.st_id) this.dest.x++;
         if (this.dest.body_id && this.dest.body_id !== this.body_id) this.dest.x++;
 
-        if (this.dest.goal === DGOAL.SURFACE && this.dest.body_id === this.body_id && this.status.alt !== null) {
-            let latStart = this.status.lat * Math.PI / 180;
-            let lonStart = this.status.lon * Math.PI / 180;
-            let latDest = this.dest.lat * Math.PI / 180;
-            let lonDest = this.dest.lon * Math.PI / 180;
-            let deltaLon = lonDest - lonStart;
-            let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
-            let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
-            if (initialBearing < 0) initialBearing = 360 + initialBearing;
-            this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
-            this.dest.dist = Math.floor(this.dest.dist * 1000) / 1000;
-            this.dest.head = Math.floor(initialBearing);
-            if (isNaN(this.dest.head)) this.dest.head = 'ERR';
+        if (this.dest.goal === DGOAL.SURFACE) {
+            if (this.dest.body_id === this.body_id && this.status.alt !== null && this.status.lat !== null && this.status.lon !== null) {
+                let latStart = this.status.lat * Math.PI / 180;
+                let lonStart = this.status.lon * Math.PI / 180;
+                let latDest = this.dest.lat * Math.PI / 180;
+                let lonDest = this.dest.lon * Math.PI / 180;
+                let deltaLon = lonDest - lonStart;
+                let deltaLat = Math.log(Math.tan(Math.PI / 4 + latDest / 2) / Math.tan(Math.PI / 4 + latStart / 2));
+                let initialBearing = (Math.atan2(deltaLon, deltaLat)) * (180 / Math.PI);
+                if (initialBearing < 0) initialBearing = 360 + initialBearing;
+                this.dest.dist = Math.acos(Math.sin(latStart) * Math.sin(latDest) + Math.cos(latStart) * Math.cos(latDest) * Math.cos(deltaLon)) * (this.dest.r);
+                this.dest.dist = Math.floor(this.dest.dist * 1000) / 1000;
+                this.dest.head = Math.floor(initialBearing);
+                if (isNaN(this.dest.head)) this.dest.head = 'ERR';
 
-            if (this.status.alt > this.dest.min_alt || this.dest.dist > this.dest.min_dist) {
-                this.dest.x++
+                if (this.dest.dist === null || this.status.alt > this.dest.min_alt || this.dest.dist > this.dest.min_dist) {
+                    this.dest.x++
+                }
+            } else {
+                this.dest.x++;
             }
         }
 
-        UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
+        if (!quiet) UNI.emitf(EV_NET, this.uid, 'dest', tools.not_nulled(this.dest));
 
         // prevent fire event on the planet, but fire every time when user jump or dock. see update()
         if (this.run_id)
@@ -201,7 +195,7 @@ class CMDR {
 
     }
 
-    dest_clear() {
+    dest_clear(quiet = false) {
         this.dest = {
             name: '',
             enabled: false,
@@ -219,7 +213,7 @@ class CMDR {
             f: '',
             x: 0,
         };
-        UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
+        if (!quiet) UNI.emitf(EV_NET, this.uid, 'dest-set', this.dest);
     }
 
     journal() {
@@ -261,6 +255,7 @@ class CMDR {
 
     data() {
         return tools.pickx(this, this._data,
+            ['_id', '_id'],
             ['name', 'name'],
             ['last_rec', 'last_rec'],
             ['sys_id', 'sys_id'],
@@ -269,7 +264,6 @@ class CMDR {
             ['run_id', 'run_id'],
             ['starpos', 'starpos'],
             ['metrics', 'metrics'],
-            ['_trail', '_trail'], //todo: remove it when finish testing nav/racing function
         );
     }
 

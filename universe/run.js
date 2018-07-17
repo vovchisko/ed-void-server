@@ -6,7 +6,7 @@ let UNI;
 let DB;
 
 global.RUNNER = {
-    IN: 'in-game',
+    IN: 'in-run',
     DEAD: 'dead',
     LEAVE: 'leave',
     FINISHED: 'finished',
@@ -36,19 +36,32 @@ class RUN {
         this.cmdr_name = cmdr.name;
         this.points = [];
         track.points.forEach(p => {this.points.push(extend({}, p))});
-        this._heart = setInterval(() => {this.tick()}, 1000);
+        this._heart = setInterval(() => {this.tick()}, 3000);
+        this._chart = [];
     }
 
     tick() {
-        console.log('race tick...' + this._id);
+        let log = extend({}, this);
+        delete log.points;
+        delete log._heart;
+        delete log.pilots;
+        console.log('RACE', log);
     }
 
     update(cmdr) {
+
         let pilot = this.pilots[cmdr._id];
 
         pilot.sys_id = cmdr.sys_id;
         pilot.body_id = cmdr.body_id;
         pilot.st_id = cmdr.st_id;
+        pilot.starpos = cmdr.starpos;
+        pilot.x = cmdr.dest.x;
+
+        if (this.status === 0) {
+            this.broadcast(cmdr._id);
+            return;
+        }
 
         //what we gonna do with clusters btw?
 
@@ -63,10 +76,10 @@ class RUN {
 
             //next point setup
             pilot.c_point++;
+            pilot.p = pilot.c_point + 1 * ('0.' + Date.now());
             if (this.points[pilot.c_point]) {
-                cmdr.dest_set(extend({r: 1000}, this.points[pilot.c_point]), '/RUN');
+                cmdr.dest_set(extend({r: 1000}, this.points[pilot.c_point]), '/RUN:' + pilot.c_point);
             } else {
-                pilot.c_point = -1;
                 pilot.status = RUNNER.FINISHED;
                 cmdr.dest_clear();
                 if (!this.has_active_pilots()) { this.complete(); }
@@ -81,7 +94,14 @@ class RUN {
     }
 
     re_arrange() {
-        //this is important - we need to rearrange players by checkpoints.
+        this._chart.splice(0, this._chart.length);
+        for (let i in this.pilots) {
+            this._chart.push({id: this.pilots[i].id, p: this.pilots[i].p});
+        }
+        this._chart.sort((a, b) => b.p - a.p);
+        for (let i = 0; i < this._chart.length; i++) {
+            this.pilots[this._chart[i].id].pos = i + 1;
+        }
     }
 
     broadcast(cmdr_id = null) {
@@ -94,9 +114,18 @@ class RUN {
         }
     }
 
-    start() {
+    start(cmdr) {
+        if (cmdr._id !== this.cmdr_id) return;
+
         this.status = 1;
-        //simply call update for all pilots
+
+        this.broadcast();
+        for (let i in this.pilots) {
+            UNI.get_user({_id: this.pilots[i].uid})
+                .then((user) => {
+                    if (user && user._cmdr) this.update(user._cmdr);
+                }).catch((e) => {console.log('RUN:START ERROR - unable to find pilot', e)});
+        }
     }
 
     leave(cmdr) {
@@ -127,12 +156,17 @@ class RUN {
     }
 
     complete(force = false) {
-        // check who is finished
-        // check who is leave
         this.status = 2;
-        this.broadcast(); // broadcast changes
-        // save records
-        console.log('race complete...');
+        this.broadcast();
+        console.log('---- RACE COMPLETE ---- //todo: save?');
+        this.close();
+    }
+
+    async close() {
+        for (let i in this.pilots) {
+            let cmdr = await UNI.get_user(this.pilots[i].uid);
+            this.leave(cmdr);
+        }
         clearInterval(this._heart);
         delete UNI.runs[this._id];
     }
@@ -156,10 +190,11 @@ class RUN {
             sys_id: cmdr.sys_id,
             body_id: cmdr.body_id,
             st_id: cmdr.st_id,
+            p: 0, // int=c_point + dec = date.now or last c_point
         };
 
         cmdr.touch({run_id: this._id});
-        cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].c_point]), '/RUN');
+        cmdr.dest_set(extend({r: 1000}, this.points[this.pilots[cmdr._id].c_point]), '/RUN:0');
 
         clog(`RUN: CMDR ${cmdr._id} (${cmdr.name}) joined the race ${this._id}`);
 
