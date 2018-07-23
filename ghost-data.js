@@ -43,3 +43,31 @@ const tracks = [
 ];
 
 module.exports.tracks = tracks;
+
+
+/*
+ track should have:
+
+ 1 - name
+
+ 2 - descriptions
+   - sponsors
+   - short text description
+   - track summary (generated from checkpoints)
+
+ 3 - checkpoints with position/body/coords + flags to track rule-breaking (like using wrong vehicle)
+
+ 4 - version (just like 1.0.3)
+
+ 5 - submited: cmdr_name / cmdr_id
+
+ 6 - Nominal time (avg. time for sidewinder)
+
+ 7 - counters:
+   - finished
+   - destroyed
+   - leave
+   - disqualified
+   - total
+
+  */
