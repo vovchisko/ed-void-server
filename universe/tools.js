@@ -217,6 +217,20 @@ function not_nulled(obj) {
     return ret;
 }
 
+function now(ms = false) {
+    return ms ? Date.now() / 1000 : Date.now();
+}
+
+function item_in(arr, prop, val, cb) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i][prop] === val) {
+            if(typeof cb === 'function') cb(arr[i], i)
+            return arr[i];
+        }
+    }
+}
+
+module.exports.item_in = item_in;
 module.exports.not_nulled = not_nulled;
 module.exports.safe_regexp = safe_regexp;
 module.exports.circle_intersect = circle_intersect;

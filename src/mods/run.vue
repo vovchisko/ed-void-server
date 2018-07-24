@@ -16,7 +16,6 @@
                 <pre>{{r}}</pre>
                 <button v-on:click="join_run(r._id)">join</button>
             </div>
-
         </div>
         <div class="container-fluid" v-if="c_tab==='tracks' && !PILOT.cmdr.run_id">
             <h3>tracks</h3>
@@ -38,10 +37,15 @@
         </div>
         <div class="active-run" v-if="PILOT.cmdr.run_id">
             <navigator></navigator>
+            <div class="row">
+                <div class="col-sm">{{R.run.status}}</div>
+                <div class="col-sm">{{R.run.c_down || 'GO!'}}</div>
+                <div class="col-sm"></div>
+            </div>
             <table class="pilots">
                 <tr v-for="p in R.run.pilots">
                     <td>
-                        <small>{{p.status}} <span v-if="R.run.status===0">{{p.x > 0 ? ' - on the way' : ' - ready!'}}</span></small>
+                        <small>{{p.status}} <span>{{p.x > 0 ? ' - on the way' : ' - on position!'}}</span></small>
                         <b>{{p.pos}} - CMDR {{p.name}}</b>
                     </td>
                     <td>
@@ -54,21 +58,21 @@
                     </td>
                 </tr>
             </table>
-            <button v-on:click="run_start()" v-if="PILOT.dest.x === 0 && R.run.status === 0 && PILOT.cmdr._id === R.run.cmdr_id">run!</button>
-            <button v-on:click="leave_run()" v-if="R.run.status === 0">leave setup</button>
-            <button v-on:click="leave_run()" v-if="R.run.status === 1">abandon race</button>
-            <button v-on:click="leave_run()" v-if="R.run.status === 2">complete race</button>
+            <button v-on:click="run_start()" v-if="R.run.status === 'setup' && PILOT.dest.x === 0">ready!</button>
+            <button v-on:click="leave_run()" v-if="R.run.status === 'setup'">leave setup</button>
+            <button v-on:click="leave_run()" v-if="R.run.status === 'running'">abandon race</button>
+            <button v-on:click="leave_run()" v-if="R.run.status === 'complete'">complete race</button>
 
         </div>
 
-        <!--div class="row">
+        <!--<div class="row">
             <div class="col-sm">
                 <pre>RUN {{R.run}}</pre>
             </div>
             <div class="col-sm">
                 <pre>PILOT.DEST {{PILOT.dest}}</pre>
             </div>
-        </div-->
+        </div>-->
     </div>
 </template>
 
@@ -81,6 +85,24 @@
     import Starpos from "../components/star-pos";
     import tools from "../ctrl/tools";
 
+
+    const RUNNER = {
+        JOINED: 'joined',
+        READY: 'ready',
+        IN: 'in-run',
+        DEAD: 'dead',
+        LEAVE: 'leave',
+        FINISHED: 'finished',
+        DISQILFIED: 'disquilified',
+    };
+
+    const RUNST = {
+        SETUP: 'setup',
+        RUNNING: 'running',
+        COMPLETE: 'complete',
+    };
+
+
     const R = {
         run: {
             _id: null,
@@ -90,7 +112,6 @@
             cmdr_name: null,
             cmdr_id: null,
             pilots: [],
-            points: [],
         },
         runs: [],
         tracks: [],
@@ -123,7 +144,7 @@
                     }).catch((err) => { console.log('s-tracks', err)});
             },
             get_runs: function () {
-                NET.send('run-list', {});
+                NET.send('run-list');
             },
             new_run: function (track_id) {
                 NET.send('run-new', {track_id: track_id});
@@ -132,11 +153,10 @@
                 NET.send('run-join', {run_id: run_id});
             },
             run_start: function () {
-                NET.send('run-start');
+                NET.send('run-ready');
             },
             leave_run: function () {
-                if (this.R.run.status === 0) NET.send('run-leave');
-                if (this.R.run.status === 1) {
+                if (this.R.run.status === RUNST.RUNNING) {
                     return A.warn({
                         text: 'are you sure that you want to leave?',
                         desc: 'it will discard all your current race score and affect statisctic',
@@ -147,9 +167,9 @@
                             'cancel': null
                         }
                     })
+                } else {
+                    NET.send('run-leave');
                 }
-                if (this.R.status === 2) NET.send('run-leave');
-
             }
         }
     }
@@ -157,7 +177,7 @@
     NET.on('uni:run-upd', (run) => {
 
         R.run.pilots.splice(0, R.run.pilots.length);
-        for (let i in run.pilots)
+        for (let i = 0; i < run.pilots.length; i++)
             apply_pilot(run.pilots[i]);
 
         R.run._id = run._id;
@@ -165,17 +185,16 @@
         R.run.status = run.status;
         R.run.name = run.name;
         R.run.cmdr_name = run.cmdr_name;
-        R.run.cmdr_id = run.cmdr_id;
+        R.run.c_down = run.c_down;
         R.run.pilots.sort((a, b) => a.pos - b.pos);
     });
 
-    NET.on('uni:run-upd-cmdr', apply_pilot);
+    NET.on('uni:run-upd-cmdr', pilot => apply_pilot(pilot));
 
     function apply_pilot(pilot) {
         // todo: this is a problem. it's just an array.
-        // let's drop points (semt it only once or something) and re-fill this list well
         for (let i = 0; i < R.run.pilots.length; i++)
-            if (pilot.id === R.run.pilots[i].id) {
+            if (R.run.pilots[i] && pilot._id === R.run.pilots[i]._id) {
                 Vue.set(R.run.pilots, i, pilot);
                 R.run.pilots.sort((a, b) => a.pos - b.pos);
                 return;
@@ -185,6 +204,14 @@
         R.run.pilots.push(pilot);
         R.run.pilots.sort((a, b) => a.pos - b.pos);
     }
+
+    NET.on('uni:run-status', (r) => {
+        for (let i = 0; i < R.runs.length; i++) {
+            if (R.runs[i]._id === r._id)
+                return Vue.set(R.runs, i, r);
+        }
+        R.runs.unshift(r);
+    });
 
     NET.on('uni:run-list', (runs) => {
         R.runs.splice(0, R.runs.length);

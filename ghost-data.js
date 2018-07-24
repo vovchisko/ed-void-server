@@ -2,6 +2,19 @@
 
 const tracks = [
     {
+        _id: 'ELDER_HUB_TEST',
+        name: 'DEV_TEST: ELDER_HUB',
+        desc: '2 points on the same station',
+        sponsor: 'VOID Development',
+        type: 'A-run',
+        vehicle: 'ship',
+        points: [
+            {goal: DGOAL.STATION, st_id: 'mundii@2738:-34:-12/elder hub', name: 'start!'},
+            {goal: DGOAL.STATION, st_id: 'mundii@2738:-34:-12/elder hub', name: 'step'},
+            {goal: DGOAL.STATION, st_id: 'mundii@2738:-34:-12/elder hub', name: 'end!'},
+        ]
+    },
+    {
         _id: 'FARSEER_TEST',
         name: 'farseer: dev test',
         desc: 'Instant run with 3 checkpoints. Nothing special.',

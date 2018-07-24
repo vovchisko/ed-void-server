@@ -49,6 +49,12 @@ class Universe extends EE3 {
         for (let u in this.users) await this.users[u].save();
     }
 
+    broadcast(c, data) {
+        for (let i in this.cmdrs) {
+            this.emitf(EV_NET, this.cmdrs[i].uid, c, data);
+        }
+    }
+
     refill_user(uid) {
         return this.get_user({_id: uid})
             .then(async (user) => {
@@ -338,7 +344,9 @@ class Universe extends EE3 {
     }
 
     user_msg(user, c, data) {
+
         clog(c, data);
+
         if (c === 'dest-set') { return user._cmdr && !user._cmdr.run_id ? user._cmdr.dest_set(data) : false; }
         if (c === 'dest-toggle') {return user._cmdr ? user._cmdr.dest.enabled = !!data : false;}
         if (c === 'repo-search') return this.repo_search(user, data);
@@ -352,13 +360,12 @@ class Universe extends EE3 {
         if (c === 'run-new') return this.create_race(user, data);
         if (c === 'run-join') return this.join_race(user, data);
         if (c === 'run-leave') return this.leave_race(user, data);
-        if (c === 'run-start') return this.run_start(user, data);
+        if (c === 'run-ready') return this.run_ready(user, data);
     }
 
-    run_start(user) {
-
+    run_ready(user) {
         if (user._cmdr && user._cmdr.run_id && this.runs[user._cmdr.run_id]) {
-            this.runs[user._cmdr.run_id].start(user._cmdr);
+            this.runs[user._cmdr.run_id].pilot_ready(user._cmdr);
         } else {
             clog('run_start: error. unable to start run');
         }
@@ -366,11 +373,8 @@ class Universe extends EE3 {
 
     async join_race(user, r) {
         let id = r ? r.run_id : null;
-        if (id && this.runs[id] && user._cmdr) {
+        if (id && this.runs[id] && user._cmdr)
             this.runs[id].join(user._cmdr);
-        } else {
-            this.send_runs_list(user);
-        }
     }
 
     async leave_race(user) {
@@ -382,15 +386,13 @@ class Universe extends EE3 {
                 user._cmdr.dest_clear();
             }
         }
-        this.send_runs_list(user);
     }
 
     send_runs_list(user) {
         let list = [];
 
         for (let i in this.runs)
-            if (this.runs[i].status === 0)
-                list.push({_id: this.runs[i]._id, name: this.runs[i].name});
+            list.push(this.runs[i].info());
 
         return this.emitf(EV_NET, user._id, 'run-list', list);
     }
@@ -404,7 +406,6 @@ class Universe extends EE3 {
         let r = new RUN(track, user._cmdr);
         this.runs[r._id] = r;
         this.runs[r._id].join(user._cmdr);
-        //todo: would be nice to have something like broadcast
     }
 
     async repo_search(user, query) {
@@ -500,11 +501,13 @@ class Universe extends EE3 {
 
     /**
      * Get user by mongodb query. Is also can be cached in Universe Instance
-     * @param {object} by is MongoDB query.
+     * @param {object|string} by is MongoDB query.
      * @returns {Promise<USER>}
      */
     async get_user(by) {
         let user = null;
+
+        if (typeof by === 'string') by = {_id: by};
 
         if (by._id && this.users[by._id]) {
             return this.users[by._id];
