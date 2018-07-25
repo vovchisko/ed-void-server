@@ -5,6 +5,8 @@ const tools = require('./tools');
 let UNI;
 let DB;
 
+global.RUN_COUNTDOWN = 3;
+
 global.RUNNER = {
     JOINED: 'joined',
     READY: 'ready',
@@ -19,6 +21,7 @@ global.RUNST = {
     SETUP: 'setup',
     RUNNING: 'running',
     COMPLETE: 'complete',
+    CLOSED: 'closed',
 };
 
 /**
@@ -39,12 +42,14 @@ class RUN {
         this.track_id = track._id;
         this.status = RUNST.SETUP; // 0 - preparation, 1 - in progress, 2 - complete
         this.name = track.name;
-        this.c_down = 11; // secodns/ticks
+        this.c_down = RUN_COUNTDOWN; // secodns/ticks
         this.pilots = []; // see join() for details
-        this.cmdr_id = cmdr._id;
-        this.cmdr_name = cmdr.name;
+        this.host = cmdr._id;
         this._track = track;
         this._heart = setInterval(() => {this.tick()}, 1000);
+
+        UNI.runs[this._id] = this;
+        UNI.runs[this._id].pilot_join(cmdr);
     }
 
     broadcast_status() {
@@ -59,8 +64,8 @@ class RUN {
                 this.broadcast_status();
                 this.broadcast();
             } else {
-                if (this.c_down !== 11) {
-                    this.c_down = 11;
+                if (this.c_down !== RUN_COUNTDOWN) {
+                    this.c_down = RUN_COUNTDOWN;
                     this.broadcast();
                     this.broadcast_status();
                 }
@@ -72,20 +77,23 @@ class RUN {
         }
 
         if (this.status === RUNST.COMPLETE) {
-            if (!this.pilots.length) { this.close() }
+            for (let i in this.pilots)
+                if (this.pilots[i].w) return;
+            this.close();
         }
-
 
         //can be removed later
         let log = extend({}, this);
         delete log._heart;
         delete log._track;
-        console.log(log)
+        console.log(log);
 
     }
 
     start() {
         this.status = RUNST.RUNNING;
+        this.broadcast_status();
+
         for (let i = 0; i < this.pilots.length; i++) {
             UNI.get_user({_id: this.pilots[i].uid})
                 .then((user) => {
@@ -94,7 +102,7 @@ class RUN {
                 .catch((e) => {console.log('RUN:START ERROR - unable to find pilot', e)});
         }
         this.broadcast();
-        this.broadcast_status();
+
     }
 
     update(cmdr) {
@@ -119,12 +127,12 @@ class RUN {
                 if (cmdr.dest.goal === DGOAL.SYSTEM) pilot.score += 1000;
                 pilot.score += 200;
 
-                pilot.c_point++;
-                pilot.p = pilot.c_point + 1 * ('0.' + Date.now()); // sort user by this value.
+                pilot.p++;
+                pilot.ord = pilot.p + 1 * ('0.' + Date.now()); // sort user by this value.
 
-                if (this._track.points[pilot.c_point]) {
+                if (this._track.points[pilot.p]) {
                     //next checkpoint
-                    cmdr.dest_set(extend({r: 1000}, this._track.points[pilot.c_point]), '/RUN:' + pilot.c_point);
+                    cmdr.dest_set(extend({r: 1000}, this._track.points[pilot.p]), '/RUN:' + pilot.p);
                 } else {
                     pilot.status = RUNNER.FINISHED;
                     cmdr.void_run.total++;
@@ -145,7 +153,7 @@ class RUN {
     }
 
     re_arrange() {
-        this.pilots.sort((a, b) => b.p - a.p);
+        this.pilots.sort((a, b) => b.ord - a.ord);
         for (let i = 0; i < this.pilots.length; i++) {
             this.pilots[i].pos = i + 1;
         }
@@ -180,12 +188,11 @@ class RUN {
         return false;
     }
 
-    leave(cmdr) {
-        console.log('>>> LEAVE?');
+    pilot_leave(cmdr) {
         tools.item_in(this.pilots, '_id', cmdr._id, (pilot, key) => {
-            console.log('>>> LEAVE!');
             cmdr.run_id = null;
             cmdr.dest_clear();
+            pilot.w = 0;
 
             if (this.status === RUNST.SETUP) {
                 this.pilots.splice(key, 1);
@@ -204,40 +211,41 @@ class RUN {
 
             this.re_arrange();
             this.broadcast();
-            this.broadcast_status();
+            if (this.status === RUNST.SETUP) this.broadcast_status();
         });
-
-
+        if (!this.pilots.length) this.close();
     }
 
     complete() {
         this.status = RUNST.COMPLETE;
         this.broadcast();
-        this.broadcast_status();
-        console.log('---- RACE COMPLETE ----');
     }
 
     async close() {
         for (let i = 0; i < this.pilots.length; i++) {
             let user = await UNI.get_user(this.pilots[i].uid);
-            this.leave(user._cmdr);
+            this.pilot_leave(user._cmdr);
         }
         clearInterval(this._heart);
+        this.status = RUNST.CLOSED;
         this.broadcast_status();
-        delete UNI.runs[this._id];
 
-        clog('>>> RUN COMPLETE!')
+        delete UNI.runs[this._id];
+        delete this._track;
+        delete this._heart;
+
+        if (this.pilots)
+            await DB.run_races.save(this);
     }
 
 
-    join(cmdr) {
+    pilot_join(cmdr) {
         if (cmdr.run_id) return clog('cmdr already busy with run ' + cmdr.name + ' / run_id: ' + cmdr.run_id);
         if (this.status !== RUNST.SETUP) return UNI.emitf(EV_NET, cmdr.uid, 'alert', {text: 'race already started'});
 
         this.pilots.push({
             _id: cmdr._id,//cmdr cmdr_id
-            name: cmdr.name, //cmdr name
-            c_point: 0, //current point ID
+            p: 0, //current point ID
             pos: 0, // position in race
             status: RUNNER.JOINED, // current status in-race
             uid: cmdr.uid,
@@ -245,7 +253,8 @@ class RUN {
             sys_id: cmdr.sys_id,
             body_id: cmdr.body_id,
             st_id: cmdr.st_id,
-            p: 0, // int=c_point + dec = date.now or last c_point
+            ord: 0, // int=p + dec = date.now or last p
+            w: 1, // watching?
         });
 
         cmdr.touch({run_id: this._id});
@@ -256,7 +265,6 @@ class RUN {
         this.re_arrange();
         this.broadcast();
         this.broadcast_status();
-
     }
 
 
@@ -265,8 +273,7 @@ class RUN {
             _id: this._id,
             //track_id: this.track_id,
             name: this.name,
-            cmdr_name: this.cmdr_name,
-            //cmdr_id: this.cmdr_id,
+            host: this.host,
             pilots: this.pilots,
             status: this.status,
             c_down: this.c_down,
@@ -274,8 +281,4 @@ class RUN {
         }
     }
 
-    async save() {
-        //no temporary fields here...
-        await DB.systems.save(this);
-    }
 }

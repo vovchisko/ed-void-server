@@ -43,18 +43,18 @@
                 <div class="col-sm"></div>
             </div>
             <table class="pilots">
-                <tr v-for="p in R.run.pilots">
+                <tr v-for="pilot in R.run.pilots">
                     <td>
-                        <small>{{p.status}} <span>{{p.x > 0 ? ' - on the way' : ' - on position!'}}</span></small>
-                        <b>{{p.pos}} - CMDR {{p.name}}</b>
+                        <small>{{pilot.status}} <span>{{pilot.x > 0 ? ' - on the way' : ' - on position!'}}</span></small>
+                        <b>{{pilot.pos}} - {{pilot._id.split('/')[1]}}</b>
                     </td>
                     <td>
-                        <small>c_point</small>
-                        <b>{{p.c_point}}</b>
+                        <small>current point</small>
+                        <b>{{pilot.p}}</b>
                     </td>
                     <td>
                         <small>score</small>
-                        <b>{{p.score}}</b>
+                        <b>{{pilot.score}}</b>
                     </td>
                 </tr>
             </table>
@@ -100,6 +100,8 @@
         SETUP: 'setup',
         RUNNING: 'running',
         COMPLETE: 'complete',
+        CLOSED: 'closed',
+
     };
 
 
@@ -109,10 +111,10 @@
             track_id: null,
             status: null,
             name: null,
-            cmdr_name: null,
-            cmdr_id: null,
+            host: null,
             pilots: [],
         },
+        pos: null,
         runs: [],
         tracks: [],
     };
@@ -184,9 +186,9 @@
         R.run.track_id = run.track_id;
         R.run.status = run.status;
         R.run.name = run.name;
-        R.run.cmdr_name = run.cmdr_name;
+        R.run.host = run.host;
         R.run.c_down = run.c_down;
-        R.run.pilots.sort((a, b) => a.pos - b.pos);
+        R.run.pilots.sort((a, b) => a.ord - b.ord);
     });
 
     NET.on('uni:run-upd-cmdr', pilot => apply_pilot(pilot));
@@ -196,19 +198,25 @@
         for (let i = 0; i < R.run.pilots.length; i++)
             if (R.run.pilots[i] && pilot._id === R.run.pilots[i]._id) {
                 Vue.set(R.run.pilots, i, pilot);
-                R.run.pilots.sort((a, b) => a.pos - b.pos);
+                R.run.pilots.sort((a, b) => a.ord - b.ord);
                 return;
             }
 
 
         R.run.pilots.push(pilot);
-        R.run.pilots.sort((a, b) => a.pos - b.pos);
+        R.run.pilots.sort((a, b) => a.ord - b.ord);
     }
 
     NET.on('uni:run-status', (r) => {
         for (let i = 0; i < R.runs.length; i++) {
-            if (R.runs[i]._id === r._id)
-                return Vue.set(R.runs, i, r);
+            if (R.runs[i]._id === r._id) {
+                if (r.status !== RUNST.SETUP) {
+                    return R.runs.splice(i, 1);
+                } else {
+                    return Vue.set(R.runs, i, r);
+                }
+            }
+
         }
         R.runs.unshift(r);
     });

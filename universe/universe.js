@@ -357,9 +357,9 @@ class Universe extends EE3 {
         }
         // runs now here
         if (c === 'run-list') return this.send_runs_list(user, data);
-        if (c === 'run-new') return this.create_race(user, data);
-        if (c === 'run-join') return this.join_race(user, data);
-        if (c === 'run-leave') return this.leave_race(user, data);
+        if (c === 'run-new') return this.run_new(user, data);
+        if (c === 'run-join') return this.run_join(user, data);
+        if (c === 'run-leave') return this.run_leave(user, data);
         if (c === 'run-ready') return this.run_ready(user, data);
     }
 
@@ -371,16 +371,16 @@ class Universe extends EE3 {
         }
     }
 
-    async join_race(user, r) {
+    run_join(user, r) {
         let id = r ? r.run_id : null;
         if (id && this.runs[id] && user._cmdr)
-            this.runs[id].join(user._cmdr);
+            this.runs[id].pilot_join(user._cmdr);
     }
 
-    async leave_race(user) {
+    run_leave(user) {
         if (user._cmdr && user._cmdr.run_id) {
             if (this.runs[user._cmdr.run_id]) {
-                this.runs[user._cmdr.run_id].leave(user._cmdr);
+                this.runs[user._cmdr.run_id].pilot_leave(user._cmdr);
             } else {
                 user._cmdr.touch({run_id: null});
                 user._cmdr.dest_clear();
@@ -397,15 +397,14 @@ class Universe extends EE3 {
         return this.emitf(EV_NET, user._id, 'run-list', list);
     }
 
-    async create_race(user, data) {
+    async run_new(user, data) {
         if (!user._cmdr) return; //just in case
         if (user._cmdr.run_id) return clog('cmdr is already in run!', user._cmdr.run_id);
 
         let track = await DB.run_tracks.findOne({_id: data.track_id});
         if (!track) return clog('unable to find track!', user._id, data);
         let r = new RUN(track, user._cmdr);
-        this.runs[r._id] = r;
-        this.runs[r._id].join(user._cmdr);
+
     }
 
     async repo_search(user, query) {
