@@ -4,13 +4,12 @@
 
 <script>
     import TOOLS from '../ctrl/tools'
-    import PILOT from '../ctrl/pilot'
 
     export default {
         name: "starpos",
         props: {
-            pos: {type: Array, default: () => { return PILOT.cmdr.starpos}},
-            dest: {type: Array, default: () => { return [0, 0, 0]}},
+            pos: {default: () => { return [0, 0, 0]}},
+            dest: {default: () => { return [0, 0, 0]}},
         },
         data: () => {
             return {
@@ -29,24 +28,26 @@
             },
             dest: function (n, o) {
                 this.recalc();
-            }
+            },
         },
         methods: {
             recalc: function () {
-                if (typeof this.pos !== 'object' || typeof this.dest !== 'object') {
-                    this.dist = "DIST-ERR!";
+                if (!this.dest) {
+                    this.dist = -1;
                     this.err = true;
                     return;
                 }
                 this.err = false;
-                this.v1 = this.pos.map(x => x);
-                this.v2 = this.dest.map(x => x);
-                this.dist = this.$options.filters.nn(TOOLS.distance(this.v1, this.v2) / 32, 0, 0) + ' ly';
+                this.v1 = typeof this.pos === 'string' ? this.pos.split('@')[1].split('/')[0].split(':') : this.pos.map(x => x);
+                this.v2 = typeof this.dest === 'string' ? this.dest.split('@')[1].split('/')[0].split(':') : this.dest.map(x => x);
+                let d = TOOLS.distance(this.v1, this.v2) / 32;
+                this.dist = d ? this.$options.filters.nn(d, 0, 0) + ' ly' : 'curr. sustem';
             }
         }
     }
 </script>
 
 <style lang="scss">
-    .star-dist { }
+    @import '../styles/vars';
+    .star-dist { @include hcaps(); }
 </style>

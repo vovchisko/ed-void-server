@@ -3,11 +3,11 @@
         <header>
             <button v-for="t in tabs" v-on:click="c_tab = t" v-bind:class="t === c_tab ? 'active':''">{{t}}</button>
         </header>
-
+        
         <div v-if="c_tab === 'log'">
             <pre v-for="l in log">{{l[0]}} : {{l[1]}}</pre>
         </div>
-
+        
         <div v-if="c_tab === 'stat'" class="container-fluid">
             <div class="row">
                 <div class="col-sm">
@@ -17,7 +17,7 @@
                     <pre>PILOT:DEST {{PILOT.dest}}</pre>
                 </div>
             </div>
-
+            
             <div class="row">
                 <div class="col-sm">
                     <pre>PILOT:STAT {{PILOT.status}}</pre>
@@ -25,39 +25,26 @@
                 <div class="col-sm">
                     <pre>CFG: {{CFG}}</pre>
                 </div>
-
+            
             </div>
         </div>
-
+        
         <div v-if="c_tab === 'pipe'">
             <pre>{{pipe}}</pre>
         </div>
         <div v-if="c_tab === 'uni'">
             <pre>{{uni}}</pre>
         </div>
-
+        
         <div class="container-fluid" v-if="c_tab === 'test'">
-            <navigator></navigator>
-            <div class="row">
-                <div class="col-sm"> <!--TODO: THIS ALSO CAN BE MOVED TO <NAVIGATOR> -->
-                    <h5>CURR. POSITION</h5>
-                    <em v-if="env.system"><b>SYSTEM</b><span>{{env.system.name}}</span></em>
-                    <em v-if="env.body"><b>BODY</b><span>{{env.body.name}}</span></em>
-                    <em v-if="env.station"><b>ST</b><span>{{env.station.name}}</span></em>
-                    <em v-if="!env.station && !env.body"><b>&nbsp;</b><span>deep space</span></em>
-                    <em v-if="status.alt"><b>LAT</b><span>{{status.lat}} <u>°</u></span></em>
-                    <em v-if="status.alt"><b>LON</b><span>{{status.lon}} <u>°</u></span></em>
-                    <em v-if="status.alt"><b>ALT</b><span>{{status.alt}} <u>M</u></span></em>
-                </div>
-                <div class="col-sm">
-                    <h5>DESTINATION</h5>
-                    <em v-if="dest.sys_id"><b>SYS</b><span>{{dest.sys_id}}</span></em>
-                    <em v-if="dest.st_id"><b>ST</b><span>{{dest.st_id}}</span></em>
-                    <em v-if="dest.body_id"><b>BODY</b><span>{{dest.body_id}}</span></em>
-                    <em v-if="dest.head"><b>HEAD</b><span>{{dest.head | nn(0,0)}} <u>°</u></span></em>
-                    <em v-if="dest.dist"><b>DIST</b><span>{{dest.dist | nn(3,3)}} <u>KM</u></span></em>
-                </div>
-            </div>
+            mundii:
+            <star-dist dest="mundii@2738:-34:-12" :pos="PILOT.cmdr.starpos"></star-dist>
+            <br>
+            deciat:
+            <star-dist dest="deciat@3924:-26:-1513" pos="mundii@2738:-34:-12"></star-dist>
+            <br>
+            deciat body:
+            <star-dist dest="deciat@3924:-26:-1513/fareseer inc" :pos="PILOT.cmdr.starpos"></star-dist>
         </div>
     </div>
 </template>

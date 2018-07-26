@@ -363,9 +363,9 @@ class Universe extends EE3 {
         if (c === 'run-ready') return this.run_ready(user, data);
     }
 
-    run_ready(user) {
+    run_ready(user, state = true) {
         if (user._cmdr && user._cmdr.run_id && this.runs[user._cmdr.run_id]) {
-            this.runs[user._cmdr.run_id].pilot_ready(user._cmdr);
+            this.runs[user._cmdr.run_id].pilot_ready(user._cmdr, state);
         } else {
             clog('run_start: error. unable to start run');
         }
@@ -392,7 +392,7 @@ class Universe extends EE3 {
         let list = [];
 
         for (let i in this.runs)
-            list.push(this.runs[i].info());
+            if (this.runs[i].status === RUNST.SETUP) list.push(this.runs[i].info());
 
         return this.emitf(EV_NET, user._id, 'run-list', list);
     }

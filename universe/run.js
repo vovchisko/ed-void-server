@@ -5,10 +5,10 @@ const tools = require('./tools');
 let UNI;
 let DB;
 
-global.RUN_COUNTDOWN = 3;
+global.RUN_COUNTDOWN = 5;
 
 global.RUNNER = {
-    JOINED: 'joined',
+    JOINED: 'pending',
     READY: 'ready',
     IN: 'in-run',
     DEAD: 'dead',
@@ -40,13 +40,14 @@ class RUN {
     constructor(track, cmdr) {
         this._id = DB.gen_id(); //we should always have new ID but it will be saved only at end of run
         this.track_id = track._id;
+        this._track = track; // temp
         this.status = RUNST.SETUP; // 0 - preparation, 1 - in progress, 2 - complete
         this.name = track.name;
-        this.c_down = RUN_COUNTDOWN; // secodns/ticks
+        this.c_down = null; // secodns/ticks
         this.pilots = []; // see join() for details
         this.host = cmdr._id;
-        this._track = track;
-        this._heart = setInterval(() => {this.tick()}, 1000);
+        this.loc = this._track.points[0];
+        this._heart = setInterval(() => {this.tick()}, 1000); // temp
 
         UNI.runs[this._id] = this;
         UNI.runs[this._id].pilot_join(cmdr);
@@ -59,13 +60,14 @@ class RUN {
     tick() {
         if (this.status === RUNST.SETUP) {
             if (this.is_all(RUNNER.READY)) {
-                this.c_down--;
+                if (this.c_down === null) this.c_down = RUN_COUNTDOWN+1;
                 if (this.c_down <= 0) return this.start();
+                this.c_down--;
                 this.broadcast_status();
                 this.broadcast();
             } else {
-                if (this.c_down !== RUN_COUNTDOWN) {
-                    this.c_down = RUN_COUNTDOWN;
+                if (this.c_down !== null) {
+                    this.c_down = null;
                     this.broadcast();
                     this.broadcast_status();
                 }
@@ -169,9 +171,9 @@ class RUN {
         }
     }
 
-    pilot_ready(cmdr) {
+    pilot_ready(cmdr, state) {
         tools.item_in(this.pilots, '_id', cmdr._id, (pilot, key) => {
-            pilot.status = RUNNER.READY;
+            pilot.status = state ? RUNNER.READY : RUNNER.JOINED;
             this.update(cmdr);
         });
     }
@@ -213,7 +215,10 @@ class RUN {
             this.broadcast();
             if (this.status === RUNST.SETUP) this.broadcast_status();
         });
-        if (!this.pilots.length) this.close();
+        if (!this.pilots.length) {
+            this.close();
+            this.broadcast_status();
+        }
     }
 
     complete() {
@@ -228,7 +233,6 @@ class RUN {
         }
         clearInterval(this._heart);
         this.status = RUNST.CLOSED;
-        this.broadcast_status();
 
         delete UNI.runs[this._id];
         delete this._track;
@@ -271,13 +275,13 @@ class RUN {
     info() {
         return {
             _id: this._id,
-            //track_id: this.track_id,
+            track_id: this.track_id,
             name: this.name,
             host: this.host,
             pilots: this.pilots,
             status: this.status,
             c_down: this.c_down,
-            //points: this._track.points,
+            loc: this.loc,
         }
     }
 
