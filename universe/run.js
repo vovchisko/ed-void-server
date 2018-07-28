@@ -44,7 +44,7 @@ class RUN {
         this.status = RUNST.SETUP; // 0 - preparation, 1 - in progress, 2 - complete
         this.name = track.name;
         this.c_down = null; // secodns/ticks
-        this.pilots = []; // see join() for details
+        this.pilots = {}; // see join() for details
         this.host = cmdr._id;
         this.loc = this._track.points[0];
         this._heart = setInterval(() => {this.tick()}, 1000); // temp
@@ -60,7 +60,7 @@ class RUN {
     tick() {
         if (this.status === RUNST.SETUP) {
             if (this.is_all(RUNNER.READY)) {
-                if (this.c_down === null) this.c_down = RUN_COUNTDOWN+1;
+                if (this.c_down === null) this.c_down = RUN_COUNTDOWN + 1;
                 if (this.c_down <= 0) return this.start();
                 this.c_down--;
                 this.broadcast_status();
@@ -92,12 +92,12 @@ class RUN {
 
     }
 
-    start() {
+    async start() {
         this.status = RUNST.RUNNING;
         this.broadcast_status();
 
-        for (let i = 0; i < this.pilots.length; i++) {
-            UNI.get_user({_id: this.pilots[i].uid})
+        for (let i in this.pilots) {
+            await UNI.get_user({_id: this.pilots[i].uid})
                 .then((user) => {
                     if (user && user._cmdr) this.update(user._cmdr);
                 })
@@ -108,56 +108,64 @@ class RUN {
     }
 
     update(cmdr) {
-        tools.item_in(this.pilots, '_id', cmdr._id, (pilot, key) => {
-            console.log(">>> ", pilot, key);
-            pilot.sys_id = cmdr.sys_id;
-            pilot.body_id = cmdr.body_id;
-            pilot.st_id = cmdr.st_id;
-            pilot.starpos = cmdr.starpos;
-            pilot.x = cmdr.dest.x;
+        if (!this.pilots[cmdr._id]) return;
 
-            if (this.status === RUNST.SETUP) {
-                if (pilot.x !== 0) pilot.status = RUNNER.JOINED; //TODO: TEST when user leave start point after ready state!
-                this.broadcast(cmdr._id);
-                return;
-            }
+        let pilot = this.pilots[cmdr._id];
 
-            if (cmdr.dest.x === 0) {
-                if (cmdr.dest.goal === DGOAL.SURFACE && cmdr.status.alt) pilot.score += Math.floor(9000 / cmdr.status.alt);
-                if (cmdr.dest.goal === DGOAL.STATION) pilot.score += 2000;
-                if (cmdr.dest.goal === DGOAL.BODY) pilot.score += 3000;
-                if (cmdr.dest.goal === DGOAL.SYSTEM) pilot.score += 1000;
-                pilot.score += 200;
+        pilot.sys_id = cmdr.sys_id;
+        pilot.body_id = cmdr.body_id;
+        pilot.st_id = cmdr.st_id;
+        pilot.starpos = cmdr.starpos;
+        pilot.x = cmdr.dest.x;
 
-                pilot.p++;
-                pilot.ord = pilot.p + 1 * ('0.' + Date.now()); // sort user by this value.
-
-                if (this._track.points[pilot.p]) {
-                    //next checkpoint
-                    cmdr.dest_set(extend({r: 1000}, this._track.points[pilot.p]), '/RUN:' + pilot.p);
-                } else {
-                    pilot.status = RUNNER.FINISHED;
-                    cmdr.void_run.total++;
-                    cmdr.void_run.score += pilot.score;
-                    cmdr.touch({});
-                    cmdr.dest_clear();
-                }
-            }
-            this.re_arrange();
+        if (this.status === RUNST.SETUP) {
+            if (pilot.x !== 0) pilot.status = RUNNER.JOINED; //TODO: TEST when user leave start point after ready state!
             this.broadcast(cmdr._id);
-        });
+            return;
+        }
+
+        if (cmdr.dest.x === 0) {
+            if (cmdr.dest.goal === DGOAL.SURFACE && cmdr.status.alt) pilot.score += Math.floor(9000 / cmdr.status.alt);
+            if (cmdr.dest.goal === DGOAL.STATION) pilot.score += 2000;
+            if (cmdr.dest.goal === DGOAL.BODY) pilot.score += 3000;
+            if (cmdr.dest.goal === DGOAL.SYSTEM) pilot.score += 1000;
+            pilot.score += 200;
+            pilot.t = Date.now();
+            pilot.p++;
+
+            if (this._track.points[pilot.p]) {
+                //next checkpoint
+                cmdr.dest_set(extend({r: 1000}, this._track.points[pilot.p]), '/RUN:' + pilot.p);
+            } else {
+                pilot.status = RUNNER.FINISHED;
+                cmdr.void_run.total++;
+                cmdr.void_run.score += pilot.score;
+                cmdr.touch({});
+                cmdr.dest_clear();
+            }
+        }
+        this.re_arrange(); //<< maybe that's the problem
+        this.broadcast(cmdr._id);
+
     }
 
     re_broadcast_for(cmdr) {
-        tools.item_in(this.pilots, '_id', cmdr._id, (pilot, key) => {
-            UNI.emitf(EV_NET, cmdr.uid, 'run-upd', this.info());
-        });
+        UNI.emitf(EV_NET, cmdr.uid, 'run-upd', this.info());
     }
 
     re_arrange() {
-        this.pilots.sort((a, b) => b.ord - a.ord);
-        for (let i = 0; i < this.pilots.length; i++) {
-            this.pilots[i].pos = i + 1;
+        let chart = [];
+        for (let i in this.pilots) {
+            chart.push({
+                _id: i,
+                order: this.pilots[i].p - (1 * ('0.' + this.pilots[i].t)) //checkpoint minus fraction time (less time minused - higher position)
+            });
+        }
+
+        chart.sort((a, b) => b.order - a.order);
+
+        for (let i = 0; i < chart.length; i++) {
+            this.pilots[chart[i]._id].pos = i + 1;
         }
     }
 
@@ -166,59 +174,64 @@ class RUN {
             if (!cmdr_id) {
                 UNI.emitf(EV_NET, this.pilots[i].uid, 'run-upd', this.info());
             } else {
-                UNI.emitf(EV_NET, this.pilots[i].uid, 'run-upd-cmdr', tools.item_in(this.pilots, '_id', cmdr_id));
+                UNI.emitf(EV_NET, this.pilots[i].uid, 'run-upd-cmdr', this.pilots[cmdr_id]);
             }
         }
     }
 
     pilot_ready(cmdr, state) {
-        tools.item_in(this.pilots, '_id', cmdr._id, (pilot, key) => {
-            pilot.status = state ? RUNNER.READY : RUNNER.JOINED;
-            this.update(cmdr);
-        });
+        this.pilots[cmdr._id].status = state ? RUNNER.READY : RUNNER.JOINED;
+        this.update(cmdr);
     }
 
     is_all(status) {
-        for (let i = 0; i < this.pilots.length; i++)
+        for (let i in this.pilots)
             if (this.pilots[i].status !== status) return false;
         return true;
     }
 
     has_any(status) {
-        for (let i = 0; i < this.pilots.length; i++)
+        for (let i in this.pilots)
             if (this.pilots[i].status === status) return true;
         return false;
     }
 
     pilot_leave(cmdr) {
-        tools.item_in(this.pilots, '_id', cmdr._id, (pilot, key) => {
-            cmdr.run_id = null;
-            cmdr.dest_clear();
-            pilot.w = 0;
+        let pilot = this.pilots[cmdr._id];
 
-            if (this.status === RUNST.SETUP) {
-                this.pilots.splice(key, 1);
-            }
+        cmdr.run_id = null;
+        cmdr.dest_clear();
+        pilot.w = 0;
 
-            if (this.status === RUNST.RUNNING) {
-                pilot.status = RUNNER.LEAVE; // that's it.
-                cmdr.void_run.total++;
-            }
+        if (this.status === RUNST.SETUP) {
+            delete this.pilots[cmdr._id];
+        }
 
-            if (this.status === RUNST.COMPLETE) {
-                //todo: win? what to do?
-            }
+        if (this.status === RUNST.RUNNING) {
+            pilot.status = RUNNER.LEAVE; // that's it.
+            cmdr.void_run.total++;
+        }
 
-            cmdr.touch({});
+        if (this.status === RUNST.COMPLETE) {
+            //todo: win? what to do?
+        }
 
-            this.re_arrange();
-            this.broadcast();
-            if (this.status === RUNST.SETUP) this.broadcast_status();
-        });
-        if (!this.pilots.length) {
+        cmdr.touch({});
+
+        this.re_arrange();
+        this.broadcast();
+        if (this.status === RUNST.SETUP) this.broadcast_status();
+
+        if (!this.pilots_count()) {
             this.close();
             this.broadcast_status();
         }
+    }
+
+    pilots_count() {
+        let c = 0;
+        for (let i in this.pilots) c++;
+        return c;
     }
 
     complete() {
@@ -227,7 +240,7 @@ class RUN {
     }
 
     async close() {
-        for (let i = 0; i < this.pilots.length; i++) {
+        for (let i  in this.pilots) {
             let user = await UNI.get_user(this.pilots[i].uid);
             this.pilot_leave(user._cmdr);
         }
@@ -238,16 +251,17 @@ class RUN {
         delete this._track;
         delete this._heart;
 
-        if (this.pilots)
+        if (this.pilots_count())
             await DB.run_races.save(this);
     }
 
 
     pilot_join(cmdr) {
+
         if (cmdr.run_id) return clog('cmdr already busy with run ' + cmdr.name + ' / run_id: ' + cmdr.run_id);
         if (this.status !== RUNST.SETUP) return UNI.emitf(EV_NET, cmdr.uid, 'alert', {text: 'race already started'});
 
-        this.pilots.push({
+        this.pilots[cmdr._id] = {
             _id: cmdr._id,//cmdr cmdr_id
             p: 0, //current point ID
             pos: 0, // position in race
@@ -259,7 +273,7 @@ class RUN {
             st_id: cmdr.st_id,
             ord: 0, // int=p + dec = date.now or last p
             w: 1, // watching?
-        });
+        };
 
         cmdr.touch({run_id: this._id});
         cmdr.dest_set(extend({r: 1000}, this._track.points[0]), '/RUN:0');
