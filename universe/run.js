@@ -5,6 +5,27 @@ const tools = require('./tools');
 let UNI;
 let DB;
 
+function run_tester() {
+    setInterval(async () => {
+        for (let i in UNI.runs) {
+            if (UNI.runs[i].status !== RUNST.RUNNING) return;
+            let run = UNI.runs[i];
+
+            for (let i in run.pilots) {
+                if (run.pilots[i].status !== RUNNER.IN) continue;
+                if (Math.random() < 0.95) continue;
+
+                let user = await UNI.get_user(run.pilots[i].uid);
+                user._cmdr.dest.x = 0;
+                run.update(user._cmdr);
+            }
+        }
+    }, 1000);
+}
+
+
+run_tester();
+
 global.RUN_COUNTDOWN = 5;
 
 global.RUNNER = {
@@ -48,6 +69,7 @@ class RUN {
         this.host = cmdr._id;
         this.loc = this._track.points[0];
         this._heart = setInterval(() => {this.tick()}, 1000); // temp
+        this.start_time = 0;
 
         UNI.runs[this._id] = this;
         UNI.runs[this._id].pilot_join(cmdr);
@@ -55,6 +77,34 @@ class RUN {
 
     broadcast_status() {
         UNI.broadcast('run-status', this.info());
+    }
+
+
+    async start() {
+        this.status = RUNST.RUNNING;
+        this.start_time = Date.now();
+        this.broadcast_status();
+
+        for (let i in this.pilots) {
+            await UNI.get_user({_id: this.pilots[i].uid})
+                .then((user) => {
+                    if (!user || !user._cmdr) throw new Error('user haven\'t active cmdr');
+
+                    if (user._cmdr.dest.x === 0) {
+                        this.pilots[i].status = RUNNER.IN;
+                        this.update(user._cmdr);
+                    } else {
+                        this.pilot_leave(user._cmdr);
+                        console.log(user._cmdr.name, 'didn\'t reach start');
+                    }
+                })
+                .catch((e) => {
+                    console.log('RUN.START: pilot not found - ' + i, e);
+                    delete this.pilots[i];
+                    this.broadcast_status();
+                });
+        }
+        this.broadcast();
     }
 
     tick() {
@@ -84,6 +134,7 @@ class RUN {
             this.close();
         }
 
+        return;
         //can be removed later
         let log = extend({}, this);
         delete log._heart;
@@ -92,20 +143,6 @@ class RUN {
 
     }
 
-    async start() {
-        this.status = RUNST.RUNNING;
-        this.broadcast_status();
-
-        for (let i in this.pilots) {
-            await UNI.get_user({_id: this.pilots[i].uid})
-                .then((user) => {
-                    if (user && user._cmdr) this.update(user._cmdr);
-                })
-                .catch((e) => {console.log('RUN:START ERROR - unable to find pilot', e)});
-        }
-        this.broadcast();
-
-    }
 
     update(cmdr) {
         if (!this.pilots[cmdr._id]) return;
@@ -130,12 +167,12 @@ class RUN {
             if (cmdr.dest.goal === DGOAL.BODY) pilot.score += 3000;
             if (cmdr.dest.goal === DGOAL.SYSTEM) pilot.score += 1000;
             pilot.score += 200;
-            pilot.t = Date.now();
-            pilot.p++;
+            pilot.t = Date.now() - this.start_time;
+            pilot.pid++;
 
-            if (this._track.points[pilot.p]) {
+            if (this._track.points[pilot.pid]) {
                 //next checkpoint
-                cmdr.dest_set(extend({r: 1000}, this._track.points[pilot.p]), '/RUN:' + pilot.p);
+                cmdr.dest_set(extend({r: 1000}, this._track.points[pilot.pid]), '/RUN:' + pilot.pid);
             } else {
                 pilot.status = RUNNER.FINISHED;
                 cmdr.void_run.total++;
@@ -158,14 +195,24 @@ class RUN {
         for (let i in this.pilots) {
             chart.push({
                 _id: i,
-                order: this.pilots[i].p - (1 * ('0.' + this.pilots[i].t)) //checkpoint minus fraction time (less time minused - higher position)
+                pid: this.pilots[i].pid,
+                t: this.pilots[i].t,
             });
         }
 
-        chart.sort((a, b) => b.order - a.order);
+        chart.sort((a, b) => {
+            if (a.pid > b.pid) return -1;
+            if (a.pid < b.pid) return 1;
+
+            if (a.t > b.t) return 1;
+            if (a.t < b.t) return -1;
+
+            return 0;
+        });
 
         for (let i = 0; i < chart.length; i++) {
             this.pilots[chart[i]._id].pos = i + 1;
+            this.pilots[chart[i]._id].pt = chart[i].pt;
         }
     }
 
@@ -199,9 +246,11 @@ class RUN {
     pilot_leave(cmdr) {
         let pilot = this.pilots[cmdr._id];
 
-        cmdr.run_id = null;
-        cmdr.dest_clear();
-        pilot.w = 0;
+        if (cmdr.run_id === this._id) {
+            cmdr.run_id = null;
+            cmdr.dest_clear();
+            pilot.w = 0;
+        }
 
         if (this.status === RUNST.SETUP) {
             delete this.pilots[cmdr._id];
@@ -263,7 +312,7 @@ class RUN {
 
         this.pilots[cmdr._id] = {
             _id: cmdr._id,//cmdr cmdr_id
-            p: 0, //current point ID
+            pid: 0, //current point ID
             pos: 0, // position in race
             status: RUNNER.JOINED, // current status in-race
             uid: cmdr.uid,
@@ -271,7 +320,6 @@ class RUN {
             sys_id: cmdr.sys_id,
             body_id: cmdr.body_id,
             st_id: cmdr.st_id,
-            ord: 0, // int=p + dec = date.now or last p
             w: 1, // watching?
         };
 
@@ -280,7 +328,6 @@ class RUN {
 
         clog(`RUN: CMDR ${cmdr._id} (${cmdr.name}) joined the race ${this._id}`);
 
-        this.re_arrange();
         this.broadcast();
         this.broadcast_status();
     }
@@ -292,6 +339,7 @@ class RUN {
             track_id: this.track_id,
             name: this.name,
             host: this.host,
+            start_time: this.start_time,
             pilots: this.pilots,
             status: this.status,
             c_down: this.c_down,

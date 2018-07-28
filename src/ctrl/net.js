@@ -44,7 +44,6 @@ class Network extends EventEmitter3 {
                 desc: 'Server not available right now. Please try again later',
                 acts: {'re-connect': () => this.init()}
             }, true)
-
         };
         this.ws.onerror = (err) => {
             this.emit('_error', err);
@@ -106,5 +105,7 @@ NET.on('_close', (code, reason) => {
         CFG.save();
     }
 });
+
+NET.on('uni:alert', (a) => A.add(a));
 
 export default NET;

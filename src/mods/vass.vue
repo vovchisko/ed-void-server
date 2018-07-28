@@ -90,7 +90,7 @@
 
 <script>
     import Vue from 'vue';
-    import NET from '../ctrl/network';
+    import NET from '../ctrl/net';
     import Data from '../ctrl/data';
     import Ev from '../components/ev';
 

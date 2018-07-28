@@ -2,9 +2,9 @@
     <div id="app">
         <alert></alert>
         <auth></auth>
-
+        
         <navbar v-if="MODE.is_ready"/>
-
+        
         <div class="container-fluid" v-if="MODE.is_ready">
             <cmdr v-if="MODE.c_mode === 'cmdr'"></cmdr>
             <vass v-if="MODE.c_mode === 'vass'"></vass>
@@ -14,7 +14,7 @@
             <cfg v-if="MODE.c_mode === 'cfg'"></cfg>
             <dev v-if="MODE.c_mode === 'dev'"></dev>
         </div>
-
+    
     </div>
 </template>
 <script>
@@ -26,7 +26,7 @@
     import Navbar from './mods/navbar.vue'
 
     import CFG from './ctrl/cfg';
-    import NET from './ctrl/network';
+    import NET from './ctrl/net';
     import MODE from './ctrl/mode';
     import PILOT from './ctrl/pilot';
 
@@ -37,6 +37,7 @@
     import Run from './mods/run.vue'
     import Cfg from './mods/cfg.vue'
     import Dev from './mods/dev.vue'
+
 
     export default {
         name: 'app',
@@ -65,6 +66,19 @@
             maximumFractionDigits: frac,
             minimumFractionDigits: min_frac
         })).format(num);
+    });
+
+    Vue.filter('timing', function (num) {
+        num = parseInt(num);
+        if (num && !isNaN(num) && typeof num === "number") {
+            let t = new Date(num);
+            return [
+                ("00" + t.getUTCHours()).slice(-2), ' : ',
+                ("00" + t.getUTCMinutes()).slice(-2), ' : ',
+                ("00" + t.getUTCSeconds()).slice(-2), '.',
+                ("000" + t.getUTCMilliseconds()).slice(-3)
+            ].join('');
+        } else{ return '-- : -- : --.---'}
     });
 
     Vue.filter('yn', function (value) {

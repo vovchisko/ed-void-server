@@ -94,25 +94,22 @@ class Clients {
 
         this.wss.on('disconnected', async (client) => {
             let user = await UNI.get_user({_id: client.id});
-            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] leave`);
-            user.online = false;
-            user.save();
+            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] (web) leave`);
+            user.touch({online: false});
         });
 
         this.wss.on('message', async (client, c, dat) => {
             let user = await UNI.get_user({_id: client.id});
             UNI.user_msg(user, c, dat);
+            user.touch({online: true});
         });
 
         this.wss.on('connected', async (client) => {
-
             let user = await UNI.get_user({_id: client.id});
             if (!user) return client.close();
-            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] joined`);
+            clog(`USR: ${user._id} [CMDR ${user.cmdr_name}] (web) joined`);
             UNI.refill_user(user._id);
-
-            user.online = true;
-            user.save();
+            user.touch({online: true});
         });
 
         this.wss.init();
@@ -148,19 +145,22 @@ class JCollector {
 
         this.wss.on('disconnected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
-            clog(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] journal disconnected`);
+            clog(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] (client-app) disconnected`);
+            juser.touch({online: false});
         });
 
         this.wss.on('connected', async (client) => {
             let juser = await UNI.get_user({_id: client.id});
             if (!juser) return client.close();
-
-            clog(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] journal connected`);
+            clog(`JCL: ${juser._id} [CMDR ${juser.cmdr_name}] (client-app) journal connected`);
+            UNI.refill_user(juser._id);
+            juser.touch({online: true});
         });
 
         this.wss.on('message', async (client, c, dat) => {
-            let user = await UNI.get_user({_id: client.id});
-            UNI.upd_status(user, dat.rec, dat.cmdr_name, dat.gv, dat.lng);
+            let juser = await UNI.get_user({_id: client.id});
+            UNI.user_msg(juser, c, dat);
+            juser.touch({online: true});
         });
 
         this.wss.init();
@@ -236,6 +236,7 @@ function init() {
 
     UNI.on(EV_NET, (uid, uni_event, data) => {
         try {
+            JCL.send_to(uid, 'uni:' + uni_event, data);
             CLS.send_to(uid, 'uni:' + uni_event, data);
         } catch (e) {
             console.log(`ERROR! Catched error in CLS.send_to(${uid}, uni:${uni_event});`, e);

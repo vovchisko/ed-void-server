@@ -23,7 +23,7 @@
 
 <script>
     import MODE from '../ctrl/mode';
-    import NET from '../ctrl/network';
+    import NET from '../ctrl/net';
 
     export default {
         name: 'navbar',

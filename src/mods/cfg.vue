@@ -133,7 +133,7 @@
 
 <script>
     import Data from '../ctrl/data';
-    import NET from '../ctrl/network';
+    import NET from '../ctrl/net';
     import CFG from '../ctrl/cfg';
     import MODE from '../ctrl/mode';
     import {A} from '../components/alert';

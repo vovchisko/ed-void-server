@@ -30,10 +30,7 @@
 </template>
 
 <script>
-    import NET from '../ctrl/network';
-
-
-    const A = {
+     const A = {
         busy: {
             show: false,
             type: 'info',
@@ -85,9 +82,6 @@
             },
         }
     }
-
-
-    NET.on('uni:alert', (a) => A.add(a));
 </script>
 
 <style lang="scss">

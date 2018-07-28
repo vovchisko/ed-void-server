@@ -63,7 +63,7 @@
 </template>
 
 <script>
-    import NET from '../ctrl/network'
+    import NET from '../ctrl/net'
     import PILOT from '../ctrl/pilot'
     import InputBody from "../components/input-body";
     import InputStation from "../components/input-station";

@@ -22,7 +22,7 @@
 
 <script>
     import Vue from 'vue'
-    import NET from '../ctrl/network'
+    import NET from '../ctrl/net'
     import TOOLS from '../ctrl/tools';
     import StarDist from './star-dist';
 

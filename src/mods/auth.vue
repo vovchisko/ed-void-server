@@ -91,7 +91,7 @@
 </template>
 
 <script>
-    import Net from '../ctrl/network';
+    import Net from '../ctrl/net';
     import Route from '../ctrl/router';
     import CFG from '../ctrl/cfg';
     import MODE from '../ctrl/mode';

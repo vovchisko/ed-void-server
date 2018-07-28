@@ -255,7 +255,7 @@
     import extend from 'deep-extend';
 
     import {A} from '../components/alert';
-    import NET from '../ctrl/network';
+    import NET from '../ctrl/net';
     import PILOT from '../ctrl/pilot';
 
     const _REPO_NULL = {};

@@ -1,4 +1,4 @@
-import NET from './network'
+import NET from './net'
 import Vue from 'vue'
 import extend from 'deep-extend'
 

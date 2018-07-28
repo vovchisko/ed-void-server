@@ -63,7 +63,7 @@
 
 <script>
     import PILOT from '../ctrl/pilot'
-    import NET from '../ctrl/network'
+    import NET from '../ctrl/net'
 
     const NAV = {
         style_ruler: {'background-position-x': 0},
