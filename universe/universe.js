@@ -345,8 +345,10 @@ class Universe extends EE3 {
 
     user_msg(user, c, data) {
 
-        clog(c, data);
         if (c === 'Status') { return this.upd_status(user, data.rec, data.cmdr_name, data.gv, data.lng); }
+
+        clog(c, data);
+
         if (c === 'dest-set') { return user._cmdr && !user._cmdr.run_id ? user._cmdr.dest_set(data) : false; }
         if (c === 'dest-toggle') {return user._cmdr ? user._cmdr.dest.enabled = !!data : false;}
         if (c === 'repo-search') return this.repo_search(user, data);

@@ -24,7 +24,7 @@ function run_tester() {
 }
 
 
-run_tester();
+//run_tester();
 
 global.RUN_COUNTDOWN = 5;
 
