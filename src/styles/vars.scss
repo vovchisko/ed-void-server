@@ -1,3 +1,4 @@
+@import "assets";
 /*
   MAIN COLORS
 */
@@ -66,7 +67,7 @@ $all-inputs: "[type=text], [type=password], [type=number], [type=email], [input=
     width: 100%; display: block;
 }
 @mixin ui-has-caret {
-    background-image: url("../public/assets/caret.svg");
+    background-image: url($asset_caret);
     background-position: calc(100% - 8px) 50%;
     background-repeat: no-repeat;
 }

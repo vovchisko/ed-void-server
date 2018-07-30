@@ -84,15 +84,14 @@ class Universe extends EE3 {
                 if (user._cmdr.dest.enabled)
                     UNI.emitf(EV_NET, user._id, 'dest', user._cmdr.dest);
 
-                /*
+
                 let scans = user._cmdr.journal()
                     .find({event: {$in: ['Scan', 'FSDJump']}})
                     .sort({timestamp: -1})
                     .limit(16);
 
                 scans.forEach((rec) => { this.emit(EV_PIPE, user._id, rec.event, rec) });
-                */
-
+                
                 if (user._cmdr.sys_id) {
                     let sys = await this.get_system(user._cmdr.sys_id);
                     this.emit(EV_NET, uid, 'c_system', sys);

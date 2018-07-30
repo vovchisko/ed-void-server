@@ -2,15 +2,6 @@ class DataStorage {
 
     constructor() {
 
-        this.cmdr = {
-            name: null,
-            sys_id: null,
-            body_id: null,
-            starpos: [0, 0, 0],
-            last_rec: null,
-            status: {}
-        };
-
         this.vass = {
             recent: [],
             exp: {

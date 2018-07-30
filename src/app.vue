@@ -104,6 +104,4 @@
     @import 'styles/fonts';
     @import 'styles/base';
     @import 'styles/fx';
-    @import 'components/styles/input-search';
-
 </style>

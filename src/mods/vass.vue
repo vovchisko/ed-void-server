@@ -92,6 +92,7 @@
     import Vue from 'vue';
     import NET from '../ctrl/net';
     import Data from '../ctrl/data';
+    import PILOT from '../ctrl/pilot';
     import Ev from '../components/ev';
 
     export default {
@@ -103,7 +104,7 @@
                 tabs: ['flight log', 'data'],
                 recent: Data.vass.recent,
                 exp: Data.vass.exp,
-                env: Data.env
+                env: PILOT.env
             }
         },
         methods: {
