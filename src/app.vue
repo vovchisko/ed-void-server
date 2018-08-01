@@ -1,18 +1,20 @@
 <template>
-    <div id="app">
+    <div id="app" v-bind:overlay="MODE.is_overlay ? 'on' : 'off'" v-bind:interact="MODE.is_interact ? 'on' : 'off'">
         <alert></alert>
         <auth></auth>
         
-        <navbar v-if="MODE.is_ready"/>
-        
-        <div class="container-fluid" v-if="MODE.is_ready">
-            <cmdr v-if="MODE.c_mode === 'cmdr'"></cmdr>
-            <vass v-if="MODE.c_mode === 'vass'"></vass>
-            <navi v-if="MODE.c_mode === 'navi'"></navi>
-            <repo v-if="MODE.c_mode === 'repo'"></repo>
-            <run v-if="MODE.c_mode === 'run'"></run>
-            <cfg v-if="MODE.c_mode === 'cfg'"></cfg>
-            <dev v-if="MODE.c_mode === 'dev'"></dev>
+        <div class="ov-wrap">
+            <navbar v-if="MODE.is_ready"/>
+            
+            <div class="container-fluid" v-if="MODE.is_ready">
+                <cmdr v-if="MODE.c_mode === 'cmdr'"></cmdr>
+                <vass v-if="MODE.c_mode === 'vass'"></vass>
+                <navi v-if="MODE.c_mode === 'navi'"></navi>
+                <repo v-if="MODE.c_mode === 'repo'"></repo>
+                <run v-if="MODE.c_mode === 'run'"></run>
+                <cfg v-if="MODE.c_mode === 'cfg'"></cfg>
+                <dev v-if="MODE.c_mode === 'dev'"></dev>
+            </div>
         </div>
     
     </div>
@@ -38,6 +40,7 @@
     import Cfg from './mods/cfg.vue'
     import Dev from './mods/dev.vue'
 
+    MODE.list.push('cmdr', 'navi', 'vass', 'repo', 'run', 'cfg');
 
     export default {
         name: 'app',
@@ -78,7 +81,7 @@
                 ("00" + t.getUTCSeconds()).slice(-2), '.',
                 ("000" + t.getUTCMilliseconds()).slice(-3)
             ].join('');
-        } else{ return '-- : -- : --.---'}
+        } else { return '-- : -- : --.---'}
     });
 
     Vue.filter('yn', function (value) {

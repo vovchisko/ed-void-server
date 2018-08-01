@@ -121,7 +121,7 @@
                     @include hcaps();
                     position: absolute;
                     right: 0; bottom: 0;
-                    font-size: 1.4px;
+                    font-size: 1.4em;
                     text-align: right;
                     small {display: block; font-size: 0.6em; line-height: 1 }
                     

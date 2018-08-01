@@ -95,12 +95,14 @@ NET.on('uni:user', (user) => {
     CFG.dev = user.dev;
     MODE.is_in = true;
     MODE.is_ready = NS_ONLINE;
-    if (user.dev)
-        Vue.set(MODE.list, 'dev', 'dev');
+    if (user.dev && !MODE.list.includes('dev'))
+        MODE.list.push('dev');
 });
 
 NET.on('_close', (code, reason) => {
     if (reason === 'unauthorized') {
+        MODE.is_ready = false;
+        MODE.is_in = false;
         CFG.api_key = '';
         CFG.save();
     }

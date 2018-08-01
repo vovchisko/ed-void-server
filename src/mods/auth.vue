@@ -201,14 +201,7 @@
         }
     }
 
-    Net.on('_close', (code, reason) => {
-        if (reason === 'unauthorized') {
-            MODE.is_ready = false;
-            MODE.is_in = false;
-            CFG.api_key = '';
-            CFG.save();
-        }
-    });
+    
 
 </script>
 
