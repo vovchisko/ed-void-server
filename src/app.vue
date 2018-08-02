@@ -1,5 +1,5 @@
 <template>
-    <div id="app" v-bind:overlay="MODE.is_overlay ? 'on' : 'off'" v-bind:interact="MODE.is_interact ? 'on' : 'off'">
+    <div id="app">
         <alert></alert>
         <auth></auth>
         
@@ -107,4 +107,5 @@
     @import 'styles/fonts';
     @import 'styles/base';
     @import 'styles/fx';
+    @import 'styles/overlay';
 </style>

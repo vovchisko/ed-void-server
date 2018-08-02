@@ -13,7 +13,7 @@
             </div>
         </div>
         <div class="row" v-if="!N.PILOT.cmdr.run_id">
-            <div class="col-sm ov ov-center ov-interact">
+            <div class="col-sm ov ov-main ov-interact">
                 <div class="ui" v-if="N.edit">
                     <button @click="set_goal(g)" v-for="g in N.DGOAL" v-bind:class="N.PILOT.dest.goal === g ? 'active':''">{{g}}</button>
                 </div>

@@ -14,15 +14,14 @@
         
         <!-- TRACKS -->
         
-        <div class="ov ov-center-long" v-if="state==='tracks' && !PILOT.cmdr.run_id">
+        <div class="ov ov-main ov-interact" v-if="state==='tracks' && !PILOT.cmdr.run_id">
             <h3>tracks</h3>
             <div class="tracks">
                 <div v-for="track in R.tracks" class="track">
-                    <div class="row">
+                    <div class="row keep">
                         <div class="col-sm-8 listed">
                             <h4>{{track.name}} <span>{{track.type}}</span></h4>
                             <p>{{track.desc}}</p>
-                            <em><b>vehicle</b><span>{{track.vehicle}}</span></em>
                             <em><b>sponsor</b><span>{{track.sponsor}}</span></em>
                         </div>
                         <div class="col-sm-2">
@@ -35,7 +34,7 @@
         
         <!-- RUN LIST IN SETUP  -->
         
-        <div class="runs ov ov-center-long" v-if="state==='runs' && !PILOT.cmdr.run_id">
+        <div class="runs ov ov-main ov-interact" v-if="state==='runs' && !PILOT.cmdr.run_id">
             <h5>active runs
                 <button v-on:click="get_runs()" class="link"><i class="i-sync"></i> refresh</button>
             </h5>
@@ -76,7 +75,7 @@
         
         <div class="active-run" v-if="PILOT.cmdr.run_id">
             
-            <div class="run-status ov-solid ov ov-top-line">
+            <div class="run-status ov ov-top-line">
                 <small>{{R.run.name}}</small>
                 <div v-if="R.run.status === R.RUNST.SETUP">
                     <h2 class="edfx" v-if="R.run.c_down===null">waiting for other pilots</h2>

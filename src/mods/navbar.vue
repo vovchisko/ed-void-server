@@ -59,7 +59,7 @@
             overflow: hidden;
             text-overflow: ellipsis; }
         
-        #nav-clickout { position: fixed; left: 0; top: 0; right: 0; bottom: 0; background-color: $ui-bg; opacity: 0.5; z-index: 1}
+        #nav-clickout { position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 1}
     }
     header {
         @include hcaps();
