@@ -36,3 +36,14 @@ function re_arrange() {
 }
 
 re_arrange();
+
+
+
+console.log('/////');
+
+
+
+const homedir = require('os').homedir();
+console.log(process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME']);
+console.log(homedir);
+console.log(process.env);

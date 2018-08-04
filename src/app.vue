@@ -8,7 +8,8 @@
             
             <div class="container-fluid" v-if="MODE.is_ready">
                 <cmdr v-if="MODE.c_mode === 'cmdr'"></cmdr>
-                <vass v-if="MODE.c_mode === 'vass'"></vass>
+                <flog v-if="MODE.c_mode === 'flog'"></flog>
+                <edata v-if="MODE.c_mode === 'edata'"></edata>
                 <navi v-if="MODE.c_mode === 'navi'"></navi>
                 <repo v-if="MODE.c_mode === 'repo'"></repo>
                 <run v-if="MODE.c_mode === 'run'"></run>
@@ -34,19 +35,20 @@
 
     import Cmdr from './mods/cmdr.vue'
     import Navi from './mods/navi.vue'
-    import Vass from './mods/vass.vue'
+    import Flog from './mods/flog.vue'
+    import Edata from './mods/edata.vue'
     import Repo from './mods/repo.vue'
     import Run from './mods/run.vue'
     import Cfg from './mods/cfg.vue'
     import Dev from './mods/dev.vue'
 
-    MODE.list.push('cmdr', 'navi', 'vass', 'repo', 'run', 'cfg');
+    MODE.list.push('cmdr', 'navi', 'flog', 'edata', 'repo', 'run', 'cfg');
 
     export default {
         name: 'app',
         data: () => {return {MODE: MODE, CFG: CFG, A: A, PILOT: PILOT}},
         components: {
-            Alert, Navbar, Auth, Cmdr, Navi, Vass, Repo, Run, Cfg, Dev
+            Alert, Navbar, Auth, Cmdr, Navi, Flog, Edata, Repo, Run, Cfg, Dev
         },
     }
 

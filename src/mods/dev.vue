@@ -122,15 +122,16 @@
         document.body.setAttribute('overlay', MODE.is_overlay ? 'on' : 'off');
     }
 
-    apply_to_mode();
+   // apply_to_mode();
 </script>
 
 <style lang="scss">
     
     body {
-        background-image: url('../../public/assets/overlay-test/6.jpg') !important;
+       // background-image: url('../../public/assets/overlay-test/6.jpg') !important;
         background-size: contain !important;
         background-position: 50% !important;
-        background-repeat: no-repeat !important;}
+        background-repeat: no-repeat !important;
+    }
 
 </style>

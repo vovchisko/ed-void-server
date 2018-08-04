@@ -48,8 +48,8 @@
             </div>
 
             <div class="col-sm ">
-                <h2 v-if="data.vass.exp.total">modules settings</h2>
-                <div v-if="data.vass.exp.total" class="tip-box" style="margin: 0;">
+                <h2 v-if="PILOT.exp.total">modules settings</h2>
+                <div v-if="PILOT.exp.total" class="tip-box" style="margin: 0;">
                     <div class="icon"><i class="i-warning"></i></div>
                     <div>
                         <h5>Warning!</h5>
@@ -132,10 +132,10 @@
 </template>
 
 <script>
-    import Data from '../ctrl/data';
     import NET from '../ctrl/net';
     import CFG from '../ctrl/cfg';
     import MODE from '../ctrl/mode';
+    import PILOT from '../ctrl/pilot';
     import {A} from '../components/alert';
 
     export default {
@@ -144,7 +144,7 @@
             return {
                 variant_font_size: new Array(17).fill(0).map((x, i) => {return i * 10 + 40 + '%'}),
                 variant_fx_level: ['full', 'medium', 'low', 'disabled'],
-                data: Data,
+                PILOT: PILOT,
                 CFG: CFG,
                 re_everify_result: {result: 0, type: '', text: ''},
                 pass_ch: {toggle: false, c: '', n: '', nc: ''}

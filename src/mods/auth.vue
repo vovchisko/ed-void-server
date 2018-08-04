@@ -1,32 +1,32 @@
 <template>
     <div id="auth" v-if="!MODE.is_in && !MODE.is_ready">
         <form v-if="sign_==='in'">
-
+            
             <h2>ed-void login</h2>
-
+            
             <div class="ui">
                 <input type="email" v-model="auth.email"/>
                 <label>Email</label>
             </div>
-
+            
             <div class="ui">
                 <input type="password" v-model="auth.pass"/>
                 <label>Password</label>
             </div>
-
+            
             <div class="ui">
-                <button type="button" v-on:click="signin()">Sign in</button>
+                <button type="submit" v-on:click="signin($event)">Sign in</button>
             </div>
-
+            
             <div class="ui links">
                 <button type="button" class="link" v-on:click="sign('up')">New Pilot</button>
                 <button type="button" class="link" v-on:click="sign('reset')">reset password</button>
             </div>
         </form>
-
+        
         <form v-if="sign_==='up'">
             <h2>create new cmdr</h2>
-
+            
             <div class="ui">
                 <input type="email" v-model="auth.email"/>
                 <label>Email</label>
@@ -40,53 +40,53 @@
                 <label>Confirm password</label>
             </div>
             <div class="ui">
-                <button type="button" v-on:click="signup()">Register</button>
+                <button type="submit" v-on:click="signup($event)">Register</button>
             </div>
-
+            
             <div class="ui links">
                 <button type="button" class="link" v-on:click="sign('in')">back to login</button>
             </div>
         </form>
-
+        
         <form v-if="sign_ === 'reset'">
-
+            
             <h2>reset password</h2>
-
+            
             <div v-if="secret">
-
+                
                 <div class="ui">
                     <input type="password" v-model="reset.new_pass"/>
                     <label>new password</label>
                 </div>
-
+                
                 <div class="ui">
                     <input type="password" v-model="reset.new_pass_c"/>
                     <label>confirm new password</label>
                 </div>
-
+                
                 <div class="ui">
-                    <button type="button" v-on:click="reset_pass()">use new password</button>
+                    <button type="submit" v-on:click="reset_pass($event)">use new password</button>
                 </div>
-
+            
             </div>
-
+            
             <div v-if="!secret">
                 <div class="ui" v-if="!reset.result">
                     <input type="email" v-model="auth.email"/>
                     <label>account email</label>
                 </div>
-
+                
                 <div class="ui" v-if="!reset.result">
-                    <button type="button" v-on:click="request_reset()">send me a link</button>
+                    <button type="submit" v-on:click="request_reset($event)">send me a link</button>
                 </div>
-
+                
                 <div class="ui links">
                     <button type="button" class="link" v-on:click="sign('in')">back to login</button>
                 </div>
-
+            
             </div>
         </form>
-
+    
     </div>
 </template>
 
@@ -142,8 +142,8 @@
 
                 this.sign('in');
             },
-            request_reset: function () {
-
+            request_reset: function (event) {
+                if (event) event.preventDefault();
                 Net.api('passrst', {email: this.auth.email})
                     .then((result) => {
 
@@ -155,7 +155,8 @@
                     })
                     .catch((e) => A.error({text: 'undable to complete request. please try again later'}));
             },
-            reset_pass: function () {
+            reset_pass: function (event) {
+                if (event) event.preventDefault();
                 if (this.reset.new_pass !== this.reset.new_pass_c)
                     return A.error({text: 'password and confirmation are not equal',});
 
@@ -175,7 +176,8 @@
             sign: function (to = 'in') {
                 this.sign_ = to;
             },
-            signup: function () {
+            signup: function (event) {
+                if (event) event.preventDefault();
                 if (this.auth.pass !== this.pass_c)
                     return A.error({text: 'password/confirm are not equal'});
 
@@ -188,7 +190,8 @@
                     .catch((e) => A.error({text: 'undable to complete request. please try again later'}));
 
             },
-            signin: function () {
+            signin: function (event) {
+                if (event) event.preventDefault();
                 Net.api('signin', {email: this.auth.email, pass: this.auth.pass})
                     .then((dat) => {
                         if (!dat.result) return A.add(dat);
@@ -200,8 +203,6 @@
             },
         }
     }
-
-    
 
 </script>
 
