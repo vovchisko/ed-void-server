@@ -6,12 +6,15 @@ body[overlay='off'] {
     background: #222 !important;
 }
 body[overlay='on'] {
+
+    #nav-clickout { background: transparent !important; }
+
     #app {
         height: 100%;
         width: 100%;
         border-style: solid;
         border-color: transparent;
-        border-width: 2em;
+        border-width: 3em 2em 2em 2em;
         position: fixed;
         perspective: 60vmax;
     }
@@ -20,7 +23,7 @@ body[overlay='on'] {
         .ov-interact { display: none;}
     }
     &[interact='on'] {
-        .ov-interact { @extend .ov-solid}
+        .ov-interact { @extend .ov-solid; }
     }
 
     * { text-shadow: 0 1px 3px rgba(0, 0, 0, 0.27)}

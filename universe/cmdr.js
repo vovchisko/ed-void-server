@@ -264,6 +264,7 @@ class CMDR {
             ['run_id', 'run_id'],
             ['starpos', 'starpos'],
             ['metrics', 'metrics'],
+            ['void_run', 'void_run'],
         );
     }
 
