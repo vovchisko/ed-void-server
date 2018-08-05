@@ -28,7 +28,7 @@ class CFG_Browser {
 
     apply_ui_cfg() {
         document.body.style.fontSize = this.ui_font_size;
-        document.body.className = 'edfx-lv-' + this.ui_fx_level;
+        document.body.setAttribute('edfx-lv', this.ui_fx_level);
     }
 }
 
