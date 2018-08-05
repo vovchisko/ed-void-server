@@ -1,6 +1,6 @@
 <template>
     <div v-if="env.system">
-        <div class="row curr-sys-summ">
+        <div class="row curr-sys-summ keep">
             <div class="col-sm">
                 <h3>
                     <small>current system:</small>
