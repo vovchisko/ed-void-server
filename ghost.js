@@ -84,7 +84,7 @@ async function re_process() {
         cmdr.__reset();
 
         let total_r = await cmdr.journal().count({});
-        journal = await cmdr.journal().find().batchSize(10).sort({timestamp: 1});
+        journal = await cmdr.journal().find().batchSize(5).sort({timestamp: 1});
 
         console.log(`${++i}/${count}\t ${c.uid}\t CMDR: ${c.name}`);
         console.log(`records: ${total_r}`);
