@@ -170,20 +170,27 @@ class RUN {
             pilot.t = Date.now() - this.start_time;
             pilot.pid++;
 
+            this.re_arrange(); //<< maybe that's the problem
+        }
+
+        if (cmdr.dest.x === 0) {
             if (this._track.points[pilot.pid]) {
                 //next checkpoint
                 cmdr.dest_set(extend({r: 1000}, this._track.points[pilot.pid]), '/RUN:' + pilot.pid);
             } else {
                 pilot.status = RUNNER.FINISHED;
-                cmdr.void_run.total++;
-                cmdr.void_run.score += pilot.score;
+
+                if (this.pilots_count() > 1){
+                    if (pilot.pos === 1) cmdr.void_run.win++;
+                    cmdr.void_run.total++;
+                    cmdr.void_run.score += pilot.score;
+                }
+
                 cmdr.touch({});
                 cmdr.dest_clear();
             }
         }
-        this.re_arrange(); //<< maybe that's the problem
         this.broadcast(cmdr._id);
-
     }
 
     re_broadcast_for(cmdr) {

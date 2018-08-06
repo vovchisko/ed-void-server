@@ -26,14 +26,13 @@ async function init() {
     // UNI.on(EV_NET, (uid, uni_event, data) => { });
 
     UNI.init();
+
     await re_fill_tracks();
-    process.exit(0);
+
     await wipe_stellars();
     await re_index_void();
+
     await re_index_journals();
-
-
-
     await re_process();
 
     console.log('COMPLETE!');
@@ -42,7 +41,6 @@ async function init() {
 }
 
 async function wipe_stellars() {
-    await DB.db_void.collection('bodies').deleteMany({});
     await DB.db_void.collection('bodies').deleteMany({});
     await DB.db_void.collection('systems').deleteMany({});
     await DB.db_void.collection('stations').deleteMany({});
@@ -119,6 +117,7 @@ async function re_process() {
 
 async function  re_fill_tracks() {
     console.log(`\n>> RE_FILL TRACKS...`);
+    await DB.run_races.removeMany({});
     await DB.run_tracks.removeMany({});
     for (let i = 0; i < DATA.tracks.length; i++) {
         let r = await DB.run_tracks.save(DATA.tracks[i]);

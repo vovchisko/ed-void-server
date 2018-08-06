@@ -75,7 +75,7 @@
 
     Vue.filter('timing', function (num) {
         num = parseInt(num);
-        if (num && !isNaN(num) && typeof num === "number") {
+        if (!isNaN(num) && typeof num === "number") {
             let t = new Date(num);
             return [
                 ("00" + t.getUTCHours()).slice(-2), ' : ',
@@ -83,7 +83,7 @@
                 ("00" + t.getUTCSeconds()).slice(-2), '.',
                 ("000" + t.getUTCMilliseconds()).slice(-3)
             ].join('');
-        } else { return '-- : -- : --.---'}
+        } else { return '00 : 00 : 00.000'}
     });
 
     Vue.filter('yn', function (value) {
@@ -109,5 +109,4 @@
     @import 'styles/fonts';
     @import 'styles/base';
     @import 'styles/fx';
-    @import 'styles/overlay';
 </style>
