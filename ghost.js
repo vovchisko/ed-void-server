@@ -29,6 +29,8 @@ async function init() {
 
     await re_fill_tracks();
 
+    process.exit(0);
+
     await wipe_stellars();
     await re_index_void();
 
