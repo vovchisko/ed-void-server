@@ -27,7 +27,7 @@ const tracks = [
             {goal: DGOAL.SURFACE, lat: 24.0490, lon: 153.4257, min_alt: 1200, min_dist: 1.95, body_id: 'deciat@3924:-26:-1513/6 a', name: 'keep pushing!'},
         ]
     },
-     {
+    {
         _id: 'FARSEER_INC_SHOWCASE_2',
         name: 'Farseer inc. Showcase 2',
         desc: 'FARSEER INC. Grab your SRV and hit the road! It`s gonna be funny!',
@@ -98,7 +98,6 @@ const tracks = [
             {goal: DGOAL.SURFACE, lat: 25.4176, lon: 22.7175, min_alt: 2000, min_dist: 2.00, body_id: 'pomeche@1813:2627:99/2 c', name: 'on top of the world!'},
         ]
     },
-
     {
         _id: 'INOVIK_A2A_CIRCLE',
         name: 'Inovik A 2 A - Circle',
@@ -123,7 +122,47 @@ const tracks = [
             {goal: DGOAL.SURFACE, lat: -39.6940, lon: 71.4308, min_alt: 1000, min_dist: 2.00, body_id: 'inovik@1890:-485:-181/a 2 a', name: 'check 13'},
             {goal: DGOAL.SURFACE, lat: -39.7636, lon: 71.7251, min_alt: 1000, min_dist: 2.00, body_id: 'inovik@1890:-485:-181/a 2 a', name: 'check 14'},
         ]
-    }
+    },
+    {
+        _id: 'CCN_COLONIA_7AA',
+        name: 'Colonia Nebula Canyon Race',
+        desc: 'Track for Colona Sitizens by CCN',
+        sponsor: 'Colonia Citizens Network',
+        type: 'a-b run',
+        vehicle: 'ship',
+        points: [
+            {goal: DGOAL.SURFACE, lat: 43.6009, lon: -85.3007, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP0: Start'},
+            {goal: DGOAL.SURFACE, lat: 43.8863, lon: -85.0847, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP1'},
+            {goal: DGOAL.SURFACE, lat: 44.1154, lon: -84.8699, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP2'},
+            {goal: DGOAL.SURFACE, lat: 44.1148, lon: -83.6137, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP3'},
+            {goal: DGOAL.SURFACE, lat: 43.6514, lon: -82.9699, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP4'},
+            {goal: DGOAL.SURFACE, lat: 43.3464, lon: -82.7731, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP5'},
+            {goal: DGOAL.SURFACE, lat: 42.8335, lon: -82.5161, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP6'},
+            {goal: DGOAL.SURFACE, lat: 42.5359, lon: -80.8679, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP7: Mount Faceplant'},
+            {goal: DGOAL.SURFACE, lat: 42.7291, lon: -80.7014, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP8'},
+            {goal: DGOAL.SURFACE, lat: 42.7565, lon: -80.5020, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP9'},
+            {goal: DGOAL.SURFACE, lat: 42.5537, lon: -80.1258, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP10'},
+            {goal: DGOAL.SURFACE, lat: 42.2250, lon: -79.6939, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP11'},
+            {goal: DGOAL.SURFACE, lat: 42.2612, lon: -79.2985, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP12: Zeprow\'s Slalom'},
+            {goal: DGOAL.SURFACE, lat: 42.1257, lon: -79.0821, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP13'},
+            {goal: DGOAL.SURFACE, lat: 42.7144, lon: -78.7053, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP14'},
+            {goal: DGOAL.SURFACE, lat: 42.8536, lon: -78.1248, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP15'},
+            {goal: DGOAL.SURFACE, lat: 42.9006, lon: -77.3947, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP16'},
+            {goal: DGOAL.SURFACE, lat: 42.8943, lon: -77.0421, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP17'},
+            {goal: DGOAL.SURFACE, lat: 42.6107, lon: -76.7923, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP18'},
+            {goal: DGOAL.SURFACE, lat: 42.4637, lon: -77.3920, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP19'},
+            {goal: DGOAL.SURFACE, lat: 42.3006, lon: -77.7760, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP20'},
+            {goal: DGOAL.SURFACE, lat: 41.4680, lon: -77.2588, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP21'},
+            {goal: DGOAL.SURFACE, lat: 41.2691, lon: -76.3079, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP22'},
+            {goal: DGOAL.SURFACE, lat: 41.0543, lon: -76.0780, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP23'},
+            {goal: DGOAL.SURFACE, lat: 41.0325, lon: -75.6650, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP24'},
+            {goal: DGOAL.SURFACE, lat: 40.5731, lon: -74.8879, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP25'},
+            {goal: DGOAL.SURFACE, lat: 40.3385, lon: -74.6942, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP26'},
+            {goal: DGOAL.SURFACE, lat: 40.3199, lon: -74.6241, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP27'},
+            {goal: DGOAL.SURFACE, lat: 40.2550, lon: -74.5609, min_alt: 1500, min_dist: 2.00, body_id: 'colonia@-304976:-29129:633860/7 a a', name: 'WP28: Putin\'s Revenge'},
+        ]
+    },
+
 ];
 
 module.exports.tracks = tracks;
