@@ -172,6 +172,32 @@ const tracks = [
         ]
     },
     {
+        _id: 'Lacaille 8760 1 - Classic Canyon Run',
+        name: 'Lacaille 8760 1 - Classic Canyon Run',
+        desc: 'Always sunny on this Lacaille 8760 1. Friendly tiny rock with 0.1G perfect for fighters run.',
+        sponsor: 'FARSEER Inc., Void Development',
+        type: 'a-b run',
+        vehicle: 'fighter, ship',
+        points: [
+            {goal: DGOAL.SURFACE, lat: -8.0806, lon: -98.0943, min_alt: 500, min_dist: 1, body_id: 'lacaille 8760@-22:-291:291/1', name: 'start'},
+            {goal: DGOAL.SURFACE, lat: -8.6961, lon: -98.8120, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'mostly forward'},
+            {goal: DGOAL.SURFACE, lat: -9.2721, lon: -98.8810, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'stay low'},
+            {goal: DGOAL.SURFACE, lat: -9.9572, lon: -98.8115, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'picknick spot'},
+            {goal: DGOAL.SURFACE, lat: -10.1580, lon: -98.3682, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'another spot'},
+            {goal: DGOAL.SURFACE, lat: -10.7620, lon: -98.5610, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'sunny day'},
+            {goal: DGOAL.SURFACE, lat: -10.5632, lon: -100.0290, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'scratch that hill'},
+            {goal: DGOAL.SURFACE, lat: -10.1599, lon: -100.8191, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'canyon saves the day'},
+            {goal: DGOAL.SURFACE, lat: -10.3074, lon: -101.1475, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'next'},
+            {goal: DGOAL.SURFACE, lat: -10.2121, lon: -101.5456, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'careful there'},
+            {goal: DGOAL.SURFACE, lat: -9.7844, lon: -101.7153, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'deep place'},
+            {goal: DGOAL.SURFACE, lat: -9.3905, lon: -102.0854, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'drift!'},
+            {goal: DGOAL.SURFACE, lat: -9.6678, lon: -102.4415, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'lay down'},
+            {goal: DGOAL.SURFACE, lat: -9.5463, lon: -103.0499, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'keep pushing'},
+            {goal: DGOAL.SURFACE, lat: -9.0297, lon: -103.1370, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'warm place'},
+            {goal: DGOAL.SURFACE, lat: -8.4636, lon: -103.4259, min_alt: 500, min_dist: 1.5, body_id: 'lacaille 8760@-22:-291:291/1', name: 'to success!'},
+        ]
+    },
+    {
         _id: 'CCN_COLONIA_7AA',
         name: 'Colonia Nebula Canyon Race',
         desc: 'Track for Colona Sitizens by CCN',
