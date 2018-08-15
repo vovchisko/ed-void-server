@@ -21,9 +21,6 @@ module.exports = function (req, res) {
             let dat = server.parse_json(buffer.toString());
             if (!dat) return res.end();
             let head = req.headers;
-
-            console.log(head);
-
             let user = await UNI.get_user({api_key: head.api_key});
             if (user) {
 
