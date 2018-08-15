@@ -14,7 +14,7 @@ class MailService {
     }
 
     send_everify(email, secret) {
-        let link = `http://${this.cfg.domain}/app/#verify/${secret}`;
+        let link = `https://${this.cfg.domain}/app/#verify/${secret}`;
 
         this.transporter.sendMail({
             from: 'ED-VOID Account Service <ed.void.dev@gmail.com>',
@@ -37,7 +37,7 @@ class MailService {
     }
 
     send_passrst(email, secret) {
-        let link = `http://${this.cfg.domain}/app/#reset/${secret}`;
+        let link = `https://${this.cfg.domain}/app/#reset/${secret}`;
 
         this.transporter.sendMail({
             from: 'ED-VOID Account Service <ed.void.dev@gmail.com>',
