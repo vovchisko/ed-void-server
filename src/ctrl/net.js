@@ -22,7 +22,7 @@ class Network extends EventEmitter3 {
 
     init() {
         A.lock({text: 'connecting to ed-void server'});
-        this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
+        this.ws = new WebSocket('wss://' + window.location.hostname + ':4201');
         this.ws.onopen = () => {
             A.release();
             this.send('auth', CFG.api_key);
@@ -38,7 +38,7 @@ class Network extends EventEmitter3 {
             A.release();
             MODE.is_ready = NS_OFFLINE;
             this.emit('_close', e.code, e.reason);
-            if (e.reason) return console.log('ws:ouch!', e.reason);
+            if (e.reason) return console.log('wss:ouch!', e.reason);
             A.error({
                 text: 'void: network error',
                 desc: 'Server not available right now. Please try again later',
