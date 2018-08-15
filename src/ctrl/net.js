@@ -22,7 +22,7 @@ class Network extends EventEmitter3 {
 
     init() {
         A.lock({text: 'connecting to ed-void server'});
-        this.ws = new WebSocket('wss://' + window.location.hostname + ':4201');
+        this.ws = new WebSocket('wss://' + window.location.hostname + ':4243');
         this.ws.onopen = () => {
             A.release();
             this.send('auth', CFG.api_key);
