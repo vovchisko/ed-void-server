@@ -22,7 +22,18 @@ class Network extends EventEmitter3 {
 
     init() {
         A.lock({text: 'connecting to ed-void server'});
-        this.ws = new WebSocket('ws://' + window.location.hostname + ':4201');
+
+        let WS_URL = null;
+
+
+        if (location.protocol === 'https:') {
+            WS_URL = 'wss://' + window.location.hostname + ':4243';
+        } else {
+            WS_URL = 'ws://' + window.location.hostname + ':4201';
+        }
+
+
+        this.ws = new WebSocket(WS_URL);
         this.ws.onopen = () => {
             A.release();
             this.send('auth', CFG.api_key);
@@ -65,7 +76,7 @@ class Network extends EventEmitter3 {
 
     api(method, data, lock = null) {
         if (lock !== false) A.lock({text: VARS.API_PROCESSING_MSG[method] || 'please wait, processing'});
-        return fetch('http://' + window.location.hostname + /*(location.port ? ':' + 4200 : '') +*/ '/api/' + method, {
+        return fetch('//' + window.location.hostname + /*(location.port ? ':' + 4200 : '') +*/ '/api/' + method, {
             method: 'POST',
             body: JSON.stringify(data),
             headers: {api_key: CFG.api_key || 'none'}
