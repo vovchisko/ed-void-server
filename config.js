@@ -20,6 +20,6 @@ module.exports.email = {
     service: 'gmail',
     auth: {
         user: 'ed.void.dev@gmail.com',
-        pass: 'a68af114ca12d9ccf4cbec53d9affced'
+        pass: ''
     }
 };
